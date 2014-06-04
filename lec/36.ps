@@ -1,0 +1,962 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Mon Apr 21 23:34:20 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (36) def
+/fdir () def
+/ftail (36) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/21/14) def
+/modtimestr (23:33:18) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS61B: Lecture 36) s
+5 508 M
+(                          Wednesday, April 23, 2014) s
+5 492 M
+(Today's reading:  Goodrich & Tamassia, Section 10.3.) s
+5 476 M
+(SPLAY TREES) s
+5 468 M
+(===========) s
+5 460 M
+(A splay tree is a type of balanced binary search tree.  Structurally, it is) s
+5 452 M
+(identical to an ordinary binary search tree; the only difference is in the) s
+5 444 M
+(algorithms for finding, inserting, and deleting entries.) s
+5 428 M
+(All splay tree operations run in O\(log n\) time _on_average_, where n is the) s
+5 420 M
+(number of entries in the tree.  Any single operation can take Theta\(n\) time in) s
+5 412 M
+(the worst case.  But any sequence of k splay tree operations, with the tree) s
+5 404 M
+(initially empty and never exceeding n items, takes O\(k log n\) worst-case time.) s
+5 388 M
+(Although 2-3-4 trees make a stronger guarantee \(_every_ operation on a 2-3-4) s
+5 380 M
+(tree takes O\(log n\) time\), splay trees have several advantages.  Splay trees) s
+5 372 M
+(are simpler and easier to program.  Because of their simplicity, splay tree) s
+5 364 M
+(insertions and deletions are typically faster in practice \(sometimes by a) s
+5 356 M
+(constant factor, sometimes asymptotically\).  Find operations can be faster or) s
+5 348 M
+(slower, depending on circumstances.) s
+5 332 M
+(Splay trees are designed to give especially fast access to entries that have) s
+5 324 M
+(been accessed recently, so they really excel in applications where a small) s
+5 316 M
+(fraction of the entries are the targets of most of the find operations.) s
+5 300 M
+(Splay trees have become the most widely used basic data structure invented in) s
+5 292 M
+(the last 30 years, because they're the fastest type of balanced search tree for) s
+5 284 M
+(many applications.) s
+5 268 M
+(Tree Rotations) s
+5 260 M
+(--------------) s
+5 252 M
+(Like many types of balanced search         Y                             X     ) s
+5 244 M
+(trees, splay trees are kept balanced      / \\        rotate left        / \\    ) s
+5 236 M
+(with the help of structural changes      X   ^      <------------      ^   Y   ) s
+5 228 M
+(called _rotations_.  There are two      / \\ /C\\                       /A\\ / \\  ) s
+5 220 M
+(types--a left rotation and a right     ^  ^         ------------>         ^  ^ ) s
+5 212 M
+(rotation--and each is the other's     /A\\/B\\         rotate right        /B\\/C\\) s
+5 204 M
+(reverse.  Suppose that X and Y are) s
+5 196 M
+(binary tree nodes, and A, B, and C are subtrees.  A rotation transforms either) s
+5 188 M
+(of the configurations illustrated above to the other.  Observe that the binary) s
+5 180 M
+(search tree invariant is preserved:  keys in A are less than or equal to X;) s
+5 172 M
+(keys in C are greater than or equal to Y; and keys in B are >= X and <= Y.) s
+5 156 M
+(Rotations are also used in AVL trees and red-black trees, which are discussed) s
+5 148 M
+(by Goodrich and Tamassia, but are not covered in this course.) s
+5 132 M
+(Unlike 2-3-4 trees, splay trees are not kept perfectly balanced, but they tend) s
+5 124 M
+(to stay reasonably well-balanced most of the time, thereby averaging O\(log n\)) s
+5 116 M
+(time per operation in the worst case \(and sometimes achieving O\(1\) average) s
+5 108 M
+(running time in special cases\).) s
+5 92 M
+(Splay Tree Operations) s
+5 84 M
+(---------------------) s
+5 76 M
+([1]  Entry find\(Object k\);) s
+5 60 M
+(The find\(\) operation in a splay tree begins just like the find\(\) operation in) s
+5 52 M
+(an ordinary binary search tree:  we walk down the tree until we find the entry) s
+5 44 M
+(with key k, or reach a dead end \(a node from which the next logical step leads) s
+5 36 M
+(to a null pointer\).) s
+376 508 M
+(However, a splay tree isn't finished its job.  Let X be the node where the) s
+376 500 M
+(search ended, whether it contains the key k or not.  We _splay_ X up the tree) s
+376 492 M
+(through a sequence of rotations, so that X becomes the root of the tree.  Why?) s
+376 484 M
+(One reason is so that recently accessed entries are near the root of the tree,) s
+376 476 M
+(and if we access the same few entries repeatedly, accesses will be very fast.) s
+376 468 M
+(Another reason is because if X lies deeply down an unbalanced branch of the) s
+376 460 M
+(tree, the splay operation will improve the balance along that branch.) s
+376 444 M
+(When we splay a node to the root of the tree, there are three cases that) s
+376 436 M
+(determine the rotations we use.) s
+376 420 M
+(-1-  X is the right child of a left      G               G               X     ) s
+376 412 M
+(child \(or the left child of a right     / \\             / \\             / \\    ) s
+376 404 M
+(child\):  let P be the parent of X,     P   ^           X   ^           P   G   ) s
+376 396 M
+(and let G be the grandparent of X.    / \\ /D\\  ==>    / \\ /D\\  ==>    / \\ / \\  ) s
+376 388 M
+(We first rotate X and P left,        ^  X            P  ^            ^  ^ ^  ^ ) s
+376 380 M
+(and then rotate X and G right, as   /A\\/ \\          / \\/C\\          /A\\/BVC\\/D\\) s
+376 372 M
+(illustrated at right.                  ^  ^        ^  ^                        ) s
+376 364 M
+(                                      /B\\/C\\      /A\\/B\\     Zig-Zag) s
+376 356 M
+(The mirror image of this case--) s
+376 348 M
+(where X is a left child and P is a right child--uses the same rotations in) s
+376 340 M
+(mirror image:  rotate X and P right, then X and G left.  Both the case) s
+376 332 M
+(illustrated above and its mirror image are called the "zig-zag" case.) s
+376 316 M
+(-2-  X is the left child of a left     G               P               X       ) s
+376 308 M
+(child \(or the right child of a right  / \\             / \\             / \\      ) s
+376 300 M
+(child\):  the ORDER of the rotations  P   ^           X   G           ^   P     ) s
+376 292 M
+(is REVERSED from case 1.  We        / \\ /D\\  ==>    / \\ / \\    ==>  /A\\ / \\    ) s
+376 284 M
+(start with the grandparent,        X  ^            ^  ^ ^  ^            ^  G   ) s
+376 276 M
+(and rotate G and P right.         / \\/C\\          /A\\/BVC\\/D\\          /B\\/ \\  ) s
+376 268 M
+(Then, we rotate P and X right.   ^  ^                                     ^  ^ ) s
+376 260 M
+(                                /A\\/B\\                       Zig-Zig     /C\\/D\\) s
+376 252 M
+(The mirror image of this case--) s
+376 244 M
+(where X and P are both right children--uses the same rotations in mirror image:) s
+376 236 M
+(rotate G and P left, then P and X left.  Both the case illustrated above and) s
+376 228 M
+(its mirror image are called the "zig-zig" case.) s
+376 212 M
+(We repeatedly apply zig-zag and zig-zig rotations to X; each pair of rotations) s
+376 204 M
+(raises X two levels higher in the tree.  Eventually, either X will reach the) s
+376 196 M
+(root \(and we're done\), or X will become the child of) s
+376 188 M
+(the root.  One more case handles the latter                P             X     ) s
+376 180 M
+(circumstance.                                             / \\           / \\    ) s
+376 172 M
+(                                                         X   ^         ^   P   ) s
+376 164 M
+(-3-  X's parent P is the root:  we rotate X and P       / \\ /C\\  ==>  /A\\ / \\  ) s
+376 156 M
+(so that X becomes the root.  This is called the        ^  ^               ^  ^ ) s
+376 148 M
+("zig" case.                                           /A\\/B\\     Zig     /B\\/C\\) s
+376 132 M
+(Here's an example of "find\(7\)".  Note how the tree's balance improves.) s
+376 116 M
+(    11                     11                      11                  [7]     ) s
+376 108 M
+(   /  \\                   /  \\                    /  \\                 / \\     ) s
+376 100 M
+(  1    12                1    12                [7]   12              1   11   ) s
+376 92 M
+( / \\                    / \\                     / \\                  /\\   / \\  ) s
+376 84 M
+(0   9                  0   9                   1   9                0 5   9  12) s
+376 76 M
+(   / \\                    / \\                 / \\ / \\                / \\ / \\   ) s
+376 68 M
+(  3   10  =zig-zig=>    [7]  10  =zig-zag=>  0  5 8  10   =zig=>    3  6 8  10 ) s
+376 60 M
+( / \\                    / \\                    / \\                 / \\         ) s
+376 52 M
+(2   5                  5   8                  3   6               2   4        ) s
+376 44 M
+(   / \\                / \\                    / \\                 ) s
+376 36 M
+(  4  [7]             3   6                  2   4                ) s
+376 28 M
+(     / \\            / \\                                                      ) s
+376 20 M
+(    6   8          2   4                                                     ) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (36) def
+/fdir () def
+/ftail (36) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/21/14) def
+/modtimestr (23:33:18) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(By inspecting each of the three cases \(zig-zig, zig-zag, and zig\), you can) s
+5 500 M
+(observe a few interesting facts.  First, in none of these three cases does the) s
+5 492 M
+(depth of a subtree increase by more than) s
+5 484 M
+(two.  Second, every time X takes two                       9) s
+5 476 M
+(steps toward the root \(zig-zig or zig-zag\),               / \\) s
+5 468 M
+(every node in the subtree rooted at X moves              8   10) s
+5 460 M
+(at least one step closer to the root.                   /) s
+5 452 M
+(As more and more nodes enter X's subtree,              7) s
+5 444 M
+(more of them get pulled closer to the root.           /) s
+5 436 M
+(                                                     6           1) s
+5 428 M
+(A node that initially lies at depth d on            /           / \\) s
+5 420 M
+(the access path from the root to X moves           5           0   8) s
+5 412 M
+(to a final depth no greater than 3 + d/2.         /               / \\) s
+5 404 M
+(In other words, all the nodes deep               4               6   9) s
+5 396 M
+(down the search path have their                 /               / \\   \\) s
+5 388 M
+(depths roughly halved.  This tendency          3  ==========>  4   7   10) s
+5 380 M
+(of nodes on the access path to move           /     find\(1\)   / \\) s
+5 372 M
+(toward the root prevents a splay tree        2               2   5) s
+5 364 M
+(from staying unbalanced for long            /                 \\) s
+5 356 M
+(\(as the example at right illustrates\).     1                   3) s
+5 348 M
+(                                          /) s
+5 340 M
+([2]  Entry min\(\);                        0) s
+5 332 M
+(     Entry max\(\);) s
+5 316 M
+(These methods begin by finding the entry with minimum or maximum key, just like) s
+5 308 M
+(in an ordinary binary search tree.  Then, they splay the node containing the) s
+5 300 M
+(minimum or maximum key to the root.) s
+5 284 M
+([3]  Entry insert\(Object k, Object v\);) s
+5 268 M
+(insert\(\) begins by inserting the new entry \(k, v\), just like in an ordinary) s
+5 260 M
+(binary search tree.  Then, it splays the new node to the root.) s
+5 244 M
+([4]  Entry remove\(Object k\);) s
+5 228 M
+(An entry having key k is removed from the tree, just as with ordinary binary) s
+5 220 M
+(search trees.  Recall that the node containing k is removed if it has zero or) s
+5 212 M
+(one children.  If it has two children, the node with the next higher key is) s
+5 204 M
+(removed instead.  In either case, let X be the node removed from the tree.) s
+5 196 M
+(After X is removed, splay X's parent to the root.  Here's a sequence) s
+5 188 M
+(illustrating the operation remove\(2\).) s
+5 172 M
+(                      2             4               5) s
+5 164 M
+(                     / \\           / \\             / \\) s
+5 156 M
+(                    1   7         1   7           4   7) s
+5 148 M
+(                       / \\   ==>     / \\   ==>   /     \\) s
+5 140 M
+(                      5   8         5   8       1       8) s
+5 132 M
+(                     /) s
+5 124 M
+(                    4) s
+5 108 M
+(In this example, the key 4 moves up to replace the key 2 at the root.  After) s
+5 100 M
+(the node containing 4 is removed, its parent \(containing 5\) splays to the root.) s
+5 84 M
+(If the key k is not in the tree, splay the node where the search ended to the) s
+5 76 M
+(root, just like in a find\(\) operation.) s
+376 508 M
+(Postscript:  Babble about Splay Trees \(not examinable, but good for you\)) s
+376 500 M
+(-------------------------------------) s
+376 492 M
+(It may improve your understanding to watch the splay tree animation at) s
+376 484 M
+(http://www.ibr.cs.tu-bs.de/courses/ss98/audii/applets/BST/SplayTree-Example.html .) s
+376 468 M
+(Splay trees can be rigorously shown to run in O\(log n\) average time per) s
+376 460 M
+(operation, over any sequence of operations \(assuming we start from an empty) s
+376 452 M
+(tree\), where n is the largest size the tree grows to.  However, the proof is) s
+376 444 M
+(quite elaborate.  It relies on an interesting algorithm analysis technique) s
+376 436 M
+(called _amortized_analysis_, which uses a _potential_function_ to account for) s
+376 428 M
+(the time saved by operations that execute more quickly than expected.  This) s
+376 420 M
+("saved-up time" can later be spent on the rare operations that take longer than) s
+376 412 M
+(O\(log n\) time to execute.  By proving that the potential function is never) s
+376 404 M
+(negative \(that is, our "bank account" full of saved-up time never goes into the) s
+376 396 M
+(red\), we prove that the operations take O\(log n\) time on average.) s
+376 380 M
+(The proof is given in Goodrich & Tamassia Section 10.3.3 and in the brilliant) s
+376 372 M
+(original paper in the Journal of the Association for Computing Machinery,) s
+376 364 M
+(volume 32, number 3, pages 652-686, July 1985.  Unfortunately, there's not much) s
+376 356 M
+(intuition for why the proof works.  You crunch the equations and the result) s
+376 348 M
+(comes out.) s
+376 332 M
+(In 2000, Danny Sleator and Robert Tarjan won the ACM Kanellakis Theory and) s
+376 324 M
+(Practice Award for their papers on splay trees and amortized analysis.  Splay) s
+376 316 M
+(trees are used in Windows NT \(in the virtual memory, networking, and file) s
+376 308 M
+(system code\), the gcc compiler and GNU C++ library, the sed string editor, Fore) s
+376 300 M
+(Systems network routers, the most popular implementation of Unix malloc, Linux) s
+376 292 M
+(loadable kernel modules, and in much other software.                          .) s
+376 284 M
+(                                                                             .) s
+376 276 M
+(                                                                            .) s
+376 268 M
+(When do operations occur that take more than O\(log n\) time?                /) s
+376 260 M
+(Consider inserting a long sequence of numbers in order:  1, 2, 3,         4   ) s
+376 252 M
+(etc.  The splay tree will become a long chain of left children \(as       /    ) s
+376 244 M
+(illustrated at right\).  Now, find\(1\) will take Theta\(n\) time.           3     ) s
+376 236 M
+(However, each of the n insert\(\) operations before the find took O\(1\)   /      ) s
+376 228 M
+(time, so the average for this example is O\(1\) time per operation.     2       ) s
+376 220 M
+(                                                                     /) s
+376 212 M
+(                                                                    1) s
+376 196 M
+(The fastest implementations of splay trees don't use the bottom-up splaying) s
+376 188 M
+(strategy discussed here.  Splay trees, like 2-3-4 trees, come in bottom-up and) s
+376 180 M
+(top-down versions.  Instead of doing one pass down the tree and another pass) s
+376 172 M
+(up, top-down splay trees do just one pass down.  This saves a constant factor) s
+376 164 M
+(in the running time.) s
+376 148 M
+(There is an interesting conjecture about splay trees called the _dynamic_) s
+376 140 M
+(_optimality_conjecture_:  that splay trees are as asymptotically fast on _any_) s
+376 132 M
+(sequence of operations as _any_ other type of search tree with rotations.) s
+376 124 M
+(What does this mean?  Any sequence of splay tree operations takes amortized) s
+376 116 M
+(O\(log n\) time per operation, but sometimes there are sequences of operations) s
+376 108 M
+(that can be processed faster by a sufficiently smart data structure.  One) s
+376 100 M
+(example is accessing the same ten keys over and over again \(which a splay tree) s
+376 92 M
+(can do in amortized O\(1\) time per access\).  The dynamic optimality conjecture) s
+376 84 M
+(guesses that if _any_ search tree can exploit the structure of a sequence of) s
+376 76 M
+(accesses to achieve asymptotically faster running time, so can splay trees.) s
+376 60 M
+(The conjecture has never been proven, but it's not clear whether it's been) s
+376 52 M
+(disproven, either.) s
+376 36 M
+(One special case that has been proven is that if you perform the find operation) s
+376 28 M
+(on each key in a splay tree in order from the smallest key to the largest key,) s
+376 20 M
+(the total time for all n operations is O\(n\), and not O\(n log n\) as you might) s
+376 12 M
+(expect.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

@@ -1,0 +1,938 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Mar 19 02:41:55 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (24) def
+/fdir (.) def
+/ftail (24) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (03/19/14) def
+/modtimestr (02:41:50) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B:  Lecture 24) s
+5 508 M
+(                           Wednesday, March 19, 2014) s
+5 492 M
+(Today's reading:  Goodrich & Tamassia, Chapter 7.) s
+5 476 M
+(ROOTED TREES) s
+5 468 M
+(============) s
+5 460 M
+(A _tree_ consists of a set of nodes and a set of edges that connect pairs of) s
+5 452 M
+(nodes.  A tree has the property that there is exactly one path \(no more, no) s
+5 444 M
+(less\) between any two nodes of the tree.  A _path_ is a sequence of one or more) s
+5 436 M
+(nodes, each consecutive pair being connected by an edge.) s
+5 420 M
+(In a _rooted_ tree, one distinguished node is called the _root_.  Every node c,) s
+5 412 M
+(except the root, has exactly one _parent_ node p, which is the first node after) s
+5 404 M
+(c on the path from c to the root.  c is p's _child_.  The root has no parent.) s
+5 396 M
+(A node can have any number of children.) s
+5 380 M
+(Some other definitions:) s
+5 364 M
+(  - A _leaf_ is a node with no children.) s
+5 356 M
+(  - An _internal_node_ is a non-leaf node \(having one or more children\).) s
+5 348 M
+(  - _Siblings_ are nodes with the same parent.) s
+5 340 M
+(  - The _ancestors_ of a node d are the nodes on the path from d to the root.) s
+5 332 M
+(    These include d's parent, d's parent's parent, d's parent's parent's) s
+5 324 M
+(    parent, and so forth up to the root.  Technically, the ancestors of d also) s
+5 316 M
+(    include d itself, which makes you wonder about d's sex life.  The root is) s
+5 308 M
+(    an ancestor of every node in the tree.) s
+5 300 M
+(  - If a is an ancestor of d, then d is a _descendant_ of a.) s
+5 292 M
+(  - The _length_ of a path is the number of edges in the path.) s
+5 284 M
+(  - The _depth_ of a node n is the length of the path from n to the root.  \(The) s
+5 276 M
+(    depth of the root is zero.\)) s
+5 268 M
+(  - The _height_ of a node n is the length of the path from n to its deepest) s
+5 260 M
+(    descendant.  \(The height of a leaf node is zero.\)) s
+5 252 M
+(  - The height of a tree is the depth of its deepest node = height of the root.) s
+5 244 M
+(  - The _subtree_ rooted at node n is the tree formed by n and its descendants.) s
+5 236 M
+(  - A _binary_tree_ is a tree in which no node has more than two children, and) s
+5 228 M
+(    every child is either a _left_child_ or a _right_child_, even if it's the) s
+5 220 M
+(    only child its parent has.) s
+5 204 M
+(A commonly encountered application of trees is the directory structure of a) s
+5 196 M
+(file system.) s
+5 180 M
+(                       _______~jrs/61b_______               <-- Root node) s
+5 172 M
+(                      /      |        |      \\) s
+5 164 M
+(                     /       |        |       \\) s
+5 156 M
+(                   hw   index.html   lab      _lec__) s
+5 148 M
+(                  / \\                /\\      / /\\ \\ \\_) s
+5 140 M
+(                 /   \\     ^        /  \\    / /  \\ \\  \\) s
+5 132 M
+(               hw1  hw2    |     lab1 lab2 01 02 03 04 05   <-- Leaf nodes) s
+5 124 M
+(                       Leaf node) s
+376 508 M
+(Representing Rooted Trees) s
+376 500 M
+(-------------------------) s
+376 492 M
+(Goodrich and Tamassia present a data structure in which each node has three) s
+376 484 M
+(references:  one reference to an item, one reference to the node's parent, and) s
+376 476 M
+(one reference to the node's children, which can be stored in any reasonable) s
+376 468 M
+(data structure like a linked list.  Directories are typically stored this way,) s
+376 460 M
+(but the lists they use are represented very differently than our list ADTs.) s
+376 444 M
+(Another popular tree representation spurns separately encapsulated linked lists) s
+376 436 M
+(so that siblings are directly linked.  It retains the "item" and "parent") s
+376 428 M
+(references, but instead of referencing a list of children, each node references) s
+376 420 M
+(just its leftmost child.  Each node also references its next sibling to the) s
+376 412 M
+(right.  The "nextSibling" references are used to join the children of a node in) s
+376 404 M
+(a singly-linked list, whose head is the node's "firstChild".) s
+376 388 M
+(I'll call this tree a "SibTree", since siblings are central to the) s
+376 380 M
+(representation.  The nodes I call "SibTreeNodes".) s
+376 364 M
+(class SibTreeNode {                  |  class SibTree {    ) s
+376 356 M
+(  Object item;                       |    SibTreeNode root;) s
+376 348 M
+(  SibTreeNode parent;                |    int size;        ) s
+376 340 M
+(  SibTreeNode firstChild;            |  }                  ) s
+376 332 M
+(  SibTreeNode nextSibling;           |) s
+376 324 M
+(}                                    |) s
+376 308 M
+(===============================================================================) s
+376 300 M
+(+ ROOTED TREE | --------------------             ---------------------------- +) s
+376 292 M
+(=============== |---          ---- |             |          parent          | +) s
+376 284 M
+(+               ||.|root  size|14| |             ---------------------------- +) s
+376 276 M
+(+               |-+-          ---- |             |           item           | +) s
+376 268 M
+(+               --|-----------------             ---------------------------- +) s
+376 260 M
+(+                 v     SibTree object           | firstChild | nextSibling | +) s
+376 252 M
+(+               -----                            ---------------------------- +) s
+376 244 M
+(+               | * |                              structure of SibTreeNodes  +) s
+376 236 M
+(+               -----                                                         +) s
+376 228 M
+(+ Root node =>  |jrs|                                                         +) s
+376 220 M
+(+               -----<---------                                               +) s
+376 212 M
+(+               |.|*|          \\                                              +) s
+376 204 M
+(+               /----<----      \\                                             +) s
+376 196 M
+(+              /  ^^      \\      \\                                            +) s
+376 188 M
+(+             v  /  \\      \\      \\                                           +) s
+376 180 M
+(+            ---/-  -\\---  -\\---  -\\---                                       +) s
+376 172 M
+(+            | . |  | . |  | . |  | . |                                       +) s
+376 164 M
+(+            -----  -----  -----  -----                                       +) s
+376 156 M
+(+            |hw |  |ind|  |lab|  |lec|<------------------------              +) s
+376 148 M
+(+            -----  -----  -----  -----<------------------      \\             +) s
+376 140 M
+(+            |.|.+->|*|.+->|.|.+->|.|*|<------------      \\      \\            +) s
+376 132 M
+(+            /----  -----  /----  --\\--<------      \\      \\      \\           +) s
+376 124 M
+(+           /  ^^         /   ^^     \\ ^      \\      \\      \\      \\          +) s
+376 116 M
+(+          v  /  \\       v   /  \\     \\ \\      \\      \\      \\      \\         +) s
+376 108 M
+(+         ---/-  -\\---   ---/-  -\\---  >-\\---  -\\---  -\\---  -\\---  -\\---     +) s
+376 100 M
+(+         | . |  | . |   | . |  | . |   | . |  | . |  | . |  | . |  | . |     +) s
+376 92 M
+(+         -----  -----   -----  -----   -----  -----  -----  -----  -----     +) s
+376 84 M
+(+         |hw1|  |hw2|   |lb1|  |lb2|   |01 |  |02 |  |03 |  |04 |  |05 |     +) s
+376 76 M
+(+         -----  -----   -----  -----   -----  -----  -----  -----  -----     +) s
+376 68 M
+(+         |*|.+->|*|*|   |*|.+->|*|*|   |*|.+->|*|.+->|*|.+->|*|.+->|*|*|     +) s
+376 60 M
+(+         -----  -----   -----  -----   -----  -----  -----  -----  -----     +) s
+376 52 M
+(===============================================================================) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (24) def
+/fdir (.) def
+/ftail (24) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (03/19/14) def
+/modtimestr (02:41:50) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Tree Traversals) s
+5 500 M
+(---------------) s
+5 492 M
+(A _traversal_ is a manner of _visiting_ each node in a tree once.  What you do) s
+5 484 M
+(when visiting any particular node depends on the application; for instance,) s
+5 476 M
+(you might print a node's value, or perform some calculation upon it.  There) s
+5 468 M
+(are several different traversals, each of which orders the nodes differently.) s
+5 452 M
+(Many traversals can be defined recursively.  In a _preorder_ traversal, you) s
+5 444 M
+(visit each node before recursively visiting its children, which are visited) s
+5 436 M
+(from left to right.  The root is visited first.) s
+5 420 M
+(class SibTreeNode {) s
+5 412 M
+(  public void preorder\(\) {) s
+5 404 M
+(    this.visit\(\);) s
+5 396 M
+(    if \(firstChild != null\) {) s
+5 388 M
+(      firstChild.preorder\(\);) s
+5 380 M
+(    }) s
+5 372 M
+(    if \(nextSibling != null\) {) s
+5 364 M
+(      nextSibling.preorder\(\);) s
+5 356 M
+(    }) s
+5 348 M
+(  }) s
+5 340 M
+(}) s
+5 324 M
+(Suppose your method visit\(\) numbers the nodes in the order they're visited.) s
+5 316 M
+(A preorder traversal visits the nodes in this order.) s
+5 300 M
+(        1) s
+5 292 M
+(       / \\) s
+5 284 M
+(      /   \\) s
+5 276 M
+(     2     6) s
+5 268 M
+(    /|\\   / \\) s
+5 260 M
+(   3 4 5 7   8) s
+5 244 M
+(Each node is visited only once, so a preorder traversal takes O\(n\) time, where) s
+5 236 M
+(n is the number of nodes in the tree.  All the traversals we will consider take) s
+5 228 M
+(O\(n\) time.) s
+5 212 M
+(A preorder traversal is a natural way to print a directory's structure.) s
+5 204 M
+(Simply have the method visit\(\) print each node of the tree.) s
+5 188 M
+(~jrs/61b) s
+5 180 M
+(   hw) s
+5 172 M
+(      hw1) s
+5 164 M
+(      hw2) s
+5 156 M
+(   index.html) s
+5 148 M
+(   lab) s
+5 140 M
+(      lab1) s
+5 132 M
+(      lab2) s
+5 124 M
+(   lec) s
+5 116 M
+(      01) s
+5 108 M
+(      02) s
+5 100 M
+(      03) s
+5 92 M
+(      04) s
+5 84 M
+(      05) s
+376 508 M
+(In a _postorder_ traversal, you visit each node's children \(in left-to-right) s
+376 500 M
+(order\) before the node itself.) s
+376 484 M
+(  public void postorder\(\) {) s
+376 476 M
+(    if \(firstChild != null\) {) s
+376 468 M
+(      firstChild.postorder\(\);) s
+376 460 M
+(    }) s
+376 452 M
+(    this.visit\(\);) s
+376 444 M
+(    if \(nextSibling != null\) {) s
+376 436 M
+(      nextSibling.postorder\(\);) s
+376 428 M
+(    }) s
+376 420 M
+(  }) s
+376 404 M
+(A postorder traversal visits the nodes in this order.) s
+376 388 M
+(        8) s
+376 380 M
+(       / \\) s
+376 372 M
+(      /   \\) s
+376 364 M
+(     4     7) s
+376 356 M
+(    /|\\   / \\) s
+376 348 M
+(   1 2 3 5   6) s
+376 332 M
+(The postorder\(\) code is trickier than it looks.  The best way to understand it) s
+376 324 M
+(is to draw a depth-two tree on paper, then pretend you're the computer and) s
+376 316 M
+(execute the algorithm carefully.  Trust me on this.  It's worth your time.) s
+376 300 M
+(A postorder traversal is the natural way to sum the total disk space used in) s
+376 292 M
+(the root directory and its descendants.  The method visit\(\) sums "this" node's) s
+376 284 M
+(disk space with the disk space of all its children.  In the example above, a) s
+376 276 M
+(postorder traversal would first sum the sizes of the files in hw1/ and hw2/;) s
+376 268 M
+(then it would visit hw/ and sum its two children.  The last thing it would) s
+376 260 M
+(compute is the total disk space at the root ~jrs/61b/, which sums all the) s
+376 252 M
+(files in the tree.) s
+376 236 M
+(Binary trees allow for an _inorder_ traversal:  recursively traverse the root's) s
+376 228 M
+(left subtree \(rooted at the left child\), then the root itself, then the root's) s
+376 220 M
+(right subtree.  The preorder, inorder, and postorder traversals of an) s
+376 212 M
+(expression tree will print a _prefix_, _infix_, or _postfix_ expression,) s
+376 204 M
+(respectively.) s
+376 188 M
+(        +) s
+376 180 M
+(       / \\         Prefix:  + * 3 7 ^ 4 2) s
+376 172 M
+(      /   \\) s
+376 164 M
+(     *     ^        Infix:  3 * 7 + 4 ^ 2) s
+376 156 M
+(    / \\   / \\) s
+376 148 M
+(   3   7 4   2    Postfix:  3 7 * 4 2 ^ +) s
+376 132 M
+(In a _level-order_ traversal, you visit the root, then all the depth-1 nodes) s
+376 124 M
+(\(from left to right\), then all the depth-2 nodes, et cetera.  The level-order) s
+376 116 M
+(traversal of our expression tree is "+ * ^ 3 7 4 2" \(which doesn't mean much\).) s
+376 100 M
+(Unlike the three previous traversals, a level-order traversal is not) s
+376 92 M
+(straightforward to define recursively.  However, a level-order traversal can be) s
+376 84 M
+(done in O\(n\) time.  Use a queue, which initially contains only the root.  Then) s
+376 76 M
+(repeat the following steps:) s
+376 68 M
+(  - Dequeue a node.) s
+376 60 M
+(  - Visit it.) s
+376 52 M
+(  - Enqueue its children \(in order from left to right\).) s
+376 44 M
+(Continue until the queue is empty.) s
+376 28 M
+(A final thought:  if you use a stack instead of a queue, and push each node's) s
+376 20 M
+(children in reverse order--from right to left \(so they pop off the stack in) s
+376 12 M
+(order from left to right\)--you perform a preorder traversal.  Think about why.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

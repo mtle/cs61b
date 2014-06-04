@@ -1,0 +1,862 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed May 14 18:32:11 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (40) def
+/fdir (.) def
+/ftail (40) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (05/14/14) def
+/modtimestr (18:31:57) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS61B: Lecture 40) s
+5 508 M
+(                          Wednesday, April 30, 2014) s
+5 492 M
+(Generational Garbage Collection) s
+5 484 M
+(-------------------------------) s
+5 476 M
+(Studies of memory allocation have shown that most objects allocated by most) s
+5 468 M
+(programs have short lifetimes, while a few go on to survive through many) s
+5 460 M
+(garbage collections.  This observation has inspired generational garbage) s
+5 452 M
+(collectors, which separate old from new objects.) s
+5 436 M
+(A generational collector has two or more generations, which are like the) s
+5 428 M
+(separate spaces used by copying collectors, except that the generations can be) s
+5 420 M
+(of different sizes, and can change size during a program's lifetime.) s
+5 404 M
+(Sun's 1.3 JVM divides objects into an old generation and a young generation.) s
+5 396 M
+(Because old objects tend to last longer, the old generation doesn't need to be) s
+5 388 M
+(garbage collected nearly as often.  Hence, the old generation uses a compacting) s
+5 380 M
+(mark-and-sweep collector, because speed is not critical, but memory efficiency) s
+5 372 M
+(might be.  Because old objects are long-lived, and because mark and sweep only) s
+5 364 M
+(uses one memory space, the old generation tends to remain compact.) s
+5 348 M
+(The young generation is itself divided into three areas.  The largest area is) s
+5 340 M
+(called "Eden", and it is the space where all objects are born, and most die.) s
+5 332 M
+(Eden is large enough that most objects in it will become garbage long before it) s
+5 324 M
+(gets full.  When Eden fills up, it is garbage collected and the surviving) s
+5 316 M
+(objects are copied into one of two _survivor_spaces_.  The survivor spaces are) s
+5 308 M
+(just the two spaces of a copying garbage collector.) s
+5 292 M
+(If an unexpectedly large number of objects survive Eden, the survivor spaces) s
+5 284 M
+(can expand if necessary to make room for additional objects.) s
+5 268 M
+(Objects move back and forth between the two survivor spaces until they age) s
+5 260 M
+(enough to be _tenured_ - moved to the old generation.  Young objects benefit) s
+5 252 M
+(from the speed of the copying collector while they're still wild and prone to) s
+5 244 M
+(die young.) s
+5 228 M
+(Thus, the Sun JVM takes advantage of the best features of both the) s
+5 220 M
+(mark-and-sweep and copying garbage collection methods.) s
+5 204 M
+(There are two types of garbage collection:  minor collections, which happen) s
+5 196 M
+(frequently but only affect the young generation - thereby saving lots of time -) s
+5 188 M
+(and major collections, which happen much less often but cover all the objects) s
+5 180 M
+(in memory.) s
+5 164 M
+(This introduces a problem.  Suppose a young object is live only because an old) s
+5 156 M
+(object references it.  How does the minor collection find this out, if it) s
+5 148 M
+(doesn't search the old generation?) s
+5 132 M
+(References from old objects to young objects tend to be rare, because old) s
+5 124 M
+(objects are set in their ways and don't change much.  Since references from old) s
+5 116 M
+(objects to young are so rare, the JVM keeps a special table of them, which it) s
+5 108 M
+(updates whenever such a reference is created.  The table of references is added) s
+5 100 M
+(to the roots of the young generation's copying collector.) s
+376 508 M
+(   -------------------------------------------------------------------------) s
+376 500 M
+(   |                                                                       |) s
+376 492 M
+(   | old generation                                                        |) s
+376 484 M
+(   |                                                                       |) s
+376 476 M
+(   |                                                                       |) s
+376 468 M
+(   -------------------------------------------------------------------------) s
+376 460 M
+(   |                                                                       |) s
+376 452 M
+(   | young generation                                                      |) s
+376 444 M
+(   |                                                                       |) s
+376 436 M
+(   |  -------------------------------------------------------------------  |) s
+376 428 M
+(   |  | survivor space                                                  |  |) s
+376 420 M
+(   |  |                                                                 |  |) s
+376 412 M
+(   |  -------------------------------------------------------------------  |) s
+376 404 M
+(   |  | survivor space                                                  |  |) s
+376 396 M
+(   |  |                                                                 |  |) s
+376 388 M
+(   |  -------------------------------------------------------------------  |) s
+376 380 M
+(   |                                 _____                   ____          |) s
+376 372 M
+(   |      /----\\               /----/     \\/\\/\\         /---/    \\____     |) s
+376 364 M
+(   |    _/      \\     -\\      /                \\___--__/              \\    |) s
+376 356 M
+(   |   /         \\___/  \\__--/                                         |   |) s
+376 348 M
+(   |  |                                                               /    |) s
+376 340 M
+(   |  |                             Eden                              \\    |) s
+376 332 M
+(   |   \\                                                               |   |) s
+376 324 M
+(   |    \\                                    _                ^       /    |) s
+376 316 M
+(   |     -\\   /\\_    _/--\\     /\\     /\\    / \\--\\    /--\\   / \\__   /     |) s
+376 308 M
+(   |       --/   \\__/     \\___/  \\/\\_/  \\__/      \\/\\/    --/     \\_/      |) s
+376 300 M
+(   -------------------------------------------------------------------------) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (40) def
+/fdir (.) def
+/ftail (40) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (05/14/14) def
+/modtimestr (18:31:57) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(AUGMENTING DATA STRUCTURES) s
+5 500 M
+(==========================) s
+5 492 M
+(Once you know how to design one of the data structures taught in this class,) s
+5 484 M
+(it's sometimes easy to augment it to have "extra" abilities.) s
+5 468 M
+(You've already augmented data structures in Project 3.  For example, the set E) s
+5 460 M
+(of edges is stored as both a hash table and an adjacency list.  The hash table) s
+5 452 M
+(allows you to test set membership in O\(1\) time, unlike the adjacency list.  The) s
+5 444 M
+(adjacency list tells you the edges adjoining a vertex in O\(degree\) time, unlike) s
+5 436 M
+(the hash table.) s
+5 420 M
+(2-3-4 Trees with Fast Neighbors) s
+5 412 M
+(-------------------------------) s
+5 404 M
+(Suppose you have a 2-3-4 tree with no duplicate keys.  Given a key k, you want) s
+5 396 M
+(to be able to determine whether k is in the tree, and what the next smaller and) s
+5 388 M
+(larger keys are, in O\(1\) time.  You are allowed to change the insert\(\) and) s
+5 380 M
+(remove\(\) operations, but they still must take O\(log n\) time.  Can you do it?) s
+5 364 M
+(It's easy if you combine the 2-3-4 tree with a hash table.  The hash table maps) s
+5 356 M
+(each key to a record that stores the next smaller and next larger keys in the) s
+5 348 M
+(tree.) s
+5 332 M
+(                    ----------------      ---------------) s
+5 324 M
+(                    |              |      | ----- ----- |) s
+5 316 M
+(                    |  Hash table  |      | | 4 | | 9 | |) s
+5 308 M
+(              5 ----+\\/\\/\\/\\/\\/\\/\\/+----->| ----- ----- |) s
+5 300 M
+(                    ----------------      | prev   next |) s
+5 292 M
+(                                          ---------------) s
+5 276 M
+(The trick is that when you insert a key into the tree, you can determine by) s
+5 268 M
+(tree search in O\(log n\) time what the next smaller and larger keys are.  Then,) s
+5 260 M
+(you update all three keys' records in the hash table in O\(1\) time.) s
+5 244 M
+(When you remove a key from the tree, you can learn its two neighboring keys) s
+5 236 M
+(from the hash table, then update the neighbor records for those two keys so) s
+5 228 M
+(they list each other instead of the removed key.  You also remove the key's) s
+5 220 M
+(record from the hash table.  The hash table updates take O\(1\) time, and it) s
+5 212 M
+(takes O\(log n\) time to remove the key from the 2-3-4 tree itself.) s
+376 508 M
+(Splay Trees with Node Information) s
+376 500 M
+(---------------------------------) s
+376 492 M
+(Sometimes it's useful for a binary search tree to record extra information in) s
+376 484 M
+(each node, like the size and height of each subtree at each node.) s
+376 468 M
+(In splay trees, this is easy to maintain.  Splaying is just a sequence of tree) s
+376 460 M
+(rotations.  Each rotation changes the sizes of only two subtrees, and we can) s
+376 452 M
+(easily compute their new sizes after the rotation.  Let size\(Y\) be the number) s
+376 444 M
+(of nodes in the subtree rooted at node Y.  After a right rotation \(for) s
+376 436 M
+(instance\) you can recompute the information as follows:) s
+376 420 M
+(size\(Y\) = 1 + size\(B\) + size\(C\)                  Y                       X     ) s
+376 412 M
+(size\(X\) = 1 + size\(A\) + size\(Y\)                 / \\                     / \\    ) s
+376 404 M
+(                                               X   ^                   ^   Y   ) s
+376 396 M
+(height\(Y\) = 1 + max{height\(B\), height\(C\)}     / \\ /C\\                 /A\\ / \\  ) s
+376 388 M
+(height\(X\) = 1 + max{height\(A\), height\(Y\)}    ^  ^      ------------>      ^  ^ ) s
+376 380 M
+(\(Note:  to make this work, we must say      /A\\/B\\      rotate right     /B\\/C\\) s
+376 372 M
+(that the height of an empty tree is -1.\)) s
+376 356 M
+(Be forwarned that a rotation does not just change the heights of X and Y--it) s
+376 348 M
+(also can change the heights of all their ancestors.  But X gets splayed all the) s
+376 340 M
+(way to the root, so all the ancestors' heights get fixed on the way up.) s
+376 324 M
+(Likewise, inserting or removing an item changes the subtree sizes of all the) s
+376 316 M
+(ancestors of the affected item, and possibly their heights as well.  But a) s
+376 308 M
+(newly inserted item gets splayed to the top; and a removed node's parent is) s
+376 300 M
+(splayed to the top.  So again, all the sizes and heights will get fixed during) s
+376 292 M
+(the rotations.  Let's watch the size fields as we insert a new node X into a) s
+376 284 M
+(splay tree.  \(The following numbers are sizes, _not_ keys.\)) s
+376 268 M
+(Note that the very first rotation is at the grandparent of node X \(zig-zig\).) s
+376 252 M
+(    10              10              10                   10             [11]) s
+376 244 M
+(   /  \\            /  \\            /  \\                 /  \\            / \\) s
+376 236 M
+(  8    1          8    1          8    1              [9]   1          6   4) s
+376 228 M
+( / \\             / \\             / \\                  / \\             /\\   /\\) s
+376 220 M
+(1   6           1   6           1   6                6   2           1  4 2  1) s
+376 212 M
+(   / \\             / \\             / \\              / \\   \\            /   \\) s
+376 204 M
+(  4   1 =zig=>    5   1 =zig=>   [5]  1 =zig-zag=> 1  4    1 =zig=>   3     1) s
+376 196 M
+( / \\             / \\             /                   /               / \\) s
+376 188 M
+(1   2           3  [1]          4                   3               1   1) s
+376 180 M
+(   / \\         / \\             /                   / \\) s
+376 172 M
+(  1  [X]      1   1           3                   1   1) s
+376 164 M
+(                             / \\             ) s
+376 156 M
+(                            1   1            ) s
+376 140 M
+(How can we use this information?  We can answer the query "How       3  find\(4\)) s
+376 132 M
+(many keys are there between x and y?" in O\(log n\) amortized         / \\        ) s
+376 124 M
+(time if the splay tree has no duplicate keys and we label every    2   5       ) s
+376 116 M
+(subtree with its size.  Our strategy is to set c = n, then        /     \\      ) s
+376 108 M
+(deduct from c the number of keys outside the range [x, y].       1       8     ) s
+376 100 M
+(                                                                        / \\    ) s
+376 92 M
+(  find\(x\);  // After the splaying, the keys in the root's left         6   9) s
+376 84 M
+(  // subtree are all less than x, so subtract their number from c.) s
+376 76 M
+(  c = c - size\(root's left subtree\);                                 6  find\(7\)) s
+376 68 M
+(  if \(root key < x\)  // Only possible if x is not in the tree--     / \\) s
+376 60 M
+(    c--;             // otherwise x was splayed to the root.       3   8) s
+376 52 M
+(                                                                  / \\   \\) s
+376 44 M
+(  find\(y\);  // After the splaying, the keys in the root's        2   5   9) s
+376 36 M
+(            // right subtree all exceed y.                      /) s
+376 28 M
+(  c = c - size\(root's right subtree\);                          1) s
+376 20 M
+(  if \(root key > y\) c--;) s
+376 12 M
+(                                                             Keys in [4, 7] =) s
+376 4 M
+(Now, c is the number of keys in [x, y].                      7 - 2 - 1 - 2 = 2.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

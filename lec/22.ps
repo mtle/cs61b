@@ -1,0 +1,848 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Mar 12 03:37:12 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (22) def
+/fdir (.) def
+/ftail (22) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (03/12/14) def
+/modtimestr (03:37:00) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 22) s
+5 508 M
+(                           Wednesday, March 12, 2014) s
+5 492 M
+(Today's reading:  Goodrich & Tamassia, Chapter 5.) s
+5 476 M
+(DICTIONARIES \(continued\)) s
+5 468 M
+(============) s
+5 452 M
+(Hash Codes) s
+5 444 M
+(----------) s
+5 436 M
+(Since hash codes often need to be designed specially for each new object,) s
+5 428 M
+(you're left to your own wits.  Here is an example of a good hash code for) s
+5 420 M
+(Strings.) s
+5 404 M
+(  private static int hashCode\(String key\) {) s
+5 396 M
+(    int hashVal = 0;) s
+5 388 M
+(    for \(int i = 0; i < key.length\(\); i++\) {) s
+5 380 M
+(      hashVal = \(127 * hashVal + key.charAt\(i\)\) % 16908799;) s
+5 372 M
+(    }) s
+5 364 M
+(    return hashVal;) s
+5 356 M
+(  }) s
+5 340 M
+(By multiplying the hash code by 127 before adding in each new character, we) s
+5 332 M
+(make sure that each character has a different effect on the final result.  The) s
+5 324 M
+("%" operator with a prime number tends to "mix up the bits" of the hash code.) s
+5 316 M
+(The prime is chosen to be large, but not so large that 127 * hashVal +) s
+5 308 M
+(key.charAt\(i\) will ever exceed the maximum possible value of an int.) s
+5 292 M
+(The best way to understand good hash codes is to understand why bad hash codes) s
+5 284 M
+(are bad.  Here are some examples of bad hash codes on Words.) s
+5 268 M
+(  [1]  Sum up the ASCII values of the characters.  Unfortunately, the sum will) s
+5 260 M
+(       rarely exceed 500 or so, and most of the entries will be bunched up in) s
+5 252 M
+(       a few hundred buckets.  Moreover, anagrams like "pat," "tap," and "apt") s
+5 244 M
+(       will collide.) s
+5 236 M
+(  [2]  Use the first three letters of a word, in a table with 26^3 buckets.) s
+5 228 M
+(       Unfortunately, words beginning with "pre" are much more common than) s
+5 220 M
+(       words beginning with "xzq", and the former will be bunched up in one) s
+5 212 M
+(       long list.  This does not approach our uniformly distributed ideal.) s
+5 204 M
+(  [3]  Consider the "good" hashCode\(\) function written out above.  Suppose the) s
+5 196 M
+(       prime modulus is 127 instead of 16908799.  Then the return value is just) s
+5 188 M
+(       the last character of the word, because \(127 * hashVal\) % 127 = 0.) s
+5 180 M
+(       That's why 127 and 16908799 were chosen to have no common factors.) s
+5 164 M
+(Why is the hashCode\(\) function presented above good?  Because we can find no) s
+5 156 M
+(obvious flaws, and it seems to work well in practice.  \(A black art indeed.\)) s
+5 140 M
+(Resizing Hash Tables) s
+5 132 M
+(--------------------) s
+5 124 M
+(Sometimes we can't predict in advance how many entries we'll need to store.  If) s
+5 116 M
+(the load factor n/N \(entries per bucket\) gets too large, we are in danger of) s
+5 108 M
+(losing constant-time performance.) s
+5 92 M
+(One option is to enlarge the hash table when the load factor becomes too large) s
+5 84 M
+(\(typically larger than 0.75\).  Allocate a new array \(typically at least twice) s
+5 76 M
+(as long as the old\), then walk through all the entries in the old array and) s
+5 68 M
+(_rehash_ them into the new.) s
+5 52 M
+(Take note:  you CANNOT just copy the linked lists to the same buckets in the) s
+5 44 M
+(new array, because the compression functions of the two arrays will certainly) s
+5 36 M
+(be incompatible.  You have to rehash each entry individually.) s
+5 20 M
+(You can also shrink hash tables \(e.g., when n/N < 0.25\) to free memory, if you) s
+5 12 M
+(think the memory will benefit something else.  \(In practice, it's only) s
+5 4 M
+(sometimes worth the effort.\)) s
+376 508 M
+(Obviously, an operation that causes a hash table to resize itself takes) s
+376 500 M
+(more than O\(1\) time; nevertheless, the _average_ over the long run is still) s
+376 492 M
+(O\(1\) time per operation.) s
+376 476 M
+(Transposition Tables:  Using a Dictionary to Speed Game Trees) s
+376 468 M
+(-------------------------------------------------------------) s
+376 460 M
+(An inefficiency of unadorned game tree search is that some grids can be reached) s
+376 452 M
+(through many different sequences of moves, and so the same grid might be) s
+376 444 M
+(evaluated many times.  To reduce this expense, maintain a hash table that) s
+376 436 M
+(records previously encountered grids.  This dictionary is called a) s
+376 428 M
+(_transposition_table_.  Each time you compute a grid's score, insert into the) s
+376 420 M
+(dictionary an entry whose key is the grid and whose value is the grid's score.) s
+376 412 M
+(Each time the minimax algorithm considers a grid, it should first check whether) s
+376 404 M
+(the grid is in the transposition table; if so, its score is returned) s
+376 396 M
+(immediately.  Otherwise, its score is evaluated recursively and stored in the) s
+376 388 M
+(transposition table.) s
+376 372 M
+(Transposition tables will only help you with your project if you can search to) s
+376 364 M
+(a depth of at least three ply \(within the five second time limit\).  It takes) s
+376 356 M
+(three ply to reach the same grid two different ways.) s
+376 340 M
+(After each move is taken, the transposition table should be emptied, because) s
+376 332 M
+(you will want to search grids to a greater depth than you did during the) s
+376 324 M
+(previous move.) s
+376 308 M
+(STACKS) s
+376 300 M
+(======) s
+376 292 M
+(A _stack_ is a crippled list.  You may manipulate only the item at the top of) s
+376 284 M
+(the stack.  The main operations: you may "push" a new item onto the top of the) s
+376 276 M
+(stack; you may "pop" the top item off the stack; you may examine the "top" item) s
+376 268 M
+(of the stack.  A stack can grow arbitrarily large.) s
+376 252 M
+( | |          | |            | | -size\(\)-> 2 |d| -top\(\)-> d     | |) s
+376 244 M
+( |b| -pop\(\)-> | | -push\(c\)-> |c|             |c|                | | -top\(\)--) s
+376 236 M
+( |a|    |     |a|            |a| -push\(d\)--> |a| --pop\(\) x 3--> | |        |) s
+376 228 M
+( ---    v     ---            ---             ---                ---        v) s
+376 220 M
+(        b                                                                 null) s
+376 204 M
+(public interface Stack {) s
+376 196 M
+(  public int size\(\);) s
+376 188 M
+(  public boolean isEmpty\(\);) s
+376 180 M
+(  public void push\(Object item\);) s
+376 172 M
+(  public Object pop\(\);) s
+376 164 M
+(  public Object top\(\);) s
+376 156 M
+(}) s
+376 140 M
+(In any reasonable implementation, all these methods run in O\(1\) time.) s
+376 132 M
+(A stack is easily implemented as a singly-linked list, using just the front\(\),) s
+376 124 M
+(insertFront\(\), and removeFront\(\) methods.) s
+376 108 M
+(Why talk about Stacks when we already have Lists?  Mainly so you can carry on) s
+376 100 M
+(discussions with other computer programmers.  If somebody tells you that) s
+376 92 M
+(an algorithm uses a stack, the limitations of a stack give you a hint how) s
+376 84 M
+(the algorithm works.) s
+376 68 M
+(Sample application:  Verifying matched parentheses in a String like) s
+376 60 M
+("{[\(\){[]}]\(\)}".  Scan through the String, character by character.) s
+376 52 M
+(  o  When you encounter a lefty--'{', '[', or '\('--push it onto the stack.) s
+376 44 M
+(  o  When you encounter a righty, pop its counterpart from atop the stack, and) s
+376 36 M
+(     check that they match.) s
+376 28 M
+(If there's a mismatch or null returned, or if the stack is not empty when you) s
+376 20 M
+(reach the end of the string, the parentheses are not properly matched.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (22) def
+/fdir (.) def
+/ftail (22) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (03/12/14) def
+/modtimestr (03:37:00) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(QUEUES) s
+5 500 M
+(======) s
+5 492 M
+(A _queue_ is also a crippled list.  You may read or remove only the item at the) s
+5 484 M
+(front of the queue, and you may add an item only to the back of the queue.  The) s
+5 476 M
+(main operations:  you may "enqueue" an item at the back of the queue; you may) s
+5 468 M
+("dequeue" the item at the front; you may examine the "front" item.  Don't be) s
+5 460 M
+(fooled by the diagram; a queue can grow arbitrarily long.) s
+5 444 M
+( ===              ===               ===               === -front\(\)-> b) s
+5 436 M
+( ab. -dequeue\(\)-> b.. -enqueue\(c\)-> bc. -enqueue\(d\)-> bcd) s
+5 428 M
+( ===     |        ===               ===               === -dequeue\(\) x 3--> ===) s
+5 420 M
+(         v                                                                  ...) s
+5 412 M
+(         a                                                 null <-front\(\)-- ===) s
+5 396 M
+(Sample Application:  Printer queues.  When you submit a job to be printed at) s
+5 388 M
+(a selected printer, your job goes into a queue.  When the printer finishes) s
+5 380 M
+(printing a job, it dequeues the next job and prints it.) s
+5 364 M
+(public interface Queue {) s
+5 356 M
+(  public int size\(\);) s
+5 348 M
+(  public boolean isEmpty\(\);) s
+5 340 M
+(  public void enqueue\(Object item\);) s
+5 332 M
+(  public Object dequeue\(\);) s
+5 324 M
+(  public Object front\(\);) s
+5 316 M
+(}) s
+5 300 M
+(In any reasonable implementation, all these methods run in O\(1\) time.  A queue) s
+5 292 M
+(is easily implemented as a singly-linked list with a tail pointer.) s
+5 276 M
+(DEQUES) s
+5 268 M
+(======) s
+5 260 M
+(A _deque_ \(pronounced "deck"\) is a Double-Ended QUEue.  You can insert and) s
+5 252 M
+(remove items at both ends.  You can easily build a fast deque using a) s
+5 244 M
+(doubly-linked list.  You just have to add removeFront\(\) and removeBack\(\)) s
+5 236 M
+(methods, and deny applications direct access to listnodes.  Obviously, deques) s
+5 228 M
+(are less powerful than lists whose listnodes are accessible.) s
+376 508 M
+(Postscript:  A Faster Hash Code \(not examinable\)) s
+376 500 M
+(-------------------------------) s
+376 492 M
+(Here's another hash code for Strings, attributed to one P. J. Weinberger, which) s
+376 484 M
+(has been thoroughly tested and performs well in practice.  It is faster than) s
+376 476 M
+(the one above, because it relies on bit operations \(which are very fast\) rather) s
+376 468 M
+(than the % operator \(which is slow by comparison\).  You will learn about bit) s
+376 460 M
+(operations in CS 61C.  Please don't ask me to explain them to you.) s
+376 444 M
+(static int hashCode\(String key\) {) s
+376 436 M
+(  int code = 0;) s
+376 420 M
+(  for \(int i = 0; i < key.length\(\); i++\) {) s
+376 412 M
+(    code = \(code << 4\) + key.charAt\(i\);) s
+376 404 M
+(    code = \(code & 0x0fffffff\) ^ \(\(code & 0xf0000000\) >> 24\);) s
+376 396 M
+(  }) s
+376 380 M
+(  return code;) s
+376 372 M
+(}) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

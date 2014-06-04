@@ -1,0 +1,938 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Tue May  6 02:01:23 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (38) def
+/fdir (.) def
+/ftail (38) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (05/06/14) def
+/modtimestr (02:00:55) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS61B:  Lecture 38) s
+5 508 M
+(                            Monday, April 29, 2013) s
+5 492 M
+(RANDOMIZED ANALYSIS) s
+5 484 M
+(===================) s
+5 476 M
+(_Randomized_algorithms_ are algorithms that make decisions based on rolls of) s
+5 468 M
+(the dice.  The random numbers actually help to keep the running time low.) s
+5 460 M
+(Examples are quicksort, quickselect, and hash tables with random hash codes.) s
+5 444 M
+(Randomized analysis, like amortized analysis, is a mathematically rigorous way) s
+5 436 M
+(of saying, "The average running time of this operation is fast, even though the) s
+5 428 M
+(worst-case running time is slow."  Unlike amortized analysis, the "average" is) s
+5 420 M
+(taken over an infinite number of runs of the program.  A randomized algorithm) s
+5 412 M
+(will sometimes run more slowly than the average, but the probability that it) s
+5 404 M
+(will run _asymptotically_ slower is extremely low.) s
+5 388 M
+(Randomized analysis requires a little bit of probability theory.) s
+5 372 M
+(Expectation) s
+5 364 M
+(-----------) s
+5 356 M
+(Suppose a method x\(\) flips a coin.  If the coin comes up heads, x\(\) takes one) s
+5 348 M
+(second to execute.  If it comes up tails, x\(\) takes three seconds.) s
+5 332 M
+(Let X be the exact running time of one call to x\(\).  With probability 0.5,) s
+5 324 M
+(X is 1, and with probability 0.5, X is 3.  For obvious reasons, X is called a) s
+5 316 M
+(_random_variable_.) s
+5 300 M
+(The _expected_ value of X is the average value X assumes in an infinite) s
+5 292 M
+(sequence of coin flips,) s
+5 276 M
+(  E[X] = 0.5 * 1 + 0.5 * 3 = 2 seconds expected time.) s
+5 260 M
+(Suppose we run the code sequence) s
+5 244 M
+(  x\(\);     // takes time X) s
+5 236 M
+(  x\(\);     // takes time Y) s
+5 220 M
+(and let Y be the running time of the _second_ call.  The total running time is) s
+5 212 M
+(T = X + Y.  \(Y and T are also random variables.\)  What is the expected total) s
+5 204 M
+(running time E[T]?) s
+5 188 M
+(The main idea from probability we need is called _linearity_of_expectation_,) s
+5 180 M
+(which says that expected running times sum linearly.) s
+5 164 M
+(  E[X + Y] = E[X] + E[Y]) s
+5 156 M
+(           = 2 + 2) s
+5 148 M
+(           = 4 seconds expected time.) s
+5 132 M
+(The interesting thing is that linearity of expectation holds true whether or) s
+5 124 M
+(not X and Y are _independent_.  Independence means that the first coin flip has) s
+5 116 M
+(no effect on the outcome of the second.  If X and Y are independent, the code) s
+5 108 M
+(will take four seconds on average.  But what if they're not?  Suppose the) s
+5 100 M
+(second coin flip always matches the first--we always get two heads, or two) s
+5 92 M
+(tails.  Then the code still takes four seconds on average.  If the second coin) s
+5 84 M
+(flip is always the opposite of the first--we always get one head and one tail--) s
+5 76 M
+(the code still takes four seconds on average.) s
+5 60 M
+(So if we determine the expected running time of each individual operation, we) s
+5 52 M
+(can determine the expected running time of a whole program by adding up the) s
+5 44 M
+(expected costs of all the operations.) s
+376 508 M
+(Hash Tables) s
+376 500 M
+(-----------) s
+376 492 M
+(The implementations of hash tables we have studied don't use random numbers,) s
+376 484 M
+(but we can model the effects of collisions on running time by pretending we) s
+376 476 M
+(have a random hash code.) s
+376 460 M
+(A _random_hash_code_ maps each possible key to a number that's chosen randomly.) s
+376 452 M
+(This does _not_ mean we roll dice every time we hash a key.  A hash table can) s
+376 444 M
+(only work if a key maps to the same bucket every time.  Each key hashes to a) s
+376 436 M
+(randomly chosen bucket in the table, but a key's random hash code never) s
+376 428 M
+(changes.) s
+376 412 M
+(Unfortunately, it's hard to choose a hash code randomly from all possible hash) s
+376 404 M
+(codes, because you need to remember a random number for each key, and that) s
+376 396 M
+(would seem to require another hash table.  However, random hash codes are) s
+376 388 M
+(a good _model_ for how a good hash code will perform.  The model isn't perfect,) s
+376 380 M
+(and it doesn't apply to bad hash codes, but for a hash code that proves) s
+376 372 M
+(effective in experiments, it's a good rough guess.  Moreover, there is a sneaky) s
+376 364 M
+(number-theoretical trick called _universal_hashing_ that generates random hash) s
+376 356 M
+(codes.  These random hash codes are chosen from a relatively small set of) s
+376 348 M
+(possibilities, yet they perform just as well as if they were chosen from the) s
+376 340 M
+(set of all possible hash codes.  \(If you're interested, you can read about it) s
+376 332 M
+(in the textbook "Algorithms" by Cormen, Leiserson, Rivest, and Stein.\)) s
+376 316 M
+(Assume our hash table uses chaining and does not allow duplicate keys.) s
+376 308 M
+(If an entry is inserted whose key matches an existing entry, the old entry is) s
+376 300 M
+(replaced.) s
+376 284 M
+(Suppose we perform the operation find\(k\), and the key k hashes to a bucket b.) s
+376 276 M
+(Bucket b contains at most one entry with key k, so the cost of the search is) s
+376 268 M
+(one dollar, plus an additional dollar for every entry stored in bucket b whose) s
+376 260 M
+(key is not k.  \(Recall from last lecture that a _dollar_ is a unit of time) s
+376 252 M
+(chosen large enough to make this statement true.\)) s
+376 236 M
+(Suppose there are n keys in the table besides k.  Let V1, V2, ..., Vn be random) s
+376 228 M
+(variables such that for each key ki, the variable Vi = 1 if key ki hashes to) s
+376 220 M
+(bucket b, and Vi is zero otherwise.  Then the cost of find\(k\) is) s
+376 204 M
+(  T = 1 + V1 + V2 + ... + Vn.) s
+376 188 M
+(The expected cost of find\(k\) is \(by linearity of expectation\)) s
+376 172 M
+(  E[T] = 1 + E[V1] + E[V2] + ... + E[Vn].) s
+376 156 M
+(What is E[Vi]?  Since there are N buckets, and the hash code is random, each) s
+376 148 M
+(key has a 1/N probability of hashing to bucket b.  So E[Vi] = 1/N, and) s
+376 132 M
+(  E[T] = 1 + n/N,) s
+376 116 M
+(which is one plus the load factor!  If we keep the load factor n/N below some) s
+376 108 M
+(constant c as n grows, find operations cost expected O\(1\) time.) s
+376 92 M
+(The same analysis applies to insert and remove operations.  All three hash) s
+376 84 M
+(table operations take O\(1\) expected amortized time.  \(The word "amortized") s
+376 76 M
+(accounts for table resizing, as discussed last lecture.\)) s
+376 60 M
+(Observe that the running times of hash table operations are _not_ independent.) s
+376 52 M
+(If key k1 and key k2 both hash to the same bucket, it increases the running) s
+376 44 M
+(time of both find\(k1\) and find\(k2\).  Linearity of expectation is important) s
+376 36 M
+(because it implies that we can add the expected costs of individual operations,) s
+376 28 M
+(and obtain the expected total cost of all the operations an algorithm performs.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (38) def
+/fdir (.) def
+/ftail (38) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (05/06/14) def
+/modtimestr (02:00:55) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Quicksort) s
+5 500 M
+(---------) s
+5 492 M
+(Recall that mergesort sorts n items in O\(n log n\) time because the recursion) s
+5 484 M
+(tree has 1 + ceiling\(log_2 n\) levels, and each level involves O\(n\) time spent) s
+5 476 M
+(merging lists.  Quicksort also spends linear time at each level \(partitioning) s
+5 468 M
+(the lists\), but it is trickier to analyze because the recursion tree is not) s
+5 460 M
+(perfectly balanced, and some keys survive to deeper levels than others.) s
+5 444 M
+(To analyze quicksort, let's analyze the expected depth one input key k will) s
+5 436 M
+(reach in the tree.  \(In effect, we're measuring a vertical slice of the) s
+5 428 M
+(recursion tree instead of a horizontal slice.\)  Assume no two keys are equal,) s
+5 420 M
+(since that is the slowest case.) s
+5 404 M
+(Quicksort chooses a random pivot.  The pivot is equally likely to be the) s
+5 396 M
+(smallest key, the second smallest, the third smallest, ..., or the largest.) s
+5 388 M
+(For each case, the probability is 1/n.  Since we want a roughly balanced) s
+5 380 M
+(partition, let's say that the least floor\(n/4\) keys and the greatest floor\(n/4\)) s
+5 372 M
+(keys are "bad" pivots, and the other keys are "good" pivots.  Since there are) s
+5 364 M
+(at most n/2 bad pivots, the probability of choosing a bad pivot is <= 0.5.) s
+5 348 M
+(If we choose a good pivot, we'll have a 1/4-3/4 split or better, and our chosen) s
+5 340 M
+(key k will go into a subset containing at most three quarters of the keys,) s
+5 332 M
+(which is sorted recursively.  If we choose a bad pivot, k might go into a) s
+5 324 M
+(subset with nearly all the other keys.) s
+5 308 M
+(Let D\(n\) be a random variable equal to the deepest depth at which key k appears) s
+5 300 M
+(when we sort n keys.  D\(n\) varies from run to run, but we can reason about its) s
+5 292 M
+(expected value.  Since we choose a bad key no more than half the time,) s
+5 276 M
+(  E[D\(n\)] <= 1 + 0.5 E[D\(n\)] + 0.5 E[D\(3n / 4\)].) s
+5 260 M
+(Multiplying by two and subtracting E[D\(n\)] from both sides gives) s
+5 244 M
+(  E[D\(n\)] <= 2 + E[D\(3n / 4\)].) s
+5 228 M
+(This inequality is called a _recurrence_, and you'll learn how to solve them in) s
+5 220 M
+(CS 170.  \(No, recurrences won't be on the CS 61B final exam.\)  The base cases) s
+5 212 M
+(for this recurrence are D\(0\) = 0 and D\(1\) = 0.  It's easy to check by) s
+5 204 M
+(substitution that a solution is) s
+5 188 M
+(  E[D\(n\)] <= 2 log    n.) s
+5 180 M
+(                  4/3) s
+5 164 M
+(So any arbitrary key k appears in expected O\(log n\) levels of the recursion) s
+5 156 M
+(tree, and causes O\(log n\) partitioning work.  By linearity of expectation, we) s
+5 148 M
+(can sum the expected O\(log n\) work for each of the n keys, and we find that) s
+5 140 M
+(quicksort runs in expected O\(n log n\) time.) s
+5 124 M
+(Quickselect) s
+5 116 M
+(-----------) s
+5 108 M
+(For quickselect, we can analyze the expected running time more directly.) s
+5 100 M
+(Suppose we run quickselect on n keys.  Let P\(n\) be a random variable equal to) s
+5 92 M
+(the total number of keys partitioned, summed over all the partitioning steps.) s
+5 84 M
+(Then the running time is in Theta\(P\(n\)\).) s
+5 68 M
+(Quickselect is like quicksort, but when we choose a good pivot, at least one) s
+5 60 M
+(quarter of the keys are discarded.  We choose a good pivot at least half the) s
+5 52 M
+(time, so) s
+5 36 M
+(  E[P\(n\)] <= n + 0.5 E[P\(n\)] + 0.5 E[P\(3n / 4\)],) s
+5 20 M
+(which is solved by E[P\(n\)] <= 8n.  Therefore, the expected running time of) s
+5 12 M
+(quickselect on n keys is in O\(n\).) s
+376 516 M
+(Amortized Time vs. Expected Time) s
+376 508 M
+(--------------------------------) s
+376 500 M
+(There's a subtle but important difference between amortized running time and) s
+376 492 M
+(expected running time.) s
+376 476 M
+(Quicksort with random pivots takes O\(n log n\) expected running time, but its) s
+376 468 M
+(worst-case running time is in Theta\(n^2\).  This means that there is a small) s
+376 460 M
+(possibility that quicksort will cost Omega\(n^2\) dollars, but the probability) s
+376 452 M
+(of that happening approaches zero as n approaches infinity.) s
+376 436 M
+(A splay tree operation takes O\(log n\) amortized time, but the worst-case) s
+376 428 M
+(running time for a splay tree operation is in Theta\(n\).  Splay trees are not) s
+376 420 M
+(randomized, and the "probability" of an Omega\(n\)-time splay tree operation is) s
+376 412 M
+(not a meaningful concept.  If you take an empty splay tree, insert the items) s
+376 404 M
+(1...n in order, then run find\(1\), the find operation _will_ cost n dollars.) s
+376 396 M
+(But a sequence of n splay tree operations, starting from an empty tree, _never_) s
+376 388 M
+(costs more than O\(n log n\) actual running time.  Ever.) s
+376 372 M
+(Hash tables are an interesting case, because they use both amortization and) s
+376 364 M
+(randomization.  Resizing takes Theta\(n\) time.  With a random hash code, there) s
+376 356 M
+(is a tiny probability that every item will hash to the same bucket, so the) s
+376 348 M
+(worst-case running time of an operation is Theta\(n\)--even without resizing.) s
+376 332 M
+(To account for resizing, we use amortized analysis.  To account for collisions,) s
+376 324 M
+(we use randomized analysis.  So when we say that hash table operations run in) s
+376 316 M
+(O\(1\) time, we mean they run in O\(1\) _expected_, _amortized_ time.) s
+376 300 M
+(  Splay trees                  O\(log n\) amortized time / operation *) s
+376 292 M
+(  Disjoint sets \(tree-based\)   O\(alpha\(f + u, u\)\) amortized time / find op **) s
+376 284 M
+(  Quicksort                    O\(n log n\) expected time ***) s
+376 276 M
+(  Quickselect                  Theta\(n\) expected time ****) s
+376 268 M
+(  Hash tables                  Theta\(1\) expected amortized time / op *****) s
+376 252 M
+(If you take CS 170, you will learn an amortized analysis of disjoint sets) s
+376 244 M
+(there.  Unfortunately, the analyses of both disjoint sets and splay trees are) s
+376 236 M
+(complicated.  Goodrich & Tamassia give the amortized analysis of splay trees,) s
+376 228 M
+(but you're not required to read or understand it for this class.) s
+376 212 M
+(*      Worst-case time is in Theta\(n\), worst-case amortized time is in) s
+376 204 M
+(       Theta\(log n\), best-case time is in Theta\(1\).) s
+376 196 M
+(**     For find operations, worst-case time is in Theta\(log u\), worst-case) s
+376 188 M
+(       amortized time is in Theta\(alpha\(f + u, u\)\), best-case time is in) s
+376 180 M
+(       Theta\(1\).  All union operations take Theta\(1\) time.) s
+376 172 M
+(***    Worst-case time is in Theta\(n^2\)--if we get worst-case input AND) s
+376 164 M
+(       worst-case random numbers.  "Worst-case expected" time is in) s
+376 156 M
+(       Theta\(n log n\)--meaning when the _input_ is worst-case, but we take the) s
+376 148 M
+(       average over all possible sequences of random numbers.  Recall that) s
+376 140 M
+(       quicksort can be implemented so that keys equal to the pivot go into a) s
+376 132 M
+(       separate list, in which case the best-case time is in Theta\(n\), because) s
+376 124 M
+(       the best-case input is one where all the keys are equal.  If quicksort) s
+376 116 M
+(       is implemented so that keys equal to the pivot are divided between lists) s
+376 108 M
+(       I1 and I2, as is the norm for array-based quicksort, then the best-case) s
+376 100 M
+(       time is in Theta\(n log n\).) s
+376 92 M
+(****   Worst-case time is in Theta\(n^2\)--if we get worst-case input AND worst-) s
+376 84 M
+(       case random numbers.  Worst-case expected time, best-case time, and) s
+376 76 M
+(       best-case expected time are in Theta\(n\).) s
+376 68 M
+(*****  Worst-case time is in Theta\(n\), expected worst-case time is in Theta\(n\)) s
+376 60 M
+(       \(worst case is when table is resized\), amortized worst-case time is in) s
+376 52 M
+(       Theta\(n\) \(worst case is when every item is in one bucket\), worst-case) s
+376 44 M
+(       expected amortized time is in Theta\(1\), best-case time is in Theta\(1\).) s
+376 36 M
+(       Confused yet?) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

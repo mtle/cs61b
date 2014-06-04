@@ -1,0 +1,898 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Wed Feb 26 17:33:32 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (16) def
+/fdir () def
+/ftail (16) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (02/26/14) def
+/modtimestr (17:33:29) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 16) s
+5 508 M
+(                         Wednesday, February 26, 2014) s
+5 492 M
+(Today's reading:  Sierra & Bates, pp. 189, 283.) s
+5 476 M
+(EXCEPTIONS \(continued\)) s
+5 468 M
+(==========) s
+5 452 M
+(The "finally" keyword) s
+5 444 M
+(---------------------) s
+5 436 M
+(A finally clause can also be added to a "try.") s
+5 420 M
+(  FileInputStream f = new FileInputStream\("filename"\);) s
+5 412 M
+(  try {) s
+5 404 M
+(    statementX;) s
+5 396 M
+(    return 1;) s
+5 388 M
+(  } catch \(IOException e\) {) s
+5 380 M
+(    e.printStackTrace\(\);) s
+5 372 M
+(    return 2;) s
+5 364 M
+(  } finally {) s
+5 356 M
+(    f.close\(\);) s
+5 348 M
+(  }) s
+5 332 M
+(If the "try" statement begins to execute, the "finally" clause will be executed) s
+5 324 M
+(at the end, no matter what happens.  "finally" clauses are used to do things) s
+5 316 M
+(that need to be done in both normal and exceptional circumstances.) s
+5 308 M
+(In this example, it is used to close a file.) s
+5 292 M
+(If statementX causes no exception, then the "finally" clause is executed, and) s
+5 284 M
+(1 is returned.) s
+5 268 M
+(If statementX causes a IOException, the exception is caught, the "catch") s
+5 260 M
+(clause is executed, and then the "finally" clause is executed.  After the) s
+5 252 M
+("finally" clause is done, 2 is returned.) s
+5 236 M
+(If statementX causes some other class of exception, the "finally" clause is) s
+5 228 M
+(executed immediately, then the exception continues to propagate down the stack.) s
+5 212 M
+(In the example above, we've invoked the method "printStackTrace" on the) s
+5 204 M
+(exception we caught.  When an exception is constructed, it takes a snapshot of) s
+5 196 M
+(the stack, which can be printed later.) s
+5 180 M
+(It is possible for an exception to occur in a "catch" or "finally" clause.  An) s
+5 172 M
+(exception thrown in a "catch" clause will terminate the "catch" clause, but the) s
+5 164 M
+("finally" clause will still get executed before the exception goes on.  An) s
+5 156 M
+(exception thrown in a "finally" clause replaces the old exception, and) s
+5 148 M
+(terminates the "finally" clause and the method immediately.) s
+5 132 M
+(However...you can nest a "try" clause inside a "catch" or "finally" clause,) s
+5 124 M
+(thereby catching those exceptions as well.) s
+5 108 M
+(Exception constructors) s
+5 100 M
+(----------------------) s
+5 92 M
+(By convention, most Throwables \(including Exceptions\) have two constructors.) s
+5 84 M
+(One takes no parameters, and one takes an error message in the form of a) s
+5 76 M
+(String.) s
+5 60 M
+(  class MyException extends Exception {) s
+5 52 M
+(    public MyException\(\) { super\(\); }) s
+5 44 M
+(    public MyException\(String s\) { super\(s\); }) s
+5 36 M
+(  }) s
+5 20 M
+(The error message will be printed if it propagates out of main\(\), and it can be) s
+5 12 M
+(read by the Throwable.getMessage\(\) method.  The constructors usually call the) s
+5 4 M
+(superclass constructors, which are defined in Throwable.) s
+376 508 M
+(GENERICS) s
+376 500 M
+(========) s
+376 492 M
+(Suppose you're using a list of Objects to store Strings.  When you fetch a) s
+376 484 M
+(String from the list, you have to cast it back to type "String" before you can) s
+376 476 M
+(call the methods exclusive to Strings.  If somehow an object that's not a) s
+376 468 M
+(String got into your list, the cast will throw an exception.  It would be nice) s
+376 460 M
+(to have the compiler enforce the restriction that nothing but Strings can ever) s
+376 452 M
+(get into your list in the first place, so you can sleep at night knowing that) s
+376 444 M
+(your family is safe from a ClassCastException.) s
+376 428 M
+(So Java offers _generics_, which allow you to declare general classes that) s
+376 420 M
+(produce specialized objects.  For example, you can create an SList for Strings) s
+376 412 M
+(only, and another SList for Integers only, even though you only wrote one) s
+376 404 M
+(SList class.  To specify the class, SList takes a _type_parameter_.) s
+376 388 M
+(class SListNode<T> {                         // T is the formal parameter.) s
+376 380 M
+(  T item;) s
+376 372 M
+(  SListNode<T> next;) s
+376 356 M
+(  SListNode\(T i, SListNode<T> n\) {) s
+376 348 M
+(    item = i;) s
+376 340 M
+(    next = n;) s
+376 332 M
+(  }) s
+376 324 M
+(}) s
+376 308 M
+(public class SList<T> {) s
+376 300 M
+(  SListNode<T> head;) s
+376 284 M
+(  public void insertFront\(T item\) {) s
+376 276 M
+(    head = new SListNode<T>\(item, head\);) s
+376 268 M
+(  }) s
+376 260 M
+(}) s
+376 244 M
+(You can now create and use an SList of Strings as follows.) s
+376 228 M
+(  SList<String> l = new SList<String>\(\);     // String is the actual parameter.) s
+376 220 M
+(  l.insertFront\("Hello"\);) s
+376 204 M
+(Likewise, you can create an SList of Integers by using "SList<Integer>" in the) s
+376 196 M
+(declaration and constructor.) s
+376 180 M
+(What are the advantages of generics?  First, the compiler will ensure at) s
+376 172 M
+(compile-time that nothing but Strings can ever enter your SList<String>.) s
+376 164 M
+(Second, you don't have to cast the Objects coming out of your SList back to) s
+376 156 M
+(Strings, so there is no chance of an unexpected ClassCastException at run time.) s
+376 148 M
+(If some bug in your program is trying to put Integer objects into your SList,) s
+376 140 M
+(it's much easier to diagnose the compiler refusing to put an Integer into an) s
+376 132 M
+(SList<String> than it is to diagnose a ClassCastException occurring when you) s
+376 124 M
+(remove an Integer from a regular SList and try to cast it to String.) s
+376 108 M
+(Generics are a complicated subject.  Consider this to be a taste of them;) s
+376 100 M
+(hardly a thorough treatment.  A good tutorial is available at) s
+376 92 M
+(https://www.seas.upenn.edu/~cis1xx/resources/generics-tutorial.pdf .) s
+376 76 M
+(Although Java generics are superficially similar to C++ templates, there's a) s
+376 68 M
+(crucial difference between them.  In the example above, Java compiles bytecode) s
+376 60 M
+(for only a single SList class.  This SList bytecode can be used by all) s
+376 52 M
+(different object types.  It is the compiler, not the bytecode itself, that) s
+376 44 M
+(enforces the fact that a particular SList object can only store objects of a) s
+376 36 M
+(particular class.  Conversely, C++ recompiles the SList methods for every type) s
+376 28 M
+(that you instantiate SLists on.  The C++ disadvantage is that one class might) s
+376 20 M
+(turn into a lot of machine code.  The C++ advantages are that you can use) s
+376 12 M
+(primitive types, and you get code optimized for each type.  Java generics don't) s
+376 4 M
+(work with primitive types.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (16) def
+/fdir () def
+/ftail (16) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (02/26/14) def
+/modtimestr (17:33:29) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(FIELD SHADOWING) s
+5 500 M
+(===============) s
+5 492 M
+(Just as methods can be overridden in subclasses, fields can be "shadowed" in) s
+5 484 M
+(subclasses.  However, shadowing works quite differently from overriding.) s
+5 476 M
+(Whereas the choice of methods is dictated by the _dyanamic_type_ of an object,) s
+5 468 M
+(the choice of fields is dictated by the _static_type_ of a variable or object.) s
+5 452 M
+(  class Super {) s
+5 444 M
+(    int x = 2;) s
+5 436 M
+(    int f\(\) {) s
+5 428 M
+(      return 2;) s
+5 420 M
+(    }) s
+5 412 M
+(  }) s
+5 396 M
+(  class Sub extends Super {) s
+5 388 M
+(    int x = 4;                // shadows Super.x) s
+5 380 M
+(    int f\(\) {                 // overrides Super.f\(\)) s
+5 372 M
+(      return 4;) s
+5 364 M
+(    }) s
+5 356 M
+(  }) s
+5 340 M
+(Any object of class Sub now has _two_ fields called x, each of which store a) s
+5 332 M
+(different integer.  How do we know which field is accessed when we refer to x?) s
+5 324 M
+(It depends on the static type of the expression whose x field is accessed.) s
+5 308 M
+(  Sub sub = new Sub\(\);) s
+5 300 M
+(  Super supe = sub;       // supe and sub reference the same object.) s
+5 292 M
+(  int i;) s
+5 276 M
+(                               ----------------) s
+5 268 M
+(                        ---    | ---      --- |    ---) s
+5 260 M
+(                        |.+--->| |4|      |2| |<---+.|) s
+5 252 M
+(                        ---    | ---      --- |    ---) s
+5 244 M
+(                        sub    |Sub.x Super.x |    supe) s
+5 236 M
+(                               ----------------) s
+5 220 M
+(  i = supe.x;             // 2) s
+5 212 M
+(  i = sub.x;              // 4) s
+5 204 M
+(  i = \(\(Super\) sub\).x;    // 2) s
+5 196 M
+(  i = \(\(Sub\) supe\).x;     // 4) s
+5 180 M
+(The last four statements all use the same object, but yield different results.) s
+5 172 M
+(Recall that method overriding does not work the same way.  Since both variables) s
+5 164 M
+(reference a Sub, the method Sub.f always overrides Super.f.) s
+5 148 M
+(  i = supe.f\(\);           // 4) s
+5 140 M
+(  i = sub.f\(\);            // 4) s
+5 132 M
+(  i = \(\(Super\) sub\).f\(\);  // 4) s
+5 124 M
+(  i = \(\(Sub\) supe\).f\(\);   // 4) s
+376 508 M
+(What if the variable whose shadowed field you want to access is "this"?) s
+376 500 M
+(You can cast "this" too, but a simpler alternative is to replace "this" with) s
+376 492 M
+("super".) s
+376 476 M
+(  class Sub extends Super {) s
+376 468 M
+(    int x = 4;                // shadows Super.x) s
+376 460 M
+(    void g\(\) {) s
+376 452 M
+(      int i;) s
+376 436 M
+(      i = this.x;           // 4) s
+376 428 M
+(      i = \(\(Super\) this\).x  // 2) s
+376 420 M
+(      i = super.x;          // 2) s
+376 412 M
+(    }) s
+376 404 M
+(  }) s
+376 388 M
+(Whereas method overriding is a powerful benefit of object orientation, field) s
+376 380 M
+(shadowing is largely a nuisance.  Whenever possible, avoid having fields in) s
+376 372 M
+(subclasses whose names are the same as fields in their superclasses.) s
+376 356 M
+(Static methods can be shadowed too; they follow the same shadowing rules as) s
+376 348 M
+(fields.  This might seem confusing:  why do ordinary, non-static methods use) s
+376 340 M
+(one system \(overriding\) while static methods use an entirely different system) s
+376 332 M
+(\(shadowing\)?  The reason is because overriding requires dynamic method lookup.) s
+376 324 M
+(Dynamic method lookup looks up the dynamic type of an object.  A static method) s
+376 316 M
+(is not called on an object, so there's nothing whose dynamic type we can look) s
+376 308 M
+(up.  Therefore, static methods _can't_ use dynamic method lookup or overriding.) s
+376 300 M
+(So they use shadowing instead.) s
+376 284 M
+(Static method shadowing, like field shadowing, is largely a nuisance.) s
+376 268 M
+("final" METHODS AND CLASSES) s
+376 260 M
+(===========================) s
+376 252 M
+(A method can be declared "final" to prevent subclasses from overriding it.  Any) s
+376 244 M
+(attempt to override it will cause a compile-time error.) s
+376 228 M
+(A class can be declared "final" to prevent it from being extended.  Any attempt) s
+376 220 M
+(to declare a subclass will cause a compile-time error.) s
+376 204 M
+(The only reason to declare a method or class "final" is to improve the speed of) s
+376 196 M
+(a program.  The compiler can speed up method calls that cannot be overridden.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

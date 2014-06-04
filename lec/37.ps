@@ -1,0 +1,880 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Apr 23 01:15:47 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (37) def
+/fdir (.) def
+/ftail (37) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/23/14) def
+/modtimestr (01:15:40) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS61B: Lecture 37) s
+5 508 M
+(                          Wednesday, April 23, 2014) s
+5 492 M
+(AMORTIZED ANALYSIS) s
+5 484 M
+(==================) s
+5 476 M
+(We've seen several data structures for which I claimed that the average time) s
+5 468 M
+(for certain operations is always better than the worst-case time:  hash tables,) s
+5 460 M
+(tree-based disjoint sets, and splay trees.) s
+5 444 M
+(The mathematics that proves these claims is called _amortized_analysis_.) s
+5 436 M
+(Amortized analysis is a way of proving that even if an operation is) s
+5 428 M
+(occasionally expensive, its cost is made up for by earlier, cheaper operations.) s
+5 412 M
+(The Averaging Method) s
+5 404 M
+(--------------------) s
+5 396 M
+(Most hash table operations take O\(1\) time, but sometimes an operation forces) s
+5 388 M
+(a hash table to resize itself, at great expense.  What is the average time to) s
+5 380 M
+(insert an item into a hash table with resizing?  Assume that the chains never) s
+5 372 M
+(grow longer than O\(1\), so any operation that doesn't resize the table takes) s
+5 364 M
+(O\(1\) time--more precisely, suppose it takes at most one second.) s
+5 348 M
+(Let n be the number of items in the hash table, and N the number of buckets.) s
+5 340 M
+(Suppose it takes one second for the insert operation to insert the new item,) s
+5 332 M
+(increment n, and then check if n = N.  If so, it doubles the size of the table) s
+5 324 M
+(from N to 2N, taking 2N additional seconds.  This resizing scheme ensures that) s
+5 316 M
+(the load factor n/N is always less than one.) s
+5 300 M
+(Suppose every newly constructed hash table is empty and has just one bucket--) s
+5 292 M
+(that is, initially n = 0 and N = 1.  After i insert operations, n = i.  The) s
+5 284 M
+(number of buckets N must be a power of two, and we never allow it to be less) s
+5 276 M
+(than or equal to n; so N is the smallest power of two > n, which is <= 2n.) s
+5 260 M
+(The total time in seconds for _all_ the table resizing operations is) s
+5 244 M
+(    2 + 4 + 8 + ... + N/4 + N/2 + N = 2N - 2.) s
+5 228 M
+(So the cost of i insert operations is at most i + 2N - 2 seconds.  Because) s
+5 220 M
+(N <= 2n = 2i, the i insert operations take <= 5i - 2 seconds.  Therefore, the) s
+5 212 M
+(_average_ running time of an insertion operation is \(5i - 2\)/i = 5 - 2/i) s
+5 204 M
+(seconds, which is in O\(1\) time.) s
+5 188 M
+(We say that the _amortized_running_time_ of insertion is in O\(1\), even though) s
+5 180 M
+(the worst-case running time is in Theta\(n\).) s
+5 164 M
+(For almost any application, the amortized running time is more important than) s
+5 156 M
+(the worst-case running time, because the amortized running time determines the) s
+5 148 M
+(total running time of the application.  The main exceptions are some) s
+5 140 M
+(applications that require fast interaction \(like video games\), for which one) s
+5 132 M
+(really slow operation might cause a noticeable glitch in response time.) s
+376 508 M
+(The Accounting Method) s
+376 500 M
+(---------------------) s
+376 492 M
+(Consider hash tables that resize in both directions:  not only do they expand) s
+376 484 M
+(as the number of items increases, but they also shrink as the number of items) s
+376 476 M
+(decreases.  You can't analyze them with the averaging method, because you don't) s
+376 468 M
+(know what sequence of insert and remove operations an application might) s
+376 460 M
+(perform.) s
+376 444 M
+(Let's try a more sophisticated method.  In the _accounting_method_, we "charge") s
+376 436 M
+(each operation a certain amount of time.  Usually we overcharge.  When we) s
+376 428 M
+(charge more time than the operation actually takes, we can save the excess time) s
+376 420 M
+(in a bank to spend on later operations.) s
+376 404 M
+(Before we start, let's stop using seconds as our unit of running time.  We) s
+376 396 M
+(don't actually know how many seconds any computation takes, because it varies) s
+376 388 M
+(from computer to computer.  However, everything a computer does can be broken) s
+376 380 M
+(down into a sequence of constant-time computations.  Let a _dollar_ be a unit) s
+376 372 M
+(of time that's long enough to execute the slowest constant-time computation) s
+376 364 M
+(that comes up in the algorithm we're analyzing.  A dollar is a real unit of) s
+376 356 M
+(time, but it's different for different computers.) s
+376 340 M
+(Each hash table operation has) s
+376 332 M
+(- an _amortized_cost_, which is the number of dollars that we "charge" to do) s
+376 324 M
+(  that operation, and) s
+376 316 M
+(- an _actual_cost_, which is the actual number of constant-time computations) s
+376 308 M
+(  the operation performs.) s
+376 292 M
+(The amortized cost is usually a fixed function of n \(e.g. $5 for insertion into) s
+376 284 M
+(a hash table, or $2 log n for insertion into a splay tree\), but the actual cost) s
+376 276 M
+(may vary wildly from operation to operation.  For example, insertion into a) s
+376 268 M
+(hash table takes a long, long time when the table is resized.) s
+376 252 M
+(When an operation's amortized cost exceeds its actual cost, the extra dollars) s
+376 244 M
+(are saved in the bank to be spent on later operations.  When an operation's) s
+376 236 M
+(actual cost exceeds its amortized cost, dollars are withdrawn from the bank to) s
+376 228 M
+(pay for an unusually expensive operation.) s
+376 212 M
+(If the bank balance goes into surplus, it means that the actual total running) s
+376 204 M
+(time is even faster than the total amortized costs imply.) s
+376 188 M
+(THE BANK BALANCE MUST NEVER FALL BELOW ZERO.  If it does, you are spending more) s
+376 180 M
+(total dollars than your budget claims, and you have failed to prove anything) s
+376 172 M
+(about the amortized running time of the algorithm.) s
+376 156 M
+(Think of amortized costs as an allowance.  If your dad gives you $500 a month) s
+376 148 M
+(allowance, and you only spend $100 of it each month, you can save up the) s
+376 140 M
+(difference and eventually buy a car.  The car may cost $30,000, but if you) s
+376 132 M
+(saved that money and don't go into debt, your _average_ spending obviously) s
+376 124 M
+(wasn't more than $500 a month.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (37) def
+/fdir (.) def
+/ftail (37) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/23/14) def
+/modtimestr (01:15:40) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Accounting of Hash Tables) s
+5 500 M
+(-------------------------) s
+5 492 M
+(Suppose every operation \(insert, find, remove\) takes one dollar of actual) s
+5 484 M
+(running time unless the hash table is resized.  We resize the table in two) s
+5 476 M
+(circumstances.) s
+5 468 M
+(- An insert operation doubles the table size if n = N AFTER the new item is) s
+5 460 M
+(  inserted and n is incremented, taking 2N additional dollars of time for) s
+5 452 M
+(  resizing to 2N buckets.  Thus, the load factor is always less than one.) s
+5 444 M
+(- The remove operation halves the table size if n = N/4 AFTER the item is) s
+5 436 M
+(  deleted and n is decremented, taking N additional dollars of time for) s
+5 428 M
+(  resizing to N/2 buckets.  Thus, the load factor is always greater than 0.25) s
+5 420 M
+(  \(except when n = 0, i.e. the table is empty\).) s
+5 404 M
+(Either way, a hash table that has _just_ been resized has n = N/2.) s
+5 396 M
+(A newly constructed hash table has n = 0 items and N = 1 buckets.) s
+5 380 M
+(By trial and error, I came up with the following amortized costs.) s
+5 364 M
+(    insert:  5 dollars) s
+5 356 M
+(    remove:  5 dollars) s
+5 348 M
+(    find:    1 dollar) s
+5 332 M
+(Is this accounting valid, or will we go broke?) s
+5 316 M
+(The crucial insight is that at any time, we can look at a hash table and know a) s
+5 308 M
+(lower bound for how many dollars are in the bank from the values of n and N.) s
+5 300 M
+(We know that the last time the hash table was resized, the number of items n) s
+5 292 M
+(was exactly N/2.  So if n != N/2, there have been subsequent insert/remove) s
+5 284 M
+(operations, and these have put money in the bank.) s
+5 268 M
+(We charge an amortized $5 for an insert or remove operation.  Every insert or) s
+5 260 M
+(remove operation costs one actual dollar \(not counting resizing\) and puts the) s
+5 252 M
+(remaining $4 in the bank to pay for resizing.  For every step n takes away from) s
+5 244 M
+(N/2, we accumulate another $4.  So there must be at least 4|n - N/2| dollars) s
+5 236 M
+(saved \(or 4n dollars for a never-resized one-bucket hash table\).) s
+5 220 M
+(IMPORTANT:  Note that 4|n - N/2| is a function of the data structure, and does) s
+5 212 M
+(NOT depend on the history of hash table operations performed.  In general, the) s
+5 204 M
+(accounting method only works if you can tell how much money is in the bank \(or,) s
+5 196 M
+(more commonly, a minimum bound on that bank balance\) just by looking at the) s
+5 188 M
+(current state of the data structure--without knowing how the data structure) s
+5 180 M
+(reached that state.) s
+5 164 M
+(An insert operation only resizes the table if the number of items n reaches N.) s
+5 156 M
+(According to the formula 4|n - N/2|, there are at least 2N dollars in the bank.) s
+5 148 M
+(Resizing the hash table from N to 2N buckets costs 2N dollars, so we can afford) s
+5 140 M
+(it.  After we resize, the bank balance might be zero again, but it isn't) s
+5 132 M
+(negative.) s
+5 116 M
+(A remove operation only resizes the table if the number of items n drops to) s
+5 108 M
+(N/4.  According to the formula 4|n - N/2|, there are at least N dollars in the) s
+5 100 M
+(bank.  Resizing the hash table from N to N/2 buckets costs N dollars, so we can) s
+5 92 M
+(afford it.) s
+5 76 M
+(The bank balance never drops below zero, so my amortized costs above are valid.) s
+5 68 M
+(Therefore, the amortized cost of all three operations is in O\(1\).) s
+5 52 M
+(Observe that if we alternate between inserting and deleting the same item over) s
+5 44 M
+(and over, the hash table is never resized, so we save up a lot of money in the) s
+5 36 M
+(bank.  This isn't a problem; it just means the algorithm is faster \(spends) s
+5 28 M
+(fewer dollars\) than my amortized costs indicate.) s
+376 508 M
+(Why Does Amortized Analysis Work?) s
+376 500 M
+(---------------------------------) s
+376 492 M
+(Why does this metaphor about putting money in the bank tell us anything about) s
+376 484 M
+(the actual running time of an algorithm?) s
+376 468 M
+(Suppose our accountant keeps a ledger with two columns:  the total amortized) s
+376 460 M
+(cost of all operations so far, and the total actual cost of all operations so) s
+376 452 M
+(far.  Our bank balance is the sum of all the amortized costs in the left) s
+376 444 M
+(column, minus the sum of all the actual costs in the right column.  If the bank) s
+376 436 M
+(balance never drops below zero, the total actual cost is less than or equal to) s
+376 428 M
+(the total amortized cost.) s
+376 412 M
+(          Total amortized cost  |  Total actual cost) s
+376 404 M
+(          ------------------------------------------) s
+376 396 M
+(                   $5           |          $1) s
+376 388 M
+(                   $1           |          $1) s
+376 380 M
+(                   $5           |          $3) s
+376 372 M
+(                    .           |           .) s
+376 364 M
+(                    .           |           .) s
+376 356 M
+(                    .           |           .) s
+376 348 M
+(                   $5           |          $1) s
+376 340 M
+(                   $5           |      $2,049) s
+376 332 M
+(                   $1           |          $1) s
+376 324 M
+(          ------------------------------------------) s
+376 316 M
+(              $12,327           >=    $10,333) s
+376 300 M
+(Therefore, the total running time of all the actual operations is never longer) s
+376 292 M
+(than the total amortized cost of all the operations.) s
+376 276 M
+(Amortized analysis \(as presented here\) only tells us an upper bound \(big-Oh\) on) s
+376 268 M
+(the actual running time, and not a lower bound \(big-Omega\).  It might happen) s
+376 260 M
+(that we accumulate a big bank balance and never spend it, and the total actual) s
+376 252 M
+(running time might be much less than the amortized cost.  For example, splay) s
+376 244 M
+(tree operations take amortized O\(log n\) time, where n is the number of items in) s
+376 236 M
+(the tree, but if your only operation is to find the same item n times in a row,) s
+376 228 M
+(the actual average running time is in O\(1\).) s
+376 212 M
+(If you want to see the amortized analysis of splay trees, Goodrich and Tamassia) s
+376 204 M
+(have it.  If you take CS 170, you'll see an amortized analysis of disjoint) s
+376 196 M
+(sets.  I am saddened to report that both analyses are too complicated to) s
+376 188 M
+(provide much intuition about their running times.  \(Especially the inverse) s
+376 180 M
+(Ackermann function, which is ridiculously nonintuitive, though cool) s
+376 172 M
+(nonetheless.\)) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

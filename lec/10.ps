@@ -1,0 +1,928 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Wed Feb 12 04:29:29 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (10) def
+/fdir () def
+/ftail (10) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (02/12/14) def
+/modtimestr (04:29:14) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 10) s
+5 508 M
+(                         Wednesday, February 12, 2014) s
+5 492 M
+(Today's reading:  All of Chapter 7, plus pp. 28-33, 250-257.) s
+5 476 M
+(INHERITANCE) s
+5 468 M
+(===========) s
+5 460 M
+(In Lab 3, you modified several methods in the SList class so that a "tail") s
+5 452 M
+(reference could keep track of the end of the list, thereby speeding up the) s
+5 444 M
+(insertEnd\(\) method.) s
+5 428 M
+(We could have accomplished the same result without modifying SList--by creating) s
+5 420 M
+(a new class that inherits all the properties of SList, and then changing only) s
+5 412 M
+(the methods that need to change.  Let's create a new class called TailList that) s
+5 404 M
+(inherits the fields and methods of the original SList class.) s
+5 388 M
+(  public class TailList extends SList {) s
+5 380 M
+(    // The "head" and "size" fields are inherited from SList.) s
+5 372 M
+(    private SListNode tail;) s
+5 356 M
+(This code declares a TailList class that behaves just like the SList class, but) s
+5 348 M
+(has an additional field "tail" not present in the SList class.  TailList is) s
+5 340 M
+(said to be a _subclass_ of SList, and SList is the _superclass_ of TailList.) s
+5 332 M
+(A TailList has three fields:  head, size, and tail.) s
+5 316 M
+(A subclass can modify or augment a superclass in at least three ways:) s
+5 308 M
+(\(1\)  It can declare new fields.) s
+5 300 M
+(\(2\)  It can declare new methods.) s
+5 292 M
+(\(3\)  It can override old methods with new implementations.) s
+5 276 M
+(We've already seen an example of the first.  Let's try out the third.  The) s
+5 268 M
+(advantage of TailList is that it can perform the insertEnd\(\) method much more) s
+5 260 M
+(quickly than a tail-less SList can.  So, let's write a new insertEnd\(\) for) s
+5 252 M
+(TailList, which will _override_ SList's old, slow insertEnd\(\) method.) s
+5 236 M
+(    public void insertEnd\(Object obj\) {) s
+5 228 M
+(      // Your solution to Lab 3 goes here.) s
+5 220 M
+(    }) s
+5 204 M
+(The isEmpty\(\), length\(\), nth\(\), and toString\(\) methods of SList do not need any) s
+5 196 M
+(changes on account of the tail reference.  These methods are inherited from) s
+5 188 M
+(SList, and there's no need to rewrite them.) s
+5 172 M
+(Inheritance and Constructors) s
+5 164 M
+(----------------------------) s
+5 156 M
+(What happens when we construct a TailList?  Java executes a TailList) s
+5 148 M
+(constructor, as you would expect, but _first_ it executes the code in the) s
+5 140 M
+(SList\(\) constructor.  The TailList constructor should initialize fields unique) s
+5 132 M
+(to TailList.  It can also modify the work done by SList\(\) if appropriate.) s
+5 116 M
+(    public TailList\(\) {) s
+5 108 M
+(      // SList\(\) constructor called automatically; sets size = 0, head = null) s
+5 100 M
+(      tail = null;) s
+5 92 M
+(    }) s
+376 508 M
+(The zero-parameter SList\(\) constructor is always called by default, regardless) s
+376 500 M
+(of the parameters passed to the TailList constructor.  To change this default) s
+376 492 M
+(behavior, the TailList constructor can explicitly call any constructor for its) s
+376 484 M
+(superclass by using the "super" keyword.) s
+376 468 M
+(    public TailList\(int x\) {) s
+376 460 M
+(      super\(x\);) s
+376 452 M
+(      tail = null;) s
+376 444 M
+(    }) s
+376 428 M
+(The call to "super\(\)" must be the first statement in the constructor.  If a) s
+376 420 M
+(constructor has no explicit call to "super", and its \(nearest\) superclass has) s
+376 412 M
+(no zero-parameter constructor, a compile-time error occurs.  There is no way to) s
+376 404 M
+(tell Java not to call a superclass constructor.  You have only the power to) s
+376 396 M
+(choose which of the superclass constructors is called.) s
+376 380 M
+(Invoking Overridden Methods) s
+376 372 M
+(---------------------------) s
+376 364 M
+(Sometimes you want to override a method, yet still be able to call the method) s
+376 356 M
+(implemented in the superclass.  The following example shows how to do this.) s
+376 348 M
+(Below, we want to reuse the code in SList.insertFront, but we also need to) s
+376 340 M
+(adjust the tail reference.) s
+376 324 M
+(    public void insertFront\(Object obj\) {) s
+376 316 M
+(      super.insertFront\(obj\);             // Insert at the front of the list.) s
+376 308 M
+(      if \(size == 1\) {                    // If necessary,) s
+376 300 M
+(        tail = head;                      //   adjust the tail reference.) s
+376 292 M
+(      }) s
+376 284 M
+(    }) s
+376 276 M
+(  }) s
+376 260 M
+(Unlike superclass constructor invocations, ordinary superclass method) s
+376 252 M
+(invocations need not be the first statement in a method.) s
+376 236 M
+(The "protected" Keyword) s
+376 228 M
+(-----------------------) s
+376 220 M
+(I lied when I said that we don't need to modify SList.  One change is) s
+376 212 M
+(necessary.  The "head" and "size" fields in SList must be declared "protected",) s
+376 204 M
+(not "private".) s
+376 188 M
+(  public class SList {) s
+376 180 M
+(    protected SListNode head;) s
+376 172 M
+(    protected int size;) s
+376 156 M
+(    [Method definitions.]) s
+376 148 M
+(  }) s
+376 132 M
+("protected" is a level of protection somewhere between "public" and "private".) s
+376 124 M
+(A "protected" field is visible to the declaring class and all its subclasses,) s
+376 116 M
+(but not to other classes.  "private" fields aren't even visible to the) s
+376 108 M
+(subclasses.) s
+376 92 M
+(If "head" and "size" are declared private, the method TailList.insertFront) s
+376 84 M
+(can't access them and won't compile.  If they're declared protected,) s
+376 76 M
+(insertFront can access them because TailList is a subclass of SList.) s
+376 60 M
+(When you write an ADT, if you think somebody might someday want to write a) s
+376 52 M
+(subclass of it, declare its vulnerable fields "protected", unless you have a) s
+376 44 M
+(reason for not wanting subclasses to see them.  Helper methods often should be) s
+376 36 M
+(declared "protected" as well.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (10) def
+/fdir () def
+/ftail (10) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (02/12/14) def
+/modtimestr (04:29:14) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Class Hierarchies) s
+5 500 M
+(-----------------) s
+5 492 M
+(Subclasses can have subclasses.  Subclassing is transitive:  if Proletariat is) s
+5 484 M
+(a subclass of Worker, and Student is a subclass of Proletariat, then Student is) s
+5 476 M
+(a subclass of Worker.  Furthermore, _every_ class is a subclass of the Object) s
+5 468 M
+(class \(including Java's built-in classes like String and BufferedReader.\)) s
+5 460 M
+(Object is at the top of every class hierarchy.) s
+5 444 M
+(          Object) s
+5 436 M
+(          /    \\) s
+5 428 M
+(      String  Worker) s
+5 420 M
+(             /      \\) s
+5 412 M
+(    Proletariat  Bourgeoisie        Superclasses appear above their subclasses.) s
+5 404 M
+(       /     \\       |) s
+5 396 M
+(    Student  TA   Professor) s
+5 380 M
+(That's why the "item" field in each listnode is of type Object:  it can) s
+5 372 M
+(reference any object of any class.  \(It can't reference a primitive type,) s
+5 364 M
+(though.\)) s
+5 348 M
+(Dynamic Method Lookup) s
+5 340 M
+(---------------------) s
+5 332 M
+(Here's where inheritance gets interesting.  Any TailList can masquerade as an) s
+5 324 M
+(SList.  An object of class TailList can be assigned to a variable of type) s
+5 316 M
+(SList--but the reverse is not true.  Every TailList is an SList, but not every) s
+5 308 M
+(SList is a TailList.  It merits repeating:) s
+5 292 M
+(>>>!!!*** Every TailList *IS* an SList. ***!!!<<<    For example:) s
+5 276 M
+(  SList s = new TailList\(\);         // Groovy.) s
+5 268 M
+(  TailList t = new SList\(\);         // COMPILE-TIME ERROR.) s
+5 252 M
+(Memorize the following two definitions.) s
+5 244 M
+(  _Static_type_:  The type of a variable.) s
+5 236 M
+(  _Dynamic_type_:  The class of the object the variable references.) s
+5 220 M
+(In the code above, the static type of s is SList, and the dynamic type of s is) s
+5 212 M
+(TailList.  Henceforth, I will often just say "type" for static type and "class") s
+5 204 M
+(for dynamic type.) s
+5 188 M
+(When we invoke an overridden method, Java calls the method for the object's) s
+5 180 M
+(_dynamic_ type, regardless of the variable's static type.) s
+5 164 M
+(  SList s = new TailList\(\);) s
+5 156 M
+(  s.insertEnd\(obj\);                 // Calls TailList.insertEnd\(\)) s
+5 148 M
+(  s = new SList\(\);) s
+5 140 M
+(  s.insertEnd\(obj\);                 // Calls SList.insertEnd\(\)) s
+5 124 M
+(This is called _dynamic_method_lookup_, because Java automatically looks up the) s
+5 116 M
+(right method for a given object at run-time.  Why is it interesting?) s
+5 108 M
+(-------------------------------------------------------------------------------) s
+5 100 M
+(| WHY DYNAMIC METHOD LOOKUP MATTERS             \(Worth reading and rereading\) |) s
+5 92 M
+(|                                                                             |) s
+5 84 M
+(| Suppose you have a method \(in any class\) that sorts an SList using only     |) s
+5 76 M
+(| SList method calls \(but doesn't construct any SLists\).  Your method now     |) s
+5 68 M
+(| sorts TailLists too, with no changes.                                       |) s
+5 60 M
+(|                                                                             |) s
+5 52 M
+(| Suppose you've written a class--let's call it RunLengthEncoding--that uses  |) s
+5 44 M
+(| SLists extensively.  By changing the constructors so that they create       |) s
+5 36 M
+(| TailLists instead of SLists, your class immediately realizes the            |) s
+5 28 M
+(| performance improvement that TailLists provide--without changing anything   |) s
+5 20 M
+(| else in the RunLengthEncoding class.                                        |) s
+5 12 M
+(-------------------------------------------------------------------------------) s
+376 516 M
+(Subtleties of Inheritance) s
+376 508 M
+(-------------------------) s
+376 500 M
+(\(1\)  Suppose we write a new method in the TailList class called eatTail\(\).  We) s
+376 492 M
+(can't call eatTail on an SList.  We can't even call eatTail on a variable of) s
+376 484 M
+(type SList that references a TailList.) s
+376 468 M
+(  TailList t = new TailList\(\);) s
+376 460 M
+(  t.eatTail\(\);                      // Groovy.) s
+376 452 M
+(  SList s = new TailList\(\);         // Groovy--every TailList is an SList.) s
+376 444 M
+(  s.eatTail\(\);                      // COMPILE-TIME ERROR.) s
+376 428 M
+(Why?  Because not every object of class SList has an "eatTail\(\)" method, so) s
+376 420 M
+(Java can't use dynamic method lookup on the variable s.) s
+376 404 M
+(But if we define eatTail\(\) in SList instead, the statements above compile and) s
+376 396 M
+(run without errors, even if no eatTail\(\) method is defined in class TailList.) s
+376 388 M
+(\(TailList inherits eatTail\(\) from SList.\)) s
+376 372 M
+(\(2\)  I pointed out earlier that you can't assign an SList object to a TailList) s
+376 364 M
+(variable.  The rules are more complicated when you assign one variable to) s
+376 356 M
+(another.) s
+376 340 M
+(  SList s;) s
+376 332 M
+(  TailList t = new TailList\(\);) s
+376 324 M
+(  s = t;                            // Groovy.) s
+376 316 M
+(  t = s;                            // COMPILE-TIME ERROR.) s
+376 308 M
+(  t = \(TailList\) s;                 // Groovy.) s
+376 300 M
+(  s = new SList\(\);) s
+376 292 M
+(  t = \(TailList\) s;                 // RUN-TIME ERROR:  ClassCastException.) s
+376 276 M
+(Why does the compiler reject "t = s", but accept "t = \(TailList\) s"?  It) s
+376 268 M
+(refuses "t = s" because not every SList is a TailList, and it wants you to) s
+376 260 M
+(confirm that you're not making a thoughtless mistake.  The cast in the latter) s
+376 252 M
+(statement is your way of reassuring the compiler that you've designed the) s
+376 244 M
+(program to make sure that the SList s will always be a TailList.) s
+376 228 M
+(If you're wrong, Java will find out when you run the program, and will crash) s
+376 220 M
+(with a "ClassCastException" error message.  The error occurs only at run-time) s
+376 212 M
+(because Java cannot tell in advance what class of object s will reference.) s
+376 196 M
+(Recall that SLists store items of type Object.  When they're recovered, they) s
+376 188 M
+(usually have to be cast back to a more specific type before they can be used.) s
+376 180 M
+(Suppose we have a list of Integers.  Recall that nth\(\) returns type Object.) s
+376 164 M
+(  int x = t.nth\(1\).intValue\(\);                // COMPILE-TIME ERROR.) s
+376 156 M
+(  int y = \( \(Integer\) t.nth\(1\) \).intValue\(\);  // Groovy.) s
+376 140 M
+(Some methods are defined on every Object, though.) s
+376 124 M
+(  String z = t.nth\(1\).toString\(\);             // Groovy.) s
+376 108 M
+(\(3\)  Java has an "instanceof" operator that tells you whether an object is of) s
+376 100 M
+(a specific class.  WARNING:  The "o" in "instanceof" is not capitalized.) s
+376 84 M
+(  if \(s instanceof TailList\) {) s
+376 76 M
+(    t = \(TailList\) s;) s
+376 68 M
+(  }) s
+376 52 M
+(This instanceof operation will return false if s is null or doesn't reference) s
+376 44 M
+(a TailList.  It returns true if s references a TailList object--even if it's) s
+376 36 M
+(a subclass of TailList.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

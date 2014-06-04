@@ -1,0 +1,990 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Mon Feb 10 15:17:06 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (09) def
+/fdir () def
+/ftail (09) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (02/10/14) def
+/modtimestr (15:16:51) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 9) s
+5 508 M
+(                          Monday, February 10, 2014) s
+5 492 M
+(Today's reading:  Sierra & Bates pp. 77, 235-239, 258-265, 663.) s
+5 476 M
+(THE STACK AND THE HEAP) s
+5 468 M
+(======================) s
+5 460 M
+(Java stores stuff in two separate pools of memory:  the stack and the heap.) s
+5 444 M
+(The _heap_ stores all objects, including all arrays, and all class variables) s
+5 436 M
+(\(i.e. those declared "static"\).) s
+5 420 M
+(The _stack_ stores all local variables, including all parameters.) s
+5 404 M
+(When a method is called, the Java Virtual Machine creates a _stack_frame_ \(also) s
+5 396 M
+(known as an _activation_record_\) that stores the parameters and local variables) s
+5 388 M
+(for that method.  One method can call another, which can call another, and so) s
+5 380 M
+(on, so the JVM maintains an internal _stack_ of stack frames, with "main" at) s
+5 372 M
+(the bottom, and the most recent method call on top.) s
+5 356 M
+(Here's a snapshot of the stack while Java is executing the SList.insertEnd) s
+5 348 M
+(method.  The stack frames are on the left.  Everything on the right half of the) s
+5 340 M
+(page is in the heap.  Read the stack from bottom to top, because that's the) s
+5 332 M
+(order in which the stack frames were created.) s
+5 316 M
+(STACK                                         |                            HEAP) s
+5 308 M
+(                                              |) s
+5 300 M
+(method call      parameters & local variables |) s
+5 292 M
+(----------------------------------------------|) s
+5 284 M
+(                                       ---    |       -------------------) s
+5 276 M
+(                                  this |.+----------->|item |.|  next |X|) s
+5 268 M
+(SListNode.SListNode         ---        ---    |       -------+-----------) s
+5 260 M
+(                        obj |.+--------------------------\\   |) s
+5 252 M
+(                            ---               |          |   |) s
+5 244 M
+(----------------------------------------------|          v   v) s
+5 236 M
+(                            ---               |        ------------) s
+5 228 M
+(                        obj |.+----------------------->|  string  |) s
+5 220 M
+(                            ---               |        ------------) s
+5 212 M
+(SList.insertEnd             ---               |          ^) s
+5 204 M
+(                       this |.+--------------------------+---------\\) s
+5 196 M
+(                            ---               |          |         |) s
+5 188 M
+(----------------------------------------------|          |         |) s
+5 180 M
+(                            ---               |          |         |) s
+5 172 M
+(                        str |.+--------------------------/         v) s
+5 164 M
+(                            ---      ---      |           ---------------------) s
+5 156 M
+(                                list |.+----------------->|head |X|  size | 0 |) s
+5 148 M
+(                                     ---      |           ---------------------) s
+5 140 M
+(SList.main                  ---               |         ---------   -----------) s
+5 132 M
+(                       args |.+------------------------>| . | .-+-->|  words  |) s
+5 124 M
+(                            ---               |         --+------   -----------) s
+5 116 M
+(                                              |           |    -----------) s
+5 108 M
+(----------------------------------------------|           \\--->|  input  |) s
+5 100 M
+(                                                               -----------) s
+5 84 M
+(The method that is currently executing \(at any point in time\) is the one whose) s
+5 76 M
+(stack frame is on top.  All the other stack frames represent methods waiting) s
+5 68 M
+(for the methods above them to return before they can continue executing.) s
+5 52 M
+(When a method finishes executing, its stack frame is erased from the top of the) s
+5 44 M
+(stack, and its local variables are erased forever.) s
+5 28 M
+(The java.lang library has a method "Thread.dumpStack" that prints a list of the) s
+5 20 M
+(methods on the stack \(but it doesn't print their local variables\).  This method) s
+5 12 M
+(can be convenient for debugging--for instance, when you're trying to figure out) s
+5 4 M
+(which method called another method with illegal parameters.) s
+376 508 M
+(Parameter Passing) s
+376 500 M
+(-----------------) s
+376 492 M
+(As in Scheme, Java passes all parameters _by_value_.  This means that the) s
+376 484 M
+(method has _copies_ of the actual parameters, and cannot change the originals.) s
+376 476 M
+(The copies reside in the method's stack frame for the method.  The method can) s
+376 468 M
+(change these copies, but the original values that were copied are not changed.) s
+376 452 M
+(In this example, the method doNothing sets its parameter to 2, but it has no) s
+376 444 M
+(effect on the value of the calling method's variable a:) s
+376 428 M
+(method:                            | STACK \(just before the method returns\)) s
+376 420 M
+(                                   |) s
+376 412 M
+(  static void doNothing\(int x\) {   |      -----) s
+376 404 M
+(    x = 2;                         |    x | 2 |) s
+376 396 M
+(  }                                |      -----     stack frame for doNothing) s
+376 388 M
+(                                   |-----------------------------------------) s
+376 380 M
+(method call:                       |) s
+376 372 M
+(                                   |      -----) s
+376 364 M
+(  int a = 1;                       |    a | 1 |) s
+376 356 M
+(  doNothing\(a\);                    |      -----     stack frame for main) s
+376 340 M
+(When the method call returns, a is still 1.  The doNothing method, as its name) s
+376 332 M
+(suggests, failed to change the value of a or do anything relevant at all.) s
+376 316 M
+(However, when a parameter is a reference to an object, the reference is copied,) s
+376 308 M
+(but the object is not; the original object is shared.  A method can modify an) s
+376 300 M
+(object that one of its parameters points to, and the change will be visible) s
+376 292 M
+(everywhere.  Here's an example that shows how a method can make a change to an) s
+376 284 M
+(object that is visible to the calling method:) s
+376 268 M
+(method:                            | STACK              | HEAP) s
+376 260 M
+(                                   |                set3|) s
+376 252 M
+(class IntBox {                     |      -----         |) s
+376 244 M
+(  public int i;                    |   ib | .-+----------------\\) s
+376 236 M
+(  static void set3\(IntBox ib\) {    |      -----         |      |) s
+376 228 M
+(    ib.i = 3;                      |                    |      |) s
+376 220 M
+(  }                                |--------------------|      v) s
+376 212 M
+(                                   |      -----         |    ------) s
+376 204 M
+(method call:                       |    b | .-+------------->|i |3|) s
+376 196 M
+(                                   |      -----     main|    ------) s
+376 188 M
+(  IntBox b = new IntBox\(\);) s
+376 180 M
+(  set3\(b\);) s
+376 164 M
+(For those of you who are familiar with programming languages that have "pass) s
+376 156 M
+(by reference," the example above is as close as you can get in Java.  But it's) s
+376 148 M
+(not "pass by reference."  Rather, it's passing a reference by value.) s
+376 116 M
+(Here's an example of a common programming error, where a method tries and fails) s
+376 108 M
+(to make a change that is visible to the calling method.  \(Assume we've just) s
+376 100 M
+(executed the example above, so b is set up.\)) s
+376 84 M
+(method:                            | STACK              | HEAP) s
+376 76 M
+(                                   |             badSet4|) s
+376 68 M
+(class IntBox {                     |      -----         |    ------) s
+376 60 M
+(  static void badSet4\(IntBox ib\) { |   ib | .-+------------->|i |4|) s
+376 52 M
+(    ib = new IntBox\(\);             |      -----         |    ------) s
+376 44 M
+(    ib.i = 4;                      |                    |) s
+376 36 M
+(  }                                |--------------------|) s
+376 28 M
+(                                   |      -----         |    ------) s
+376 20 M
+(method call:                       |    b | .-+------------->|i |3|) s
+376 12 M
+(                                   |      -----     main|    ------) s
+376 4 M
+(  badSet4\(b\);) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (09) def
+/fdir () def
+/ftail (09) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (02/10/14) def
+/modtimestr (15:16:51) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Binary search) s
+5 500 M
+(-------------) s
+5 492 M
+(When a method calls itself recursively, the JVM's internal stack holds two or) s
+5 484 M
+(more stack frames connected with that method.  Only the top one can be) s
+5 476 M
+(accessed.) s
+5 460 M
+(Here's a recursive method that searches a sorted array of ints for a particular) s
+5 452 M
+(int.  Let i be an array of ints sorted from least to greatest--for instance,) s
+5 444 M
+({-3, -2, 0, 0, 1, 5, 5}.  We want to search the array for the value "findMe".) s
+5 436 M
+(If we find "findMe", we return its array index; otherwise, we return FAILURE.) s
+5 420 M
+(We could simply check every element of the array, but that would be slow.) s
+5 412 M
+(A better strategy is to check the middle array element first.  If findMe is) s
+5 404 M
+(lesser, we know it can only be in the left half of the array; if findMe is) s
+5 396 M
+(greater, we know it can only be in the right half.  Hence, we've eliminated) s
+5 388 M
+(half the possibilities with one comparison.  We still have half the array to) s
+5 380 M
+(check, so we recursively check the middle element of that half, and so on,) s
+5 372 M
+(cutting the possibilites in half each time.  Suppose we search for 1.) s
+5 356 M
+(  -------------------) s
+5 348 M
+(  | -3 -2 0 0 1 5 5 |) s
+5 340 M
+(  ----------^--------) s
+5 332 M
+(   compare with 0 |  ) s
+5 324 M
+(                  |  ) s
+5 316 M
+(                  v  ) s
+5 308 M
+(            ---------) s
+5 300 M
+(            | 1 5 5 |) s
+5 292 M
+(            ----^----) s
+5 284 M
+(              | compare with 5) s
+5 276 M
+(              |      ) s
+5 268 M
+(              V      ) s
+5 260 M
+(            -----) s
+5 252 M
+(            | 1 |    ) s
+5 244 M
+(            -----    ) s
+5 228 M
+(The recursion has two base cases.) s
+5 220 M
+(\(1\)  If findMe equals the middle element, return its index; in the example) s
+5 212 M
+(     above, we return index 4.) s
+5 204 M
+(\(2\)  If we try to search a subarray of length zero, the array does not contain) s
+5 196 M
+(     "findMe", and we return FAILURE.) s
+5 180 M
+(  public static final int FAILURE = -1;) s
+5 164 M
+(  private static int bsearch\(int[] i, int left, int right, int findMe\) {) s
+5 156 M
+(    if \(left > right\) {) s
+5 148 M
+(      return FAILURE;                   // Base case 2:  subarray of size zero.) s
+5 140 M
+(    }) s
+5 132 M
+(    int mid = \(left + right\) / 2;            // Halfway between left and right.) s
+5 124 M
+(    if \(findMe == i[mid]\) {) s
+5 116 M
+(      return mid;                                     // Base case 1:  success!) s
+5 108 M
+(    } else if \(findMe < i[mid]\) {) s
+5 100 M
+(      return bsearch\(i, left, mid - 1, findMe\);            // Search left half.) s
+5 92 M
+(    } else {) s
+5 84 M
+(      return bsearch\(i, mid + 1, right, findMe\);          // Search right half.) s
+5 76 M
+(    }) s
+5 68 M
+(  }) s
+5 52 M
+(  public static int bsearch\(int[] i, int findMe\) {) s
+5 44 M
+(    return bsearch\(i, 0, i.length - 1, findMe\);) s
+5 36 M
+(  }) s
+5 20 M
+(How long does binary search take?  Suppose the array has n elements.  In one) s
+5 12 M
+(call to bsearch, we eliminate at least half the elements from consideration.) s
+5 4 M
+(Hence, it takes log_2 n \(the base 2 logarithm of n\) bsearch calls to pare down) s
+376 516 M
+(the possibilities to one.  Binary search takes time proportional to log_2 n.) s
+376 508 M
+(If you're not comfortable with logarithms, please review Goodrich & Tamassia) s
+376 500 M
+(Sections 4.1.2 & 4.1.7.) s
+376 484 M
+(STACK    bsearch    left [4]             |) s
+376 476 M
+(                   right [4]  findMe [1] |) s
+376 468 M
+(                     mid [4]       i [.]-+---------\\) s
+376 460 M
+(         --------------------------------|         |) s
+376 452 M
+(         bsearch    left [4]             |         |) s
+376 444 M
+(                   right [6]  findMe [1] |         |) s
+376 436 M
+(                     mid [5]       i [.]-+---------|) s
+376 428 M
+(         --------------------------------|         |) s
+376 420 M
+(         bsearch    left [0]             |         |) s
+376 412 M
+(                   right [6]  findMe [1] |         |) s
+376 404 M
+(                     mid [3]       i [.]-+---------|) s
+376 396 M
+(         --------------------------------|         |) s
+376 388 M
+(         bsearch  findMe [1]       i [.]-+---------|   -------------------) s
+376 380 M
+(         --------------------------------|         \\-->| -3 -2 0 0 1 5 5 |) s
+376 372 M
+(         main                   args [.]-+->[]         -------------------) s
+376 364 M
+(                                         |                                 HEAP) s
+376 348 M
+(The stack frames appear at right in the figure above.  There are three) s
+376 340 M
+(different local variables named "left" on the stack, three named "right", three) s
+376 332 M
+(named "mid", four named "i", and four named "findMe".  While the current) s
+376 324 M
+(invocation of bsearch\(\) is executing, only the topmost copy of "left" is in) s
+376 316 M
+(scope, and likewise for "right" and "mid".  The other copies are hidden and) s
+376 308 M
+(cannot be accessed or changed until the current invocation of bsearch\(\)) s
+376 300 M
+(terminates.) s
+376 284 M
+(Most operating systems give a program enough stack space for a few thousand) s
+376 276 M
+(stack frames.  If you use a recursive procedure to walk through a million-node) s
+376 268 M
+(list, Java will try to create a million stack frames, and the stack will) s
+376 260 M
+(run out of space.  The result is a run-time error.  You should use iteration) s
+376 252 M
+(instead of recursion when the recursion will be very deep.) s
+376 236 M
+(However, our recursive binary search method does not have this problem.  Most) s
+376 228 M
+(modern microprocessors cannot address more than 2^64 bytes of memory.  Even if) s
+376 220 M
+(an array of bytes takes this much space, we will only have to cut the array in) s
+376 212 M
+(half 64 times to run a binary search.  There's room on the stack for 64 stack) s
+376 204 M
+(frames, with plenty to spare.  In general, recursion to a depth of roughly) s
+376 196 M
+(log n \(where n is the number of items in a data structure\) is safe, whereas) s
+376 188 M
+(recursion to a depth of roughly n is not.) s
+376 172 M
+(Unfortunately, binary search can't be used on linked lists.  Think about why.) s
+376 156 M
+(Scope and Recursion) s
+376 148 M
+(-------------------) s
+376 140 M
+(The _scope_ of a variable is the portion of the program that can access the) s
+376 132 M
+(variable.  Here are some of Java's scoping rules.) s
+376 116 M
+(- Local variables and parameters are in scope only inside the method that) s
+376 108 M
+(  declares them, and only for the topmost stack frame.  Furthermore, a local) s
+376 100 M
+(  variable is in scope only from the variable declaration down to the innermost) s
+376 92 M
+(  closing brace that encloses it.  A local variable declared in the) s
+376 84 M
+(  initialization part of a "for" loop is in scope only in the loop body.) s
+376 76 M
+(- Class variables \(static fields\) are in scope everywhere in the class, except) s
+376 68 M
+(  when shadowed by a local variable or parameter of the same name.) s
+376 60 M
+(- Fully qualified class variables \("System.out", rather than "out"\) are in) s
+376 52 M
+(  scope everywhere in the class, and cannot be shadowed.  If they're public,) s
+376 44 M
+(  they're in scope in _all_ classes.) s
+376 36 M
+(- Instance variables \(non-static fields\) are in scope in non-static methods of) s
+376 28 M
+(  the class, except when shadowed.) s
+376 20 M
+(- Fully qualified instance variables \("amanda.name", "this.i"\) are in scope) s
+376 12 M
+(  everywhere in the class, and cannot be shadowed.  If they're public, they're) s
+376 4 M
+(  in scope in all classes.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

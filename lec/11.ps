@@ -1,0 +1,930 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Wed Feb 12 11:04:12 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (11) def
+/fdir () def
+/ftail (11) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (02/12/14) def
+/modtimestr (11:03:53) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 11) s
+5 508 M
+(                         Wednesday, February 12, 2014) s
+5 492 M
+(Today's reading:  Sierra & Bates, pp. 95-109, 662.) s
+5 476 M
+(equals\(\)) s
+5 468 M
+(========) s
+5 460 M
+(Every class has an equals\(\) method.  If you don't define one explictly, you) s
+5 452 M
+(inherit Object.equals\(\), for which "r1.equals\(r2\)" returns the same boolean) s
+5 444 M
+(value as "r1 == r2", where r1 and r2 are references.  However, many classes) s
+5 436 M
+(override equals\(\) to compare the _content_ of two objects.) s
+5 420 M
+(Integer \(in the java.lang library\) is such a class; it stores one private int.) s
+5 412 M
+(Two distinct Integer objects are equals\(\) if they contain the same int.) s
+5 404 M
+(In the following example, "i1 == i2" is false, but "i1.equals\(i2\)" is true.) s
+5 396 M
+("i2 == i3" and "i2.equals\(i3\)" are both true.) s
+5 380 M
+(           ---    -------            ---    -------    ---) s
+5 372 M
+(        i1 |.+--->|  7  |         i2 |.+--->|  7  |<---+.| i3) s
+5 364 M
+(           ---    -------            ---    -------    ---) s
+5 348 M
+(IMPORTANT:  r1.equals\(r2\) throws a run-time exception if r1 is null.) s
+5 332 M
+(There are at least four different degrees of equality.) s
+5 324 M
+(\(1\)  Reference equality, ==.  \(The default inherited from the Object class.\)) s
+5 316 M
+(\(2\)  Shallow structural equality:  two objects are "equals" if all their fields) s
+5 308 M
+(     are ==.  For example, two SLists whose "size" fields are equal and whose) s
+5 300 M
+(     "head" fields point to the same SListNode.) s
+5 292 M
+(\(3\)  Deep structural equality:  two objects are "equals" if all their fields) s
+5 284 M
+(     are "equals".  For example, two SLists that represent the same sequence of) s
+5 276 M
+(     items \(though the SListNodes may be different\).) s
+5 268 M
+(\(4\)  Logical equality.  Two examples:) s
+5 260 M
+(     \(a\)  Two "Set" objects are "equals" if they contain the same elements,) s
+5 252 M
+(          even if the underlying lists store the elements in different orders.) s
+5 244 M
+(     \(b\)  The Fractions 1/3 and 2/6 are "equals", even though their numerators) s
+5 236 M
+(          and denominators are all different.) s
+5 220 M
+(The equals\(\) method for a particular class may test any of these four levels of) s
+5 212 M
+(equality, depending on what seems appropriate.  Let's write an equals\(\) method) s
+5 204 M
+(for SLists that tests for deep structural equality.  The following method) s
+5 196 M
+(returns true only if the two lists represent identical sequences of items.) s
+5 180 M
+(  public class SList {) s
+5 172 M
+(    public boolean equals\(Object other\) {) s
+5 164 M
+(      if \(!\(other instanceof SList\)\) {           // Reject non-SLists.) s
+5 156 M
+(        return false;) s
+5 148 M
+(      }) s
+5 132 M
+(      SList o = \(SList\) other;) s
+5 124 M
+(      if \(size != o.size\) {) s
+5 116 M
+(        return false;) s
+5 108 M
+(      }) s
+5 92 M
+(      SListNode n1 = head;) s
+5 84 M
+(      SListNode n2 = o.head;) s
+5 76 M
+(      while \(n1 != null\) {) s
+5 68 M
+(        if \(!n1.item.equals\(n2.item\)\) {          // Deep equality of the items.) s
+5 60 M
+(          return false;) s
+5 52 M
+(        }) s
+5 44 M
+(        n1 = n1.next;) s
+5 36 M
+(        n2 = n2.next;) s
+5 28 M
+(      }) s
+5 20 M
+(      return true;) s
+5 12 M
+(    }) s
+5 4 M
+(  }) s
+376 508 M
+(Note that this implementation may fail if the SList invariants have been) s
+376 500 M
+(corrupted.  \(A wrong "size" field or a loop in an SList can make it fail.\)) s
+376 484 M
+(IMPORTANT:  Overriding DOESN'T WORK if we change the signature of the original) s
+376 476 M
+(method, even just to change a parameter to a subclass.  In the Object class,) s
+376 468 M
+(the signature is equals\(Object\), so in the code above, we must declare "other") s
+376 460 M
+(to be an Object too.  If we declare "other" to be an SList, the equals\(\) method) s
+376 452 M
+(will compile but it will NOT override.  That means the code) s
+376 436 M
+(  Object s = new SList\(\);) s
+376 428 M
+(  s.equals\(s\);) s
+376 412 M
+(will call Object.equals\(\), not SList.equals\(\).  Dynamic method lookup won't) s
+376 404 M
+(care that s is an SList, because the equals\(\) method above is not eligible to) s
+376 396 M
+(override Object.equals\(\).) s
+376 380 M
+(Therefore, if you want to override a method, make sure the signature is EXACTLY) s
+376 372 M
+(the same.) s
+376 356 M
+("for each" LOOPS) s
+376 348 M
+(================) s
+376 340 M
+(Java has a "for each" loop for iterating through the elements of an array.) s
+376 324 M
+(  int[] array = {7, 12, 3, 8, 4, 9};) s
+376 308 M
+(  for \(int i : array\) {) s
+376 300 M
+(    System.out.print\(i + " "\);) s
+376 292 M
+(  }) s
+376 276 M
+(Note that i is _not_ iterating from 0 to 5; it's taking on the value of each) s
+376 268 M
+(array element in turn.  You can iterate over arrays of any type this way.) s
+376 252 M
+(  String concat = "";) s
+376 244 M
+(  for \(String s : stringArray\) {) s
+376 236 M
+(    concat = concat + s;) s
+376 228 M
+(  }) s
+376 212 M
+(For some reason, the type declaration _must_ be in the "for" statement.  The) s
+376 204 M
+(compiler barfs if you try) s
+376 188 M
+(  int i;) s
+376 180 M
+(  for \(i : array\) { ... }) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (11) def
+/fdir () def
+/ftail (11) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (02/12/14) def
+/modtimestr (11:03:53) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(TESTING) s
+5 500 M
+(=======) s
+5 492 M
+(Complex software, like Project 1, is easier to debug if you write lots of test) s
+5 484 M
+(code.  We'll consider three types of testing:) s
+5 468 M
+(\(1\)  Modular testing:  testing each method and each class separately.) s
+5 460 M
+(\(2\)  Integration testing:  testing a set of methods/classes together.) s
+5 452 M
+(\(3\)  Result verification:  testing results for correctness, and testing data) s
+5 444 M
+(       structures to ensure they still satisfy their invariants.) s
+5 428 M
+(\(1\)  Modular Testing) s
+5 420 M
+(--------------------) s
+5 412 M
+(When you write a program and it fails, it can be quite difficult to determine) s
+5 404 M
+(which part of the code is responsible.  Even experienced programmers often) s
+5 396 M
+(guess wrong.  It's wise to test every method you write individually.) s
+5 380 M
+(There are two types of test code for modular testing:  test drivers and stubs.) s
+5 364 M
+(\(a\)  Test drivers are methods that call the code being tested, then check the) s
+5 356 M
+(results.  In Lab 3 and Homework 3, you've seen test drivers in the SList class) s
+5 348 M
+(that check that your code is doing the right thing.) s
+5 332 M
+(Both public and private methods should be tested.  Hence, a test driver usually) s
+5 324 M
+(needs to be inside the class it tests.  In a class intended for use by other) s
+5 316 M
+(classes, the obvious place to put a test driver is in the main\(\) method, as we) s
+5 308 M
+(did in Lab 3 and Homework 3.  However, if a class is the entry point for the) s
+5 300 M
+(program, you can't put your test driver in main\(\).  Instead, put it in a method) s
+5 292 M
+(with a name like testDriver\(\), and then write _another_ class whose main\(\)) s
+5 284 M
+(method calls your test driver.) s
+5 268 M
+(\(b\)  Stubs are small bits of code that are _called_ by the code being tested.) s
+5 260 M
+(They are often quite short.  They serve three purposes.) s
+5 244 M
+(\(i\)  If you write a method that calls other methods that haven't yet been) s
+5 236 M
+(     implemented, you can write simple stubs that fake the missing methods.) s
+5 228 M
+(\(ii\) Suppose you are having difficulty determining whether a bug lies in) s
+5 220 M
+(     a calling method, or a method it calls.  You can temporarily replace the) s
+5 212 M
+(     callee with a stub that returns controlled results to the caller, so you) s
+5 204 M
+(     can see if the caller is responsible for the problem.) s
+5 196 M
+(\(iii\)Stubs allow you to create repeatable test cases that might not arise often) s
+5 188 M
+(     in practice.  For instance, suppose a subroutine fetches and returns input) s
+5 180 M
+(     from an airline database, and your code calls this subroutine.  You might) s
+5 172 M
+(     want to test whether your code operates correctly when ten airplanes) s
+5 164 M
+(     depart at the same time.  Such an event might be rare in practice, but you) s
+5 156 M
+(     can replace the database access subroutine with a stub that feeds fake) s
+5 148 M
+(     data to your code.  There are two advantages:) s
+5 132 M
+(     - Stubs can produce test data that the real code rarely or never produces.) s
+5 124 M
+(     - Stubs produce _repeatable_ test data, so that bugs can be reproduced.) s
+5 108 M
+(\(2\)  Integration Testing) s
+5 100 M
+(------------------------) s
+5 92 M
+(Integration testing is testing all the components together \(preferably _after_) s
+5 84 M
+(you have tested them in isolation\).  Sometimes bugs arise during integration) s
+5 76 M
+(because your test cases weren't thorough enough.  Other times, they arise) s
+5 68 M
+(because of misunderstandings about how the components are supposed to interact) s
+5 60 M
+(with each other.  Integration testing is harder than modular testing, because) s
+5 52 M
+(it's harder to determine where a bug is, or to identify your mistaken) s
+5 44 M
+(assumptions about how the components interact.) s
+5 28 M
+(The most important task in avoiding these bugs is to define your interfaces) s
+5 20 M
+(well and unambiguously.  There should be no ambiguity in the descriptions of) s
+5 12 M
+(the behavior of your methods, especially in unusual cases.  We'll talk a lot) s
+5 4 M
+(more about this in later lectures.) s
+376 508 M
+(The best advice I can give on integration testing:  learn to use a debugger.) s
+376 492 M
+(\(3\)  Result Verification) s
+376 484 M
+(------------------------) s
+376 476 M
+(A result verifier is a method that checks the results of other methods.  There) s
+376 468 M
+(are at least two types of result verifiers you can write.) s
+376 452 M
+(\(a\)  Data structure integrity checkers.  A method can inspect a data structure) s
+376 444 M
+(     \(like a list\) and verify that all the invariants are satisfied.  For) s
+376 436 M
+(     Project 1, we are asking you to write a simple checker named "check\(\)") s
+376 428 M
+(     that verifies the integrity of your run-length encodings.) s
+376 420 M
+(\(b\)  Algorithm result checkers.  A method can inspect the output of another) s
+376 412 M
+(     method for correctness.  For example, if a method is supposed to sort an) s
+376 404 M
+(     array of numbers, a result checker can walk through the output and check) s
+376 396 M
+(     that each item really is less than or equal to its successor.) s
+376 380 M
+(An _assertion_ is a piece of code that tests an invariant or a result.) s
+376 372 M
+(Java offers an "assert" keyword that tests whether an assertion evaluates to) s
+376 364 M
+("true".  If the assertion comes up "false", Java terminates the program with an) s
+376 356 M
+("AssertionError" error message, a stack trace, and an optional message of your) s
+376 348 M
+(own choosing.) s
+376 332 M
+(  assert x == 3;) s
+376 324 M
+(  assert list.size == list.countLength\(\) : "wrong SList size:  " + list.size;) s
+376 308 M
+(At the end of each method that changes a data structure, add assertions) s
+376 300 M
+(\(possibly a call to an integrity checker\).  At the end of each method that) s
+376 292 M
+(computes a result, add an assertion that calls a result checker.) s
+376 276 M
+(Assertions are convenient because you can turn them on or off.  To turn them on) s
+376 268 M
+(when you're testing your code, run your code with "java -ea" \(for "enable) s
+376 260 M
+(assertions"\).  To turn them off for greater speed, run with "java -da" \(for) s
+376 252 M
+("disable assertions"\).  The default \(if you specify no switch\) is -da.) s
+376 244 M
+(WARNING:  when assertions are turned off, the method "list.countLength\(\)" above) s
+376 236 M
+(is never called.  Good for speed, but countLength\(\) must not perform a task) s
+376 228 M
+(that is necessary for your program's correctness.) s
+376 212 M
+(Regression Testing) s
+376 204 M
+(------------------) s
+376 196 M
+(A _regression_test_ is a test suite can be re-run whenever changes are made to) s
+376 188 M
+(the code.  Nearly every software company has reams of regression tests for each) s
+376 180 M
+(product.  They run them again every time they fix a bug or add a feature.) s
+376 164 M
+(Some principles of regression testing:) s
+376 148 M
+(\(a\)  All-paths testing:  your test cases should try to test every path through) s
+376 140 M
+(     the code.  Test every method.  For every "if" statement, you should try to) s
+376 132 M
+(     write a test case for each of the two paths.) s
+376 124 M
+(\(b\)  "Boundary cases" should be tested, as well as non-boundary cases.  For) s
+376 116 M
+(     instance, if you write a binary search method, test it on arrays of) s
+376 108 M
+(     lengths zero and one, as well as longer lengths.  Test the cases where the) s
+376 100 M
+(     item sought is the first element, the last element, in the middle, not) s
+376 92 M
+(     present.  For every loop in the code, try to test the cases where it) s
+376 84 M
+(     iterates zero or one times, as well as the case where it iterates several) s
+376 76 M
+(     times.  Test the branch "if \(x >= 1\)" for x equal to 0, 1, and 2.) s
+376 68 M
+(\(c\)  Generally, methods can be divided into two types:  extenders, which) s
+376 60 M
+(     construct or change an object; and observers, which return information) s
+376 52 M
+(     about an object.  \(Some methods do both, but you should always think hard) s
+376 44 M
+(     about whether that's good design.\)  Ideally, your test cases should test) s
+376 36 M
+(     every combination of extender and observer.) s
+376 20 M
+(In real-world software development, the size of the test code is often larger) s
+376 12 M
+(than the size of the code being tested.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

@@ -1,0 +1,850 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Mar  5 00:41:31 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (19) def
+/fdir (.) def
+/ftail (19) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (03/05/14) def
+/modtimestr (00:39:27) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 19) s
+5 508 M
+(                           Wednesday, March 5, 2014) s
+5 492 M
+(Today's reading:  Sierra & Bates, p. 664.) s
+5 476 M
+(ENCAPSULATED LISTS \(a case study in encapsulation\)) s
+5 468 M
+(==================) s
+5 460 M
+(Homeworks 3, 4, and 5 introduced you to three different implementations of) s
+5 452 M
+(linked lists, each fundamentally different.) s
+5 436 M
+(With the Homework 3 lists, if an application writer wants to query the identity) s
+5 428 M
+(of every item in the list without modifying the list, it takes time) s
+5 420 M
+(proportional to the square of n, the number of items in the list \(i.e.,) s
+5 412 M
+(Theta\(n^2\) time\), because you have to use nth\(i\) to identify each item in time) s
+5 404 M
+(proportional to i.) s
+5 388 M
+(The lists in Homeworks 4 and 5 allow an application to directly hold a node in) s
+5 380 M
+(a list.  By alternating between the next\(\) method and the item field or method,) s
+5 372 M
+(you can query all the list's items in Theta\(n\) time.  Similarly, if an) s
+5 364 M
+(application holds a node in the middle of a list, it can insert or delete c) s
+5 356 M
+(items there in time proportional to c, no matter how long the list is.) s
+5 340 M
+(The Homework 5 lists \(SList and DList\) are well-encapsulated, whereas the) s
+5 332 M
+(Homework 4 DList has flaws.  I will discuss these flaws today to illustrate why) s
+5 324 M
+(designing the really good list ADTs of Homework 5 was tricky.  Let's ask some) s
+5 316 M
+(questions about how lists should behave.) s
+5 300 M
+(\(1\)  What happens if we invoke l.remove\(n\)--but the node n is in a different) s
+5 292 M
+(     list than l?) s
+5 276 M
+(     In Homework 4, Part II asks whether it is possible for an application to) s
+5 268 M
+(     break the DList invariants.  One way to do this is to mismatch nodes and) s
+5 260 M
+(     lists in method calls.  When an application does this, the "size" field of) s
+5 252 M
+(     the wrong list is updated, thereby breaking the invariant that a list's) s
+5 244 M
+(     size field should be correct.  How can we fix this?) s
+5 228 M
+(     ADT interface answer:  The methods remove\(\), insertAfter\(\), etc. should) s
+5 220 M
+(     always update the right list's "size" field.) s
+5 204 M
+(     Implementation answer:  It's unacceptably slow to walk through a whole) s
+5 196 M
+(     list just to see if the node n is really in the list l.  Instead, every) s
+5 188 M
+(     node should keep a reference to the list that contains it.  In Homework 5,) s
+5 180 M
+(     each ListNode has a "myList" field.) s
+5 164 M
+(\(2\)  Should insertAfter\(\), remove\(\), etc. be methods of List or ListNode?) s
+5 148 M
+(     Normally, we expect the methods that modify a data structure \(like a List\)) s
+5 140 M
+(     to be methods within that data structure's class.  However, if we define) s
+5 132 M
+(     methods like insertAfter\(\) and remove\(\) in the ListNode class, rather than) s
+5 124 M
+(     the List class, we completely avoid the question of what happens if) s
+5 116 M
+(     they're invoked for a node that's not in "this" list.  This way, the) s
+5 108 M
+(     interface is more elegant.) s
+5 92 M
+(     ADT interface answer:  the list methods are divided among List and) s
+5 84 M
+(     ListNode.) s
+5 68 M
+(  Some methods of List                  | Some methods of ListNode) s
+5 60 M
+(                                        |) s
+5 52 M
+(  public boolean isEmpty\(\)              | public Object item\(\)) s
+5 44 M
+(  public void insertFront\(Object item\)  | public ListNode next\(\)               ) s
+5 36 M
+(  public ListNode front\(\)               | public void insertAfter\(Object item\) ) s
+5 20 M
+(     Implementation answer:  again, each node has a "myList" field so we can) s
+5 12 M
+(     update a list's "size" field when we call n.remove\(\), n.insertAfter\(\),) s
+5 4 M
+(     etc.) s
+376 508 M
+(\(3\)  What happens if we invoke l.remove\(n\), then l.insertAfter\(i, n\)?) s
+376 492 M
+(     Another way to trash the DList invariants is to treat a node that's been) s
+376 484 M
+(     removed from a list as if it's still active.  If we call insertAfter on a) s
+376 476 M
+(     node we've already removed, we may mangle the pointers.) s
+376 460 M
+(                                                                  AARGHH!!!) s
+376 452 M
+(---   ---   ---               ---       ---                   ---           ---) s
+376 444 M
+(|x|<->|n|<->|y|  --remove\(\)-> |x|<----->|y| --insertAfter\(\)-> |x|---------->|y|) s
+376 436 M
+(---   ---   ---               ---       ---                   ---           ---) s
+376 428 M
+(                               ^         ^                     ^             ^) s
+376 420 M
+(                               |   ---   |                     |  ---   ---  |) s
+376 412 M
+(                               \\---|n|---/                     \\--|n|<->| |<-/) s
+376 404 M
+(                                   ---                            ---   ---) s
+376 388 M
+(     The result violates the invariant that if x.next == y, then y.prev == x.) s
+376 380 M
+(     We would prevent the pointer mangling if remove\(n\) set n's pointers to) s
+376 372 M
+(     null, but that wouldn't stop insertAfter\(\) from incrementing the list's) s
+376 364 M
+(     "size" field \(or throwing a NullPointerException\), which is not a) s
+376 356 M
+(     reasonable result.) s
+376 340 M
+(     Calling remove\(n\) twice on the same node also corrupts "size".) s
+376 324 M
+(     How can we fix this?) s
+376 308 M
+(     ADT interface answer:  After n.remove\(\) is executed, removing n from the) s
+376 300 M
+(     list, n is considered to be an "invalid" node.  Any attempt to use n,) s
+376 292 M
+(     except to call n.isValidNode\(\), throws an exception.) s
+376 276 M
+(     Why do we change the node, rather than erasing the reference to it?) s
+376 268 M
+(     First, the remove\(\) method can't erase the reference, which is passed by) s
+376 260 M
+(     value.  Second, there might be lots of other references to the same node,) s
+376 252 M
+(     and we need to erase all of them too!  All those other references could be) s
+376 244 M
+(     used to corrupt the data structure if the node itself isn't neutralized.) s
+376 228 M
+(     Implementation answer:  When an item is removed from a list, the) s
+376 220 M
+(     corresponding ListNode's "myList" reference is set to null.  This is just) s
+376 212 M
+(     a convenient way to mark a node as "invalid".  The "next" and "prev") s
+376 204 M
+(     references are also set to null.  These steps eliminate opportunities for) s
+376 196 M
+(     accidentally corrupting a list as illustrated above.  \(Also, they help) s
+376 188 M
+(     Java's garbage collection to reclaim unused DListNodes.  We'll discuss) s
+376 180 M
+(     garbage collection near the end of the semester.\)) s
+376 164 M
+(     Any ListNode whose "myList" reference is null is considered "invalid",) s
+376 156 M
+(     and any attempt to use it will incite an exception.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (19) def
+/fdir (.) def
+/ftail (19) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (03/05/14) def
+/modtimestr (00:39:27) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(\(4\)  What happens if we walk off the end of a list?  \(Using the next\(\) method.\)) s
+5 492 M
+(     ADT interface answer:  In Homework 4, if you invoke next\(\) on the last) s
+5 484 M
+(     node in a list, it returns null.  In Homework 5, it returns an invalid) s
+5 476 M
+(     node instead.  There are two reasons for this change.  First, it provides) s
+5 468 M
+(     consistency, because invoking next\(\) at the end of a list yields the same) s
+5 460 M
+(     result as removing a node.  Second, if you call a method on the result--) s
+5 452 M
+(     for instance, n.next\(\).item\(\)--it throws an InvalidNodeException instead) s
+5 444 M
+(     of a NullPointerException.  This eliminates ambiguity; you can catch an) s
+5 436 M
+(     InvalidNodeException without wondering why it was thrown, whereas many) s
+5 428 M
+(     different bugs can cause NullPointerExceptions.) s
+5 412 M
+(     Implementation answer:  Recall that our implementation uses a doubly-,) s
+5 404 M
+(     circularly-linked list with a sentinel node.  Any sentinel is considered) s
+5 396 M
+(     an invalid node.  This simplifies the implementations of the next\(\) and) s
+5 388 M
+(     prev\(\) methods in the DList class.) s
+5 372 M
+(     However, if you apply next\(\) to a sentinel, you won't get the first node) s
+5 364 M
+(     of the list; you'll get an InvalidNodeException.  Why?  When n is the last) s
+5 356 M
+(     node in a list, why not let n.next\(\).next\(\) be the first node?  First, the) s
+5 348 M
+(     fact that the implementation uses a sentinel should be completely hidden) s
+5 340 M
+(     from the application.  Second, we want to be able to change the) s
+5 332 M
+(     implementation without breaking the application.  Suppose we switch from) s
+5 324 M
+(     DLists to SLists that don't have sentinels.  We would need to "fix" SList) s
+5 316 M
+(     so that n.next\(\).next\(\) still behaves the way it does with DLists.  It's) s
+5 308 M
+(     better not to allow applications to take advantage of such quirks from the) s
+5 300 M
+(     start.) s
+376 508 M
+(\(5\)  How do we access an item?) s
+376 492 M
+(     ADT interface answer:  In Homework 4, each node's "item" field is public.) s
+376 484 M
+(     In Homework 5, we make the "item" field protected; applications must use) s
+376 476 M
+(     the item\(\) and setItem\(\) methods to access it.  Why?  To make sure that) s
+376 468 M
+(     applications can't store items in deleted nodes or sentinels.  Any attempt) s
+376 460 M
+(     to invoke item\(\) or setItem\(\) on an invalid node causes an exception.) s
+376 452 M
+(     Why?  So that the implementation can be changed without breaking an) s
+376 444 M
+(     application.  Suppose, for instance, that an application stores items in) s
+376 436 M
+(     sentinel nodes.  Would the application still work the same way if you) s
+376 428 M
+(     switched from DLists to SLists, which don't have sentinel nodes?) s
+376 412 M
+(     This may seem like a strange justification.  But in real-world) s
+376 404 M
+(     programming, programmers often take advantage of undocumented quirks, like) s
+376 396 M
+(     being able to store items in sentinel nodes.  Once applications have been) s
+376 388 M
+(     written that depend on these quirks, the quirks become "features" that) s
+376 380 M
+(     must be preserved in any new List implementation.  That's why ADTs should) s
+376 372 M
+(     never do _more_ than what the documentation says they do.) s
+376 356 M
+(     In Frederick P. Brooks, Jr.'s famous book on software engineering, "The) s
+376 348 M
+(     Mythical Man-Month" \(page 65\), he writes) s
+376 332 M
+(       Invalid syntax always produces some result; in a policed system that) s
+376 324 M
+(       result is an invalidity indication _and_nothing_more_.  In an unpoliced) s
+376 316 M
+(       system all kinds of side effects may appear, and these may have been) s
+376 308 M
+(       used by programmers.  When we undertook to emulate the IBM 1401) s
+376 300 M
+(       [processor] on System/360 [an operating system], for example, it) s
+376 292 M
+(       developed that there were 30 different "curios"--side effects of) s
+376 284 M
+(       supposedly invalid operations--that had come into widespread use and had) s
+376 276 M
+(       to be considered as part of the definition.  The implementation as a) s
+376 268 M
+(       definition [of the functionality] overprescribed; it not only said what) s
+376 260 M
+(       the machine must do, it also said a great deal about how it had to do) s
+376 252 M
+(       it.) s
+376 236 M
+(     By ensuring that an implementation does not produce any result not) s
+376 228 M
+(     specified in the interface--even for invalid inputs--a programmer makes it) s
+376 220 M
+(     easy to fix bugs, optimize performance, and add new features without) s
+376 212 M
+(     compromising existing applications.) s
+376 196 M
+(This lecture's lesson is that design decisions can be complicated and have) s
+376 188 M
+(unexpected repercussions.) s
+376 172 M
+(Our design decisions for the Homework 5 lists, described above, will carry over) s
+376 164 M
+(to our tree interfaces, which you'll encounter in an upcoming assignment.) s
+376 148 M
+(One final thought.  Why don't we simply keep a boolean "valid" flag in each) s
+376 140 M
+(ListNode, and use that to distinguish valid nodes from invalid ones?  It would) s
+376 132 M
+(make the implementation clearer, and therefore more maintainable.  However, it) s
+376 124 M
+(would also make each ListNode occupy more memory.  I chose reduced memory use) s
+376 116 M
+(over readability, but this was an arbitrary choice.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

@@ -1,0 +1,870 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Apr 30 04:11:57 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (39) def
+/fdir (.) def
+/ftail (39) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/30/14) def
+/modtimestr (04:04:05) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS61B: Lecture 39) s
+5 508 M
+(                          Wednesday, April 30, 2014) s
+5 492 M
+(Today's reading:  Goodrich & Tamassia, Sections 14.1.2-14.1.3.) s
+5 476 M
+(GARBAGE COLLECTION) s
+5 468 M
+(==================) s
+5 460 M
+(Objects take up space in memory.  If your program creates lots of objects,) s
+5 452 M
+(throws them away, and creates more, you might eventually run out of memory.) s
+5 444 M
+(To reduce the chance that this will happen, Java has garbage collection.) s
+5 428 M
+(While the Java Virtual Machine \(JVM\) runs your program, it also spends little) s
+5 420 M
+(bits of time searching for objects that you're no longer using, so it can) s
+5 412 M
+(reclaim their memory for use by other objects.) s
+5 396 M
+(You don't have to know anything about garbage collection to be an effective) s
+5 388 M
+(Java programmer.  But garbage collection is interesting because the JVM uses) s
+5 380 M
+(a lot of hidden data structures to manage memory.  These data structures are) s
+5 372 M
+(hidden from your Java program--after all, the JVM, just like any other) s
+5 364 M
+(encapsulated module, should hide the details of how it is implemented.  Here's) s
+5 356 M
+(a peak at what's going on under the hood.) s
+5 340 M
+(Roots and Reachability) s
+5 332 M
+(----------------------) s
+5 324 M
+(Garbage collection's prime directive is to never sweep up an object your) s
+5 316 M
+(program might possibly use or inspect again.  These objects are said to be) s
+5 308 M
+(_live_.  The opposite of "live" is _garbage_--objects that your program cannot) s
+5 300 M
+(reference again.  Java's design makes it possible for the JVM to determine) s
+5 292 M
+(whether an object can ever be used again by your program or not.) s
+5 276 M
+(Garbage collection begins at the roots.  A _root_ is any object reference your) s
+5 268 M
+(program can access directly, without going through another object.  There are) s
+5 260 M
+(two kinds \(that we know about\).  First, every local variable \(including) s
+5 252 M
+(parameters\) in every stack frame on the program stack is a root if it is) s
+5 244 M
+(a reference.  \(Primitive types like ints are not roots; only references are.\)) s
+5 236 M
+(Second, every class variable \(aka "static" field\) that is a reference is a) s
+5 228 M
+(root.) s
+5 212 M
+(An object is live, and should not be garbage collected, if) s
+5 204 M
+(- it is referenced by a root \(obviously\), or) s
+5 196 M
+(- it is referenced by a field in another live object.) s
+5 188 M
+(Note that this definition is recursive.  Another way to say it is that an) s
+5 180 M
+(object is live if it is _reachable_ from the roots.  If you run depth-first) s
+5 172 M
+(search starting at all the roots, you will visit all the live objects and) s
+5 164 M
+(none of the garbage.  And that's exactly what garbage collectors do:  run) s
+5 156 M
+(depth-first search from the roots.) s
+5 140 M
+(Each object has a small tag that allows the garbage collector to mark whether) s
+5 132 M
+(the object has been visited or not.  The tag is invisible to your Java program,) s
+5 124 M
+(but it takes a few bits of the object's memory.  \(This is not the only "hidden") s
+5 116 M
+(memory Java associates with an object--for example, every object has a hidden) s
+5 108 M
+(label that tells Java what class it's in.\)) s
+376 508 M
+(Memory Addresses) s
+376 500 M
+(----------------) s
+376 492 M
+(In any modern computer, memory is one huge array of bytes with addresses.) s
+376 476 M
+(    ----------------------------) s
+376 468 M
+(    |   |   |   |   |   |   |   ...) s
+376 460 M
+(    ----------------------------) s
+376 452 M
+(      0   1   2   3   4   5   6) s
+376 436 M
+(However, modern computers prefer to read or write four bytes at a time, and) s
+376 428 M
+(they do this much faster if the four bytes start at an address divisible by) s
+376 420 M
+(four, so that's how things like ints and floats are stored.) s
+376 404 M
+(Every time you declare a local variable, you are naming a memory location.) s
+376 396 M
+(\(You pick the name, Java picks the address.\)  An assignment statement writes) s
+376 388 M
+(something into a memory location.) s
+376 372 M
+(                  bob) s
+376 364 M
+(       -----------------------------                         int bob;) s
+376 356 M
+(    ...  |   |   | 3 |   |   |   |  ...) s
+376 348 M
+(       -----------------------------                         bob = 3;) s
+376 340 M
+(          208 212 216 220 224 228) s
+376 324 M
+(Computers can store memory addresses in memory.  To reduce the number of) s
+376 316 M
+(syllables, memory addresses are called _pointers_ for short.  Some languages) s
+376 308 M
+(like C allow you to declare variables that are pointers.  A pointer field is) s
+376 300 M
+(a memory location that points to another memory location.) s
+376 284 M
+(                  bob     ptr) s
+376 276 M
+(       -----------------------------) s
+376 268 M
+(    ...  |   |   | 3 |   |216|   |  ...) s
+376 260 M
+(       --------------------+--------) s
+376 252 M
+(          208 212 216 220  |  228) s
+376 244 M
+(                   ^       |) s
+376 236 M
+(                   |       |) s
+376 228 M
+(                   \\-------/) s
+376 212 M
+(Java uses pointers too, but it considers them confidential information, and) s
+376 204 M
+(won't let you print them or look at the numbers directly.  Java references are) s
+376 196 M
+(a little bit like pointers, but as we'll learn soon, they're actually more) s
+376 188 M
+(complicated than pointers.) s
+376 172 M
+(The important point is that your computer's memory is just one giant array that) s
+376 164 M
+(has no structure except the structure you impose on it.  Java saves you a huge) s
+376 156 M
+(amount of time and effort by structuring memory for you.  Java does this by) s
+376 148 M
+(using hidden pointer-based data structures that you can't access from a Java) s
+376 140 M
+(program.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (39) def
+/fdir (.) def
+/ftail (39) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/30/14) def
+/modtimestr (04:04:05) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Mark and Sweep Garbage Collection) s
+5 500 M
+(---------------------------------) s
+5 492 M
+(A mark-and-sweep garbage collector runs in two separate phases.  The _mark_) s
+5 484 M
+(phase does a DFS from every root, and marks all the live objects.  The _sweep_) s
+5 476 M
+(phase does a pass over all the objects in memory.  Each object that was not) s
+5 468 M
+(marked as being live is garbage, and its memory is reclaimed.) s
+5 452 M
+(How does the sweep phase do a pass over all the objects in memory?  The JVM has) s
+5 444 M
+(an elaborate internal data structure for managing the heap.  This hidden data) s
+5 436 M
+(structure keeps track of free memory and allocated memory so that new objects) s
+5 428 M
+(can be allocated without overwriting live ones.  Time prevents my describing) s
+5 420 M
+(Java's heap data structure here, but it allows the garbage collector to do) s
+5 412 M
+(a pass over every object, even the ones that are not live.  It's roughly like) s
+5 404 M
+(an invisible linked list that links _everything_.) s
+5 388 M
+(Similarly, the stack frames on the stack are data structures that make it) s
+5 380 M
+(possible for the garbage collector to determine which data on the stack are) s
+5 372 M
+(references, and which are not.) s
+5 356 M
+(When a mark-and-sweep collector runs, your program stops running for an instant) s
+5 348 M
+(while the garbage collector does a mark pass and a sweep pass.  The garbage) s
+5 340 M
+(collector is typically started when the JVM tries to create a new object but) s
+5 332 M
+(doesn't have enough memory for it.) s
+5 316 M
+(Compaction) s
+5 308 M
+(----------) s
+5 300 M
+(Typical programs allocate and forget a good many objects.  One problem that) s
+5 292 M
+(arises is _fragmentation_, the tendency of the free memory to get broken up) s
+5 284 M
+(into lots of small pieces.  Fragmentation can render Java unable to allocate a) s
+5 276 M
+(large object despite having lots of free memory available.) s
+5 260 M
+(\(Fragmentation also means that the memory caches and virtual memory don't) s
+5 252 M
+(perform as well.  If you don't know why, wait until CS 61C or CS 152.\)) s
+5 236 M
+(To solve this problem, a compacting garbage collector actually picks up the) s
+5 228 M
+(objects and moves them to different locations in memory, thereby removing the) s
+5 220 M
+(space between the objects.  This is easily done during the sweep phase.) s
+5 204 M
+( -------------------------------------    -------------------------------------) s
+5 196 M
+( |object  object    object   object  | => |objectobjectobjectobject           |) s
+5 188 M
+( -------------------------------------    -------------------------------------) s
+376 508 M
+(References) s
+376 500 M
+(----------) s
+376 492 M
+(There's a problem here:  if we pick up an object and move it, what about all) s
+376 484 M
+(the references to that object?  Aren't those references wrong now?) s
+376 468 M
+(Interestingly, in the Oracle JVM, a reference isn't a pointer.  A reference is) s
+376 460 M
+(a handle.  A _handle_ is a pointer to a pointer.) s
+376 444 M
+(When an object moves, Java corrects the second pointer so it points to the) s
+376 436 M
+(object's new address.  That way, even if there are a million references to the) s
+376 428 M
+(object, they're all corrected in one fell swoop.  The "second pointers" are) s
+376 420 M
+(kept in a special table, since they don't take as much memory as objects.) s
+376 404 M
+(   reference reference reference              reference reference reference) s
+376 396 M
+(        |        |        |                        |        |        |     ) s
+376 388 M
+(        |        v        |                        |        v        |     ) s
+376 380 M
+(        \\----->====<------/                        \\----->====<------/     ) s
+376 372 M
+(           /---+- |                   ==>                 | -+----\\        ) s
+376 364 M
+(           |   ====                                       ====    |) s
+376 356 M
+(           v                                                      v) s
+376 348 M
+(          object                                                object) s
+376 340 M
+(       "Over here"                                       "No, wait, over here") s
+376 324 M
+(The special table of "second pointers" does not suffer from fragmentation) s
+376 316 M
+(because all pointers have exactly the same size.  Objects suffer from) s
+376 308 M
+(fragmentation because when a small object is garbage collected, the space it) s
+376 300 M
+(leaves behind might not be large enough to accommodate a larger object.  But) s
+376 292 M
+(a garbage-collected object's "second pointer" can simply be reused by any newly) s
+376 284 M
+(constructed object that comes along, because all "second pointers" have the) s
+376 276 M
+(same size.) s
+376 260 M
+(Copying Garbage Collection) s
+376 252 M
+(--------------------------) s
+376 244 M
+(Copying garbage collection is an alternative to mark and sweep.  It does) s
+376 236 M
+(compaction, but it is faster than mark and sweep with compaction because there) s
+376 228 M
+(is only one phase, rather than a mark phase and a sweep phase.) s
+376 212 M
+(Memory is divided into two distinct spaces, called the old space and the new) s
+376 204 M
+(space.  A copying garbage collector finds the live objects by DFS as usual, but) s
+376 196 M
+(when it encounters an object in the old space, it _immediately_ moves it to the) s
+376 188 M
+(new space.  The object is moved to the first available memory location in the) s
+376 180 M
+(new space, so compaction is part of the deal.  After all the objects are moved) s
+376 172 M
+(to the new space, the garbage objects that remain in the old space are simply) s
+376 164 M
+(forgotten.  There is no need for a sweep phase.) s
+376 148 M
+(Next time the garbage collector runs, the new space is relabeled the "old) s
+376 140 M
+(space" and the old space is relabeled the "new space".  Long-lived objects may) s
+376 132 M
+(be copied back and forth between the two spaces many times.) s
+376 116 M
+(While your program is running \(between garbage collections\), all your objects) s
+376 108 M
+(are in one space, while the other space sits empty.) s
+376 92 M
+(The advantage of copying garbage collection is that it's fast.  The) s
+376 84 M
+(disadvantage is that you effectively cut in half the amount of heap memory) s
+376 76 M
+(available to your program.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

@@ -1,0 +1,954 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Wed Mar  5 22:35:32 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (18) def
+/fdir () def
+/ftail (18) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (03/05/14) def
+/modtimestr (22:35:15) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 18) s
+5 508 M
+(                           Wednesday, March 5, 2014) s
+5 492 M
+(Today's reading:  Sierra & Bates, pp. 80-84.) s
+5 476 M
+(ENCAPSULATION) s
+5 468 M
+(=============) s
+5 460 M
+(A _module_ is a set of methods that work together as a whole to perform some) s
+5 452 M
+(task or set of related tasks.  A module is _encapsulated_ if its implementation) s
+5 444 M
+(is completely hidden, and it can be accessed only through a documented) s
+5 436 M
+(interface.) s
+5 420 M
+(As you know, an abstract data type \(ADT\) is an encapsulated data structure.) s
+5 412 M
+(Not all encapsulated modules are ADTs, though.  Algorithms \(like list sorters\)) s
+5 404 M
+(and applications \(like network routing software\) can also be encapsulated, even) s
+5 396 M
+(if they are distinct from the data structures they use.) s
+5 380 M
+(So far, I've discussed encapsulation as a way of preventing "evil tamperers") s
+5 372 M
+(from corrupting your data structures.  Who are these evil tamperers?) s
+5 364 M
+(Sometimes, they're your coworkers, or other programmers who will work on a) s
+5 356 M
+(project long after you're gone.  Often the evil tamperer is you.) s
+5 340 M
+(A Cautionary Tale) s
+5 332 M
+(-----------------) s
+5 324 M
+(Doug Whole, a programmer at a Silicon Valley startup, implements a singly-) s
+5 316 M
+(linked list much like the one you used in Homework 3, but all its fields are) s
+5 308 M
+(public.  Doug also writes application code that uses linked lists.  One day,) s
+5 300 M
+(Doug needs to write code that splices the second node out of a list.  It would) s
+5 292 M
+(only take one line, and he doesn't foresee ever needing to use the same) s
+5 284 M
+(operation anywhere else.  Being lazy, Doug doesn't feel like adding a new) s
+5 276 M
+(method to the List class.  Instead, he just does the work directly.) s
+5 260 M
+(public class ListMangler {) s
+5 252 M
+(  [lotsa code]) s
+5 236 M
+(  /* Gosh, I am sooooooooooooooooooo tired. */) s
+5 228 M
+(  list.head.next = list.head.next.next;) s
+5 212 M
+(  [lotsa more code]) s
+5 204 M
+(}) s
+5 188 M
+(Two years later, another programmer, Jeannie Yess, decides to improve the speed) s
+5 180 M
+(of their list data structure.  After careful thought, she decides to reprogram) s
+5 172 M
+(the List class so that it uses doubly-linked lists internally.  A "previous") s
+5 164 M
+(field is added to ListNode, and the List methods are rewritten.) s
+5 148 M
+(Jeannie tests her new List implementation extensively, and can find no bugs.) s
+5 140 M
+(But when she replaces Doug's List class with her own, the company's landmark) s
+5 132 M
+(ListMangler application repeatedly produces the wrong results.  After two long) s
+5 124 M
+(days of debugging, Jeannie discovers the culprit:  Doug's single line of code.) s
+5 108 M
+(This kind of bug is one of the most difficult to find and fix.  It's also very) s
+5 100 M
+(common in commercial software systems, and it can have far-reaching effects.) s
+5 84 M
+(You see, Doug's line of code is not the only one that reads or modifies the) s
+5 76 M
+(list data structure directly.  Jeannie still has to debug 100,000 lines of) s
+5 68 M
+(Doug's code in other failing applications, as well as 500,000 lines more) s
+5 60 M
+(written by other programmers who also directly manipulated ListNodes.  The List) s
+5 52 M
+(improvement project is abandoned.) s
+376 508 M
+(A Remedy:  Encapsulation) s
+376 500 M
+(------------------------                                     Applications      ) s
+376 492 M
+(You "encapsulate" a module by defining an interface                            ) s
+376 484 M
+(through which the outside world can use, inspect, or            ^ | ^ |        ) s
+376 476 M
+(manipulate it.  Recall that the interface is the set of         | | | |        ) s
+376 468 M
+(prototypes and behaviors of the methods \(and sometimes  -------Interface-------) s
+376 460 M
+(fields\) that access the module or data structure.       |       | | | |       |) s
+376 452 M
+(                                                        |       | v | v       |) s
+376 444 M
+(Think of a module or an ADT as a closed box.            |                     |) s
+376 436 M
+(Data can ONLY go in and out through the interface.      |      Module or      |) s
+376 428 M
+(Other attempts to access the internals of the module    | Abstract Data Type  |) s
+376 420 M
+(or ADT are outlawed.                                    |                     |) s
+376 412 M
+(                                                        -----------------------) s
+376 404 M
+(Why encapsulation is your friend:) s
+376 396 M
+(  [1]  The implementation is independent of the functionality.  A programmer) s
+376 388 M
+(       who has the documentation of the interface can implement a new version) s
+376 380 M
+(       of the module or ADT independently.  A new, better implementation can) s
+376 372 M
+(       replace an old one.) s
+376 364 M
+(  [2]  Encapsulation prevents Doug from writing applications that corrupt a) s
+376 356 M
+(       module's internal data.  In real-world programming, encapsulation) s
+376 348 M
+(       reduces debugging time.  A lot.) s
+376 340 M
+(  [3]  ADTs can guarantee that their invariants are preserved.) s
+376 332 M
+(  [4]  Teamwork.  Once you've rigorously defined interfaces between modules,) s
+376 324 M
+(       each programmer can independently implement a module without having) s
+376 316 M
+(       access to the other modules.  A large, complex programming project can) s
+376 308 M
+(       be broken up into dozens of pieces.) s
+376 300 M
+(  [5]  Documentation and maintainability.  By defining an unambiguous) s
+376 292 M
+(       interface, you make it easier for other programmers to fix bugs that) s
+376 284 M
+(       arise years after you've left the company.  Many bugs are a result of) s
+376 276 M
+(       unforeseen interactions between modules.  If there's a clear) s
+376 268 M
+(       specification of each interface and each module's behavior, bugs are) s
+376 260 M
+(       easier to trace.) s
+376 252 M
+(  [6]  When your Project 2 doesn't work, it will be easier to figure out which) s
+376 244 M
+(       teammate to blame.) s
+376 228 M
+(An interface is a CONTRACT between module writers, specifying exactly how they) s
+376 220 M
+(will communicate.) s
+376 204 M
+(Enforcing Encapsulation) s
+376 196 M
+(-----------------------) s
+376 188 M
+(Many languages offer only one construct for enforcing the encapsulation of) s
+376 180 M
+(ADTs:  self-discipline.) s
+376 164 M
+(As we've seen, Java offers facilities that fortify your self-discipline,) s
+376 156 M
+(especially Java packages and the "private", package, and "protected" modifiers) s
+376 148 M
+(for field and method declarations.) s
+376 132 M
+(Java's facilities aren't always enough, though.  There are circumstances in) s
+376 124 M
+(which you'll want to have multiple modules in the same package.  For instance,) s
+376 116 M
+(in Project 2 it would be reasonable to put all your modules in the "player") s
+376 108 M
+(package.  If you do that, you'll have to fall back on self-discipline.  This) s
+376 100 M
+(means defining your modules and interfaces before you start programming, and) s
+376 92 M
+(resisting the temptation to let one module snoop through or change another) s
+376 84 M
+(module's data structures.) s
+376 68 M
+(One way to find this self-discipline is, wherever one module uses another, to) s
+376 60 M
+(have a different team member work on each module.  If neither team member) s
+376 52 M
+(reveals their code to the other, it's much harder to yield to temptation.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (18) def
+/fdir () def
+/ftail (18) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (03/05/14) def
+/modtimestr (22:35:15) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Modules and Interfaces in Project 2) s
+5 500 M
+(-----------------------------------) s
+5 492 M
+(In Project 2, you are required to divide the programming task into modules,) s
+5 484 M
+(define interfaces between them, and document these interfaces in your GRADER) s
+5 476 M
+(file, before you start programming.  This will allow you to work as a team.) s
+5 460 M
+(The game-playing program you will write for              -----------------) s
+5 452 M
+(Project 2 can easily be broken down into a               | MachinePlayer |) s
+5 444 M
+(number of modules.  Four likely examples are             -----------------) s
+5 436 M
+(illustrated at right.  Your MachinePlayer, its     modules       |) s
+5 428 M
+(game tree search \(with alpha-beta pruning\), the         --------------------) s
+5 420 M
+(board evaluation function, and the module that          | game tree search |) s
+5 412 M
+(identifies winning networks can all be                  --------------------) s
+5 404 M
+(implemented completely independently, even                  |             |) s
+5 396 M
+(though they will ultimately work together.       -----------------------  |) s
+5 388 M
+(                                                 | evaluation function |  |) s
+5 380 M
+(You should probably break your MachinePlayer     -----------------------  |) s
+5 372 M
+(down into a few more modules than this \(the                      |        |) s
+5 364 M
+(project README gives a few more suggestions\), but        ----------------------) s
+5 356 M
+(don't try to break it up too much.  You will             | network identifier |) s
+5 348 M
+(reach a point where it is no longer possible to          ----------------------) s
+5 340 M
+(subdivide any module into pieces that are) s
+5 332 M
+(independent and communicate through _simple_ interfaces.) s
+5 316 M
+(You might still be confused:  what exactly _is_ a module?  It's a collection of) s
+5 308 M
+(methods that provide some functionality through a single \(hopefully elegant\)) s
+5 300 M
+(interface.  The main difference between a module and a class is this:) s
+5 284 M
+(  - A _module_ is organized around the _functionality_ it provides.) s
+5 276 M
+(  - A _class_ is organized around a _data_storage_unit_.  \(Remember that an) s
+5 268 M
+(    object is a repository of data.\)) s
+5 252 M
+(The concept of modules is a bit abstract for several reasons.) s
+5 236 M
+(  - A module can be made up of several classes, or a class could be made up of) s
+5 228 M
+(    several modules.  Module boundaries and class boundaries can be independent) s
+5 220 M
+(    of each other.) s
+5 212 M
+(      o Why would a module have several classes?  Because it might implement) s
+5 204 M
+(        a data structure made up of several classes of objects.  For example,) s
+5 196 M
+(        a List ADT has a list object and node objects.  A Graph ADT has a graph) s
+5 188 M
+(        object, vertices, and edges.) s
+5 180 M
+(      o Why would a class have several modules?  Because a single class of) s
+5 172 M
+(        object might support many independent operations.  The game tree search) s
+5 164 M
+(        and the evaluation function above both operate on a Network game board,) s
+5 156 M
+(        but they are independent enough of each other that you could change) s
+5 148 M
+(        the implementation of one without changing the other.  \(Of course, if) s
+5 140 M
+(        you change the way a game board is represented, you'll have to change) s
+5 132 M
+(        both implementations.\)) s
+5 124 M
+(  - A module may include many methods, or as few as one.  \(But not every method) s
+5 116 M
+(    needs its own module!\)) s
+5 108 M
+(  - A package may contain one module or many.) s
+5 92 M
+(For Project 2, you should document your modules and interfaces as follows.) s
+5 76 M
+(  - List the modules.) s
+5 68 M
+(  - For each module, specify its interface.) s
+5 60 M
+(      o Recall that an interface includes the prototype\(s\) for the methods by) s
+5 52 M
+(        which the module can be called.  This list does not necessarily include) s
+5 44 M
+(        all the methods in the module!  It only includes the methods that are) s
+5 36 M
+(        available for _external_ callers \(outside the module\).) s
+5 28 M
+(      o An interface also includes, for each prototype, a comment that) s
+5 20 M
+(        describes precisely the module's behavior from an _external_ observer's) s
+5 12 M
+(        point of view.  Your description does not need to state how the module) s
+5 4 M
+(        is implemented, though.  For instance, a module that does game tree) s
+376 516 M
+(        search should say that it returns a good, legal move, but it does not) s
+376 508 M
+(        need to say that it does alpha-beta pruning.  \(It's not forbidden to) s
+376 500 M
+(        say this, though.\)  Likewise, you should state that the "network) s
+376 492 M
+(        identifier" determines whether a game board contains a winning network) s
+376 484 M
+(        for a given player, but the interface does not need to specify what) s
+376 476 M
+(        algorithm is used to look for winning networks.  \(A description of the) s
+376 468 M
+(        algorithm should be included in the comments _in_ the implementation,) s
+376 460 M
+(        but it is not part of the _interface_.\)  ) s
+376 452 M
+(      o The behavior comment should also describe, for each prototype, every) s
+376 444 M
+(        parameter and the return value \(if any\), and how they are interpreted.) s
+376 436 M
+(        Here you are making a _contract_ that your module will speak a certain) s
+376 428 M
+(        language when it communicates with external callers.) s
+376 412 M
+(Here's a short example of an interface you might put in your GRADER file.) s
+376 404 M
+(\(You are not required to implement it this way; this is just an example.) s
+376 396 M
+(Other modules will probably require longer behavioral descriptions.\)) s
+376 380 M
+(  /**) s
+376 372 M
+(   *  hasValidNetwork\(\) determines whether "this" GameBoard has a valid network) s
+376 364 M
+(   *  for player "side".  \(Does not check whether the opponent has a network.\)) s
+376 356 M
+(   *  A full description of what constitutes a valid network appears in the) s
+376 348 M
+(   *  project "readme" file.) s
+376 340 M
+(   *) s
+376 332 M
+(   *  Unusual conditions:) s
+376 324 M
+(   *    If side is neither MachinePlayer.COMPUTER nor MachinePlayer.OPPONENT,) s
+376 316 M
+(   *          returns false.) s
+376 308 M
+(   *    If GameBoard squares contain illegal values, the behavior of this) s
+376 300 M
+(   *          method is undefined \(i.e., don't expect any reasonable behavior\).) s
+376 292 M
+(   *) s
+376 284 M
+(   *  @param side is MachinePlayer.COMPUTER or MachinePlayer.OPPONENT) s
+376 276 M
+(   *  @return true if player "side" has a winning network in "this" GameBoard;) s
+376 268 M
+(   *          false otherwise.) s
+376 260 M
+(   **/) s
+376 252 M
+(  protected boolean hasValidNetwork\(int side\)) s
+376 236 M
+(Your description of how a module behaves should be complete and unambiguous,) s
+376 228 M
+(and should take into account unusual and erroneous inputs and circumstances.) s
+376 220 M
+(\(It's sometimes okay if your module doesn't handle an erroneous input well, but) s
+376 212 M
+(you should document that.\)  When you and your partners are writing the) s
+376 204 M
+(interfaces for each module, think carefully about whether you believe these) s
+376 196 M
+(interfaces will really allow all the modules to do everything they need to do.) s
+376 180 M
+(When you design your interfaces, they should appear \(prototypes and behavioral) s
+376 172 M
+(descriptions both\) in both the GRADER file and in the code itself.  Once) s
+376 164 M
+(you've finished, decide which team members will implement which modules, and) s
+376 156 M
+(start programming.) s
+376 140 M
+(You may find your team returning to modify the interfaces after a first attempt) s
+376 132 M
+(at programming, but that's okay.  Just be sure to change the documentation \(in) s
+376 124 M
+(both GRADER and the code comments\) to reflect your new design decisions.) s
+376 108 M
+(I recommend you write a draft of your interfaces this week so you'll have lots) s
+376 100 M
+(of time to program.  The interfaces in the GRADER file are worth 10% of your) s
+376 92 M
+(project score.  You will need to show them to your TA next week in Lab 8.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

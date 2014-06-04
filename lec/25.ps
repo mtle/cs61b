@@ -1,0 +1,1010 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Mar 19 02:40:08 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (25) def
+/fdir (.) def
+/ftail (25) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (03/19/14) def
+/modtimestr (02:39:57) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B:  Lecture 25) s
+5 508 M
+(                           Wednesday, March 19, 2014) s
+5 492 M
+(Today's reading:  Goodrich & Tamassia, Sections 8.1-8.3.) s
+5 476 M
+(PRIORITY QUEUES) s
+5 468 M
+(===============) s
+5 460 M
+(A priority queue, like a dictionary, contains _entries_ that each consist of) s
+5 452 M
+(a key and an associated value.  However, whereas a dictionary is used when we) s
+5 444 M
+(want to be able to look up arbitrary keys, a priority queue is used to) s
+5 436 M
+(prioritize entries.  Define a total order on the keys \(e.g. alphabetical) s
+5 428 M
+(order\).  You may identify or remove the entry whose key is the lowest \(but no) s
+5 420 M
+(other entry\).  This limitation helps to make priority queues fast.  However, an) s
+5 412 M
+(entry with any key may be inserted at any time.) s
+5 396 M
+(For concreteness, let's use Integer objects as our keys.  The main operations:) s
+5 388 M
+(- insert\(\) adds an entry to the priority queue;) s
+5 380 M
+(- min\(\) returns the entry with the minimum key; and) s
+5 372 M
+(- removeMin\(\) both removes and returns the entry with the minimum key.) s
+5 356 M
+(                  key) s
+5 348 M
+(  ---------        |         ---------              ---------) s
+5 340 M
+(  |4: womp|        v         |4: womp|              |       |) s
+5 332 M
+(  |7: gong|-insert\(5, hoot\)->|7: gong|-removeMin\(\)->|7: gong|->min\(\)) s
+5 324 M
+(  |       |           ^      |5: hoot|     |        |5: hoot|    |) s
+5 316 M
+(  ---------           |      ---------     v        ---------    v) s
+5 308 M
+(                    value              \(4, womp\)             \(5, hoot\)) s
+5 292 M
+(Priority queues are most commonly used as "event queues" in simulations.  Each) s
+5 284 M
+(value on the queue is an event that is expected to take place, and each key) s
+5 276 M
+(is the time the event takes place.  A simulation operates by removing) s
+5 268 M
+(successive events from the queue and simulating them.  This is why most) s
+5 260 M
+(priority queues return the minimum, rather than maximum, key:  we want to) s
+5 252 M
+(simulate the events that occur first first.) s
+5 236 M
+(public interface PriorityQueue {) s
+5 228 M
+(  public int size\(\);) s
+5 220 M
+(  public boolean isEmpty\(\);) s
+5 212 M
+(  Entry insert\(Object key, Object value\);) s
+5 204 M
+(  Entry min\(\);) s
+5 196 M
+(  Entry removeMin\(\);) s
+5 188 M
+(}) s
+5 172 M
+(See page 340 of Goodrich & Tamassia for how they implement an "Entry".) s
+5 156 M
+(Binary Heaps:  An Implementation of Priority Queues) s
+5 148 M
+(---------------------------------------------------) s
+5 140 M
+(A _complete_binary_tree_ is a binary tree in which every row is full, except) s
+5 132 M
+(possibly the bottom row, which is filled from left to right as in the) s
+5 124 M
+(illustration below.  Just the keys are shown; the associated values are) s
+5 116 M
+(omitted.) s
+5 100 M
+(         2       index:  0   1   2   3   4   5   6    7   8    9   10) s
+5 92 M
+(        / \\) s
+5 84 M
+(       /   \\           ------------------------------------------------) s
+5 76 M
+(      5     3          |   | 2 | 5 | 3 | 9 | 6 | 11 | 4 | 17 | 10 | 8 |) s
+5 68 M
+(     / \\   / \\         ------------------------------------------------) s
+5 60 M
+(    9   6 11  4          ^) s
+5 52 M
+(   / \\ /                 |) s
+5 44 M
+( 17 10 8                 \\--- array index 0 intentionally left empty.) s
+376 508 M
+(A _binary_heap_ is a complete binary tree whose entries satisfy the) s
+376 500 M
+(_heap-order_property_:  no child has a key less than its parent's key.) s
+376 492 M
+(Observe that every subtree of a binary heap is also a binary heap, because) s
+376 484 M
+(every subtree is complete and satisfies the heap-order property.) s
+376 468 M
+(Because it is complete, a binary heap can be stored compactly as an array of) s
+376 460 M
+(entries.  We map tree nodes to array indices with _level_numbering_, which) s
+376 452 M
+(places the root at index 1 and orders the remaining nodes by a level-order) s
+376 444 M
+(traversal of the tree.) s
+376 428 M
+(Observe that if a node's index is i, its children's indices are 2i and 2i+1,) s
+376 420 M
+(and its parent's index is floor\(i/2\).  Hence, no node needs to store explicit) s
+376 412 M
+(references to its parent or children.  \(Array index 0 is left empty to make the) s
+376 404 M
+(indexing work out nicely.  If we instead put the root at index 0, node i's) s
+376 396 M
+(children are at indices 2i+1 and 2i+2, and its parent is at floor\([i-1]/2\).\)) s
+376 380 M
+(We can use either an array-based or a node-and-reference-based tree data) s
+376 372 M
+(structure, but the array representation tends to be faster \(by a significant) s
+376 364 M
+(constant factor\) because there is no need to read and write the references that) s
+376 356 M
+(connect nodes to each other, cache performance is better, and finding the last) s
+376 348 M
+(node in the level order is easier.) s
+376 332 M
+(Just like in hash tables, either each tree node has two references \(one for the) s
+376 324 M
+(key, and one for the value\), or each node references an "Entry" object \(see) s
+376 316 M
+(page 340 of Goodrich and Tamassia\).) s
+376 300 M
+(Let's look at how we implement priority queue operations with a binary heap.) s
+376 284 M
+([1]  Entry min\(\);) s
+376 268 M
+(The heap-order property ensures that the entry with the minimum key is always) s
+376 260 M
+(at the top of the heap.  Hence, we simply return the entry at the root node.) s
+376 252 M
+(If the heap is empty, return null or throw an exception.) s
+376 236 M
+([2]  Entry insert\(Object k, Object v\);) s
+376 220 M
+(Let x be the new entry \(k, v\), whose key is k and whose value is v.  We place) s
+376 212 M
+(the new entry x in the bottom level of the tree, at the first free spot from) s
+376 204 M
+(the left.  \(If the bottom level is full, start a new level with x at the far) s
+376 196 M
+(left.\)  In an array-based implementation, we place x in the first free location) s
+376 188 M
+(in the array \(excepting index 0\).) s
+376 172 M
+(Of course, the new entry's key may violate the heap-order property.  We correct) s
+376 164 M
+(this by having the entry bubble up the tree until the heap-order property is) s
+376 156 M
+(satisfied.  More precisely, we compare x's key with its parent's key.) s
+376 148 M
+(While x's key is less, we exchange x with its parent, then repeat the test with) s
+376 140 M
+(x's new parent.  Continue until x's key is greater than or equal to its parent,) s
+376 132 M
+(or x reaches the root.  For instance, if we insert an entry whose key is 2:) s
+376 116 M
+(          2                  2                  2                  2) s
+376 108 M
+(         / \\                / \\                / \\                / \\) s
+376 100 M
+(        /   \\              /   \\              /   \\              /   \\) s
+376 92 M
+(       5     3            5     3            5     3            2     3) s
+376 84 M
+(      / \\   / \\    =>    / \\   / \\    =>    / \\   / \\    =>    / \\   / \\) s
+376 76 M
+(     9   6 11  4        9   6 11  4        9   2 11  4        9   5 11  4) s
+376 68 M
+(    / \\ /              / \\ / \\            / \\ / \\            / \\ / \\) s
+376 60 M
+(  17 10 8            17 10 8  2         17 10 8  6         17 10 8  6) s
+376 44 M
+(As this example illustrates, a heap can contain multiple entries with the same) s
+376 36 M
+(key.  \(After all, in a typical simulation, we can't very well outlaw multiple) s
+376 28 M
+(events happening at the same time.\)) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (25) def
+/fdir (.) def
+/ftail (25) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (03/19/14) def
+/modtimestr (02:39:57) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(When we finish, is the heap-order property satisfied?          p          x) s
+5 500 M
+(Yes, if the heap-order property was satisfied before the      / \\        / \\) s
+5 492 M
+(insertion.  Let's look at a typical exchange of x with a     s   x  =>  s   p) s
+5 484 M
+(parent p \(right\) during the insertion operation.  Since     /\\   /\\    /\\   /\\) s
+5 476 M
+(the heap-order property was satisfied before the insertion,     l  r       l  r) s
+5 468 M
+(we know that p <= s \(where s is x's sibling\), p <= l, and) s
+5 460 M
+(p <= r \(where l and r are x's children\).  We swap only if x < p, which implies) s
+5 452 M
+(that x < s; after the swap, x is the parent of s.  After the swap, p is the) s
+5 444 M
+(parent of l and r.  All other relationships in the subtree rooted at x are) s
+5 436 M
+(unchanged, so after the swap, the tree rooted at x has the heap-order property.) s
+5 420 M
+(For maximum speed, don't put x at the bottom of the tree and bubble it up.) s
+5 412 M
+(Instead, bubble a hole up the tree, then fill in x.  This modification saves) s
+5 404 M
+(the time that would be spent setting a sequence of references to x that are) s
+5 396 M
+(going to change anyway.) s
+5 380 M
+(insert\(\) returns an Entry object representing \(k, v\).) s
+5 364 M
+([3]  Entry removeMin\(\);) s
+5 348 M
+(If the heap is empty, return null or throw an exception.  Otherwise, begin by) s
+5 340 M
+(removing the entry at the root node and saving it for the return value.  This) s
+5 332 M
+(leaves a gaping hole at the root.  We fill the hole with the last entry in the) s
+5 324 M
+(tree \(which we call "x"\), so that the tree is still complete.) s
+5 308 M
+(It is unlikely that x has the minimum key.  Fortunately, both subtrees rooted) s
+5 300 M
+(at the root's children are heaps, and thus the new mimimum key is one of these) s
+5 292 M
+(two children.  We bubble x down the heap until the heap-order property is) s
+5 284 M
+(satisfied, as follows.  We compare x's key with both its children's keys.) s
+5 276 M
+(While x has a child whose key is smaller, swap x with the child having the) s
+5 268 M
+(minimum key, then repeat the test with x's new children.  Continue until x is) s
+5 260 M
+(less than or equal to its children, or reaches a leaf.) s
+5 244 M
+(Consider running removeMin\(\) on our original tree.) s
+5 228 M
+(          2                  8                  3                  3) s
+5 220 M
+(         / \\                / \\                / \\                / \\) s
+5 212 M
+(        /   \\              /   \\              /   \\              /   \\) s
+5 204 M
+(       5     3            5     3            5     8            5     4) s
+5 196 M
+(      / \\   / \\    =>    / \\   / \\    =>    / \\   / \\    =>    / \\   / \\) s
+5 188 M
+(     9   6 11  4        9   6 11  4        9   6 11  4        9   6 11  8) s
+5 180 M
+(    / \\ /              / \\                / \\                / \\) s
+5 172 M
+(  17 10 8            17 10              17 10              17 10) s
+5 156 M
+(Above, the entry bubbled all the     1                  4                  2) s
+5 148 M
+(way to a leaf.  This is not         / \\                / \\                / \\) s
+5 140 M
+(always the case, as the            /   \\              /   \\              /   \\) s
+5 132 M
+(example at right shows.           2     3     =>     2     3     =>     4     3) s
+5 124 M
+(                                 / \\   / \\          / \\   /            / \\   /) s
+5 116 M
+(                                9   6 11  4        9   6 11           9   6 11) s
+5 100 M
+(For maximum speed, don't put x at the root and bubble it down.  Instead, bubble) s
+5 92 M
+(a hole down the tree, then fill in x.) s
+376 516 M
+(Running Times) s
+376 508 M
+(-------------) s
+376 500 M
+(There are other, less efficient ways we could implement a priority queue than) s
+376 492 M
+(using a heap.  For instance, we could use a list or array, sorted or unsorted.) s
+376 484 M
+(The following table shows running times for all, with n entries in the queue.) s
+376 468 M
+(                    Binary Heap        Sorted List/Array   Unsorted List/Array) s
+376 460 M
+(min\(\)               Theta\(1\)           Theta\(1\)            Theta\(n\)) s
+376 452 M
+(insert\(\)) s
+376 444 M
+(  worst-case        Theta\(log n\) *     Theta\(n\)            Theta\(1\) *) s
+376 436 M
+(  best-case         Theta\(1\) *         Theta\(1\) *          Theta\(1\) *) s
+376 428 M
+(removeMin\(\)) s
+376 420 M
+(  worst-case        Theta\(log n\)       Theta\(1\) **         Theta\(n\)) s
+376 412 M
+(  best-case         Theta\(1\)           Theta\(1\) **         Theta\(n\)) s
+376 396 M
+( *   If you're using an array-based data structure, these running times assume) s
+376 388 M
+(     that you don't run out of room.  If you do, it will take Theta\(n\) time to) s
+376 380 M
+(     allocate a larger array and copy the entries into it.  However, if you) s
+376 372 M
+(     double the array size each time, the _average_ running time will still be) s
+376 364 M
+(     as indicated.) s
+376 356 M
+( **  Removing the minimum from a sorted array in constant time is most easily) s
+376 348 M
+(     done by keeping the array always sorted from largest to smallest.) s
+376 332 M
+(In a binary heap, min's running time is clearly in Theta\(1\).) s
+376 316 M
+(insert\(\) puts an entry x at the bottom of the tree and bubbles it up.  At each) s
+376 308 M
+(level of the tree, it takes O\(1\) time to compare x with its parent and swap if) s
+376 300 M
+(indicated.  An n-node complete binary tree has height floor\(log2 n\).  In the) s
+376 292 M
+(worst case, x will bubble all the way to the top, taking Theta\(log n\) time.) s
+376 276 M
+(Similarly, removeMin\(\) may cause an entry to bubble all the way down the heap,) s
+376 268 M
+(taking Theta\(log n\) worst-case time.) s
+376 252 M
+(Bottom-Up Heap Construction) s
+376 244 M
+(---------------------------) s
+376 236 M
+(Suppose we are given a bunch of randomly ordered entries, and want to make a) s
+376 228 M
+(heap out of them.  We could insert them one by one in O\(n log n\) time, but) s
+376 220 M
+(there's a faster way.  We define one more heap operation.) s
+376 204 M
+([4]  void bottomUpHeap\(\);) s
+376 188 M
+(First, we make a complete tree out of the entries, in any order.  \(If we're) s
+376 180 M
+(using an array representation, we just throw all the entries into an array.\)) s
+376 172 M
+(Then we work backward from the last internal node \(non-leaf node\) to the root) s
+376 164 M
+(node, in reverse order in the array or the level-order traversal.  When we) s
+376 156 M
+(visit a node this way, we bubble its entry down the heap as in removeMin\(\).) s
+376 140 M
+(Before we bubble an entry down, we know \(inductively\) that its two child) s
+376 132 M
+(subtrees are heaps.  Hence, by bubbling the entry down, we create a larger heap) s
+376 124 M
+(rooted at the node where that entry started.) s
+376 116 M
+(                                                                +-+) s
+376 108 M
+(        9                  9                  9                 |2|) s
+376 100 M
+(       / \\                / \\                / \\                /-\\) s
+376 92 M
+(      /   \\              /   \\-+          +-/   \\              /   \\) s
+376 84 M
+(     4     7     =>     4    |2|    =>    |2|    2     =>     4     2) s
+376 76 M
+(    / \\   / \\          / \\   /-\\          /-\\   / \\          / \\   / \\) s
+376 68 M
+(   2   8 2   6        2   8 7   6        4   8 7   6        9   8 7   6) s
+376 52 M
+(The running time of bottomUpHeap is tricky to derive.  If each internal node) s
+376 44 M
+(bubbles all the way down, then the running time is proportional to the sum of) s
+376 36 M
+(the heights of all the nodes in the tree.  Page 371 of Goodrich and Tamassia) s
+376 28 M
+(has a simple and elegant argument showing that this sum is less than n, where n) s
+376 20 M
+(is the number of entries being coalesced into a heap.  Hence, the running time) s
+376 12 M
+(is in Theta\(n\), which beats inserting n entries into a heap individually.) s
+_R
+S
+%%Page: (3) 3
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 3 def
+/fname (25) def
+/fdir (.) def
+/ftail (25) def
+% User defined strings:
+/pagenumstr (3) def
+/moddatestr (03/19/14) def
+/modtimestr (02:39:57) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(Postscript:  Other Types of Heaps \(not examinable\)) s
+5 508 M
+(---------------------------------) s
+5 500 M
+(Binary heaps are not the only heaps in town.  Several important variants are) s
+5 492 M
+(called "mergeable heaps", because it is relatively fast to combine two) s
+5 484 M
+(mergeable heaps together into a single mergeable heap.  We will not describe) s
+5 476 M
+(these complicated heaps in CS 61B, but it's worthwhile for you to know they) s
+5 468 M
+(exist in case you ever need one.) s
+5 452 M
+(The best-known mergeable heaps are called "binomial heaps," "Fibonacci heaps,") s
+5 444 M
+("skew heaps," and "pairing heaps."  Fibonacci heaps have another remarkable) s
+5 436 M
+(property:  if you have a reference to an arbitrary node in a Fibonacci heap,) s
+5 428 M
+(you can decrease its key in constant time.  \(Pairing heaps are suspected of) s
+5 420 M
+(having the same property, but nobody knows for sure.\)  This operation is used) s
+5 412 M
+(frequently by Dijkstra's algorithm, an important algorithm for finding the) s
+5 404 M
+(shortest path in a graph.  The following running times are all worst-case.) s
+5 388 M
+(                  Binary       Binomial     Skew         Pairing      Fibonacci) s
+5 380 M
+(insert\(\)          O\(log n\)     O\(log n\)     O\(1\)         O\(log n\) *   O\(1\)) s
+5 372 M
+(removeMin\(\)       O\(log n\)     O\(log n\)     O\(log n\)     O\(log n\)     O\(log n\)) s
+5 364 M
+(merge\(\)           O\(n\)         O\(log n\)     O\(1\)         O\(log n\) *   O\(1\)) s
+5 356 M
+(decreaseKey\(\)     O\(log n\)     O\(log n\)     O\(log n\)     O\(log n\) *   O\(1\)) s
+5 340 M
+( *   Conjectured to be O\(1\), but nobody has proven or disproven it.) s
+5 324 M
+(The time bounds given here for skew heaps, pairing heaps, and Fibonacci heaps) s
+5 316 M
+(are "amortized" bounds, not worst case bounds.  This means that, if you start) s
+5 308 M
+(from an empty heap, any sequence of operations will take no more than the given) s
+5 300 M
+(time bound on average, although individual operations may occasionally take) s
+5 292 M
+(longer.  We'll discuss amortized analysis near the end of the semester.) s
+_R
+S
+%%Trailer
+%%Pages: 3
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

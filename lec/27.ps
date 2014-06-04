@@ -1,0 +1,906 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Apr  2 04:45:28 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (27) def
+/fdir (.) def
+/ftail (27) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/02/14) def
+/modtimestr (04:44:35) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 27) s
+5 508 M
+(                           Wednesday, April 2, 2014) s
+5 492 M
+(2-3-4 TREES) s
+5 484 M
+(===========) s
+5 476 M
+(Last lecture, we learned about the Ordered Dictionary ADT, and we learned one) s
+5 468 M
+(data structure for implementing it:  binary search trees.  Today we learn) s
+5 460 M
+(a faster one.) s
+5 444 M
+(A 2-3-4 tree is a perfectly balanced tree.  It has a big advantage over regular) s
+5 436 M
+(binary search trees:  because the tree is perfectly balanced, find, insert, and) s
+5 428 M
+(remove operations take O\(log n\) time, even in the worst case.) s
+5 412 M
+(2-3-4 trees are thus named because every node has 2, 3, or 4 children, except) s
+5 404 M
+(leaves, which are all at the bottom level of the tree.  Each node stores 1, 2,) s
+5 396 M
+(or 3 entries, which determine how other entries are distributed among its) s
+5 388 M
+(children's subtrees.) s
+5 372 M
+(Each internal \(non-leaf\) node has one more child than entries.  For example,) s
+5 364 M
+(a node with keys [20, 40, 50] has four children.  Eack key k in the subtree) s
+5 356 M
+(rooted at the first child satisfies k <= 20; at the second child,) s
+5 348 M
+(20 <= k <= 40; at the third child, 40 <= k <= 50; and at the fourth child,) s
+5 340 M
+(k >= 50.) s
+5 324 M
+(WARNING:  The algorithms for insertion and deletion I'll discuss today are) s
+5 316 M
+(different from those discussed by Goodrich and Tamassia.  The text presents) s
+5 308 M
+("bottom-up" 2-3-4 trees, so named because the effects of node splits at the) s
+5 300 M
+(bottom of the tree can work their way back up toward the root.  I'll discuss) s
+5 292 M
+("top-down" 2-3-4 trees, in which insertion and deletion finish at the leaves.) s
+5 284 M
+(Top-down 2-3-4 trees are usually faster than bottom-up ones, because both trees) s
+5 276 M
+(search down from the root to the leaves, but only the bottom-up trees sometimes) s
+5 268 M
+(go back up to the root.  Goodrich and Tamassia call 2-3-4 trees "\(2, 4\) trees".) s
+5 252 M
+(2-3-4 trees are a type of B-tree, which you may learn about someday in) s
+5 244 M
+(connection with fast disk access for database systems.  B-trees on disks) s
+5 236 M
+(usually use the top-down insertion/deletion algorithms, because accessing) s
+5 228 M
+(a disk track is slow, so you'd rather not revisit it multiple times.) s
+5 212 M
+([1]  Entry find\(Object k\);) s
+5 196 M
+(Finding an entry is straightforward.        ==========) s
+5 188 M
+(Start at the root.  At each node,           +20 40 50+) s
+5 180 M
+(check for the key k; if it's not         /--==========------\\) s
+5 172 M
+(present, move down to the           /---/      /  \\          \\-----\\) s
+5 164 M
+(appropriate child chosen by     ----      ----      ----            =======) s
+5 156 M
+(comparing k against the keys.   |14|      |32|      |43|            +70 79+) s
+5 148 M
+(Continue until k is found,      ----      ----      ----            =======) s
+5 140 M
+(or k is not found at a          /  \\      /  \\      /  \\            /  |  \\) s
+5 132 M
+(leaf node.  For example,     ---- ---- ---- ---- ---- ---- ---------- ==== ----) s
+5 124 M
+(find\(74\) visits the          |10| |18| |25| |33| |42| |47| |57 62 66| +74+ |81|) s
+5 116 M
+(double-lined boxes at right. ---- ---- ---- ---- ---- ---- ---------- ==== ----) s
+5 100 M
+(Incidentally, you can define an inorder traversal on 2-3-4 trees analogous to) s
+5 92 M
+(that on binary trees, and it visits the keys in sorted order.) s
+376 508 M
+([2]  Entry insert\(Object k, Object e\);) s
+376 492 M
+(insert\(\), like find\(\), walks down the tree in search of the key k.  If it finds) s
+376 484 M
+(an entry with key k, it proceeds to that entry's "left child" and continues.) s
+376 468 M
+(Unlike find\(\), insert\(\) sometimes modifies             ----         -------) s
+376 460 M
+(nodes of the tree as it walks down.                    |20|         |11 20|) s
+376 452 M
+(Specifically, whenever insert\(\) encounters             ----         -------) s
+376 444 M
+(a 3-key node, the middle key is ejected,               /  \\   =>    /  |  \\) s
+376 436 M
+(and is placed in the parent node instead.     ========== ----    ---- ---- ----) s
+376 428 M
+(Since the parent was previously treated the   +10 11 12+ |30|    |10| |12| |30|) s
+376 420 M
+(same way, the parent has at most two keys,    ========== ----    ---- ---- ----) s
+376 412 M
+(and always has room for a third.  The other) s
+376 404 M
+(two keys in the 3-key node are split into two separate 1-key nodes, which are) s
+376 396 M
+(divided underneath the old middle key \(as the figure illustrates\).) s
+376 380 M
+(For example, suppose we                      ----                              ) s
+376 372 M
+(insert 60 into the tree                      |40|                              ) s
+376 364 M
+(depicted in [1].  The                      /------\\                            ) s
+376 356 M
+(first node visited is                 /---/        \\----\\                      ) s
+376 348 M
+(the root, which has three          ----                  ----                  ) s
+376 340 M
+(keys; so we kick the               |20|                  |50|                  ) s
+376 332 M
+(middle key \(40\) upstairs.          ----                /------\\                ) s
+376 324 M
+(Since the root node has           /    \\              /        \\               ) s
+376 316 M
+(no parent, a new node         ----      ----      ----          ----------     ) s
+376 308 M
+(is created to hold 40         |14|      |32|      |43|          |62 70 79|     ) s
+376 300 M
+(and becomes the root.         ----      ----      ----          ----------     ) s
+376 292 M
+(Similarly, 62 is kicked       /  \\      /  \\      /  \\          /  |  |   \\    ) s
+376 284 M
+(upstairs when insert\(\)     ---- ---- ---- ---- ---- ---- ------- ---- ---- ----) s
+376 276 M
+(finds the node containing  |10| |18| |25| |33| |42| |47| |57 60| |66| |74| |81|) s
+376 268 M
+(it.  This ensures us that  ---- ---- ---- ---- ---- ---- ------- ---- ---- ----) s
+376 260 M
+(when we arrive at the leaf) s
+376 252 M
+(\(labeled 57 in this example\), there's room to add the new key 60.) s
+376 236 M
+(Observe that along the way, we created a new 3-key node "62 70 79".  We do not) s
+376 228 M
+(kick its middle key upstairs until the next time it is visited.) s
+376 212 M
+(Again, the reasons why we split every 3-key node we encounter \(and move its) s
+376 204 M
+(middle key up one level\) are \(1\) to make sure there's room for the new key in) s
+376 196 M
+(the leaf node, and \(2\) to make sure that above the leaves, there's room for any) s
+376 188 M
+(key that gets kicked upstairs.  Sometimes, an insertion operation increases the) s
+376 180 M
+(height of the tree by one by creating a new root.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (27) def
+/fdir (.) def
+/ftail (27) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/02/14) def
+/modtimestr (04:44:35) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+([3]  Entry remove\(Object k\);) s
+5 492 M
+(2-3-4 tree remove\(\) is similar to remove\(\) on binary search trees:  you find) s
+5 484 M
+(the entry you want to remove \(having key k\).  If it's in a leaf, you remove it.) s
+5 476 M
+(If it's in an internal node, you replace it with the entry with the next higher) s
+5 468 M
+(key.  That entry is always in a leaf.  In either case, you remove an entry from) s
+5 460 M
+(a leaf in the end.) s
+5 444 M
+(Like insert\(\), remove\(\) changes nodes of the tree as it walks down.  Whereas) s
+5 436 M
+(insert\(\) eliminates 3-key nodes \(moving keys up the tree\) to make room for new) s
+5 428 M
+(keys, remove\(\) eliminates 1-key nodes \(pulling keys down the tree\) so that a) s
+5 420 M
+(key can be removed from a leaf without leaving it empty.  There are three ways) s
+5 412 M
+(1-key nodes \(except the root\) are eliminated.) s
+5 396 M
+(\(1\)  When remove\(\) encounters a 1-key  -------                  -------        ) s
+5 388 M
+(node \(except the root\), it tries       |20 40|                  |20 50|        ) s
+5 380 M
+(to steal a key from an adjacent        -------                  -------        ) s
+5 372 M
+(sibling.  But we can't just steal      /  |  \\          =>     /   |   \\       ) s
+5 364 M
+(the sibling's key without          ---- ==== ----------    ---- ------- -------) s
+5 356 M
+(violating the search tree          |10| +30+ |50 51 52|    |10| |30 40| |51 52|) s
+5 348 M
+(invariant.  This figure shows      ---- ==== ----------    ---- ------- -------) s
+5 340 M
+(remove's action, called a           /\\   /\\   / |  | \\      /\\   / | \\   / | \\ ) s
+5 332 M
+("rotation", when it reaches "30".            S                        S        ) s
+5 324 M
+(We move a key from the sibling to) s
+5 316 M
+(the parent, and we move a key from the parent to the 1-key node.  We also move) s
+5 308 M
+(a subtree S from the sibling to the 1-key node \(now a 2-key node\).) s
+5 292 M
+(Goodrich & Tamassia call rotations "transfer" operations.  Note that we can't) s
+5 284 M
+(steal a key from a non-adjacent sibling.) s
+5 268 M
+(\(2\)  If no adjacent sibling has more than one     -------               ----   ) s
+5 260 M
+(key, a rotation can't be used.  In this case,     |20 40|               |40|   ) s
+5 252 M
+(the 1-key node steals a key from its parent.      -------               ----   ) s
+5 244 M
+(Since the parent was previously treated the       /  |  \\    =>         /  \\   ) s
+5 236 M
+(same way \(unless it's the root\), it has at    ==== ---- ----    ---------- ----) s
+5 228 M
+(least two keys, and can spare one.  The       +10+ |30| |50|    |10 20 30| |50|) s
+5 220 M
+(sibling is also absorbed, and the 1-key node  ==== ---- ----    ---------- ----) s
+5 212 M
+(becomes a 3-key node.  The figure illustrates) s
+5 204 M
+(remove's action when it reaches "10".  This is called a "fusion" operation.) s
+5 188 M
+(\(3\)  If the parent is the root and contains only one key, and the sibling) s
+5 180 M
+(contains only one key, then the current 1-key node, its 1-key sibling, and the) s
+5 172 M
+(1-key root are fused into one 3-key node that serves as the new root.  The) s
+5 164 M
+(height of the tree decreases by one.) s
+5 148 M
+(Eventually we reach a leaf.  After we process the leaf, it has at least two) s
+5 140 M
+(keys \(if there are at least two keys in the tree\), so we can delete the key) s
+5 132 M
+(and still have one key in the leaf.) s
+5 116 M
+(For example, suppose we                  ----------                            ) s
+5 108 M
+(remove 40 from the large                 |20 xx 50|                            ) s
+5 100 M
+(tree depicted in [2].  The            /-----------------\\                      ) s
+5 92 M
+(root node contains 40,            /--/      /   \\        \\-----\\               ) s
+5 84 M
+(which we mark "xx" to         ----      ----      ----          ----------     ) s
+5 76 M
+(remind us that we plan to     |14|      |32|      |43|          |62 70 79|     ) s
+5 68 M
+(replace it with the           ----      ----      ----          ----------     ) s
+5 60 M
+(smallest key in the root      /  \\      /  \\      /  \\          /  |  |   \\    ) s
+5 52 M
+(node's right subtree.  To  ---- ---- ---- ---- ---- ---- ------- ---- ---- ----) s
+5 44 M
+(find that key, we move on  |10| |18| |25| |33| |42| |47| |57 60| |66| |74| |81|) s
+5 36 M
+(to the 1-key node labeled  ---- ---- ---- ---- ---- ---- ------- ---- ---- ----) s
+5 28 M
+(50.  Following our rules) s
+5 20 M
+(for 1-key nodes, we fuse 50 with its sibling and parent to create a new 3-key) s
+5 12 M
+(root labeled "20 xx 50".) s
+376 508 M
+(Next, we visit the node                     ----------) s
+376 500 M
+(labeled 43.  Again                          |20 xx 62|) s
+376 492 M
+(following our rules for                 /--------------------\\) s
+376 484 M
+(1-key nodes, we rotate            /----/    /       \\         \\-----\\) s
+376 476 M
+(62 from a sibling to the      ----      ----      -------            -------) s
+376 468 M
+(root, and move 50 from        |14|      |32|      |43 50|            |70 79|) s
+376 460 M
+(the root to the node          ----      ----      -------            -------) s
+376 452 M
+(containing 43.                /  \\      /  \\     /   |   \\           /  |  \\) s
+376 444 M
+(                           ---- ---- ---- ---- ---- ---- ------- ---- ---- ----) s
+376 436 M
+(                           |10| |18| |25| |33| |42| |47| |57 60| |66| |74| |81|) s
+376 428 M
+(                           ---- ---- ---- ---- ---- ---- ------- ---- ---- ----) s
+376 412 M
+(Finally, we move down to                    ----------                         ) s
+376 404 M
+(the node labeled 42.  A                     |20 xx 62|                         ) s
+376 396 M
+(different rule for 1-key               /--------------------\\                  ) s
+376 388 M
+(nodes requires us to             /----/        /  \\          \\-----\\           ) s
+376 380 M
+(fuse the nodes labeled       ----      -------/    \\------          -------    ) s
+376 372 M
+(42 and 47 into a 3-key       |14|      |32|           |50|          |70 79|    ) s
+376 364 M
+(node, stealing 43 from       ----      ----           ----          -------    ) s
+376 356 M
+(the parent node.             /  \\      /  \\           /  \\          /  |  \\    ) s
+376 348 M
+(                          ---- ---- ---- ---- ---------- ------- ---- ---- ----) s
+376 340 M
+(                          |10| |18| |25| |33| |42 43 47| |57 60| |66| |74| |81|) s
+376 332 M
+(                          ---- ---- ---- ---- ---------- ------- ---- ---- ----) s
+376 316 M
+(The last step is to remove 42 from the leaf and replace "xx" with 42.) s
+376 300 M
+(Running Times) s
+376 292 M
+(-------------) s
+376 284 M
+(A 2-3-4 tree with height h has between 2^h and 4^h leaves.  If n is the total) s
+376 276 M
+(number of entries \(including entries in internal nodes\), then n >= 2^\(h+1\) - 1.) s
+376 268 M
+(By taking the logarithm of both sides, we find that h is in O\(log n\).) s
+376 252 M
+(The time spent visiting a 2-3-4 node is typically longer than in a binary) s
+376 244 M
+(search tree \(because the nodes and the rotation and fusion operations are) s
+376 236 M
+(complicated\), but the time per node is still in O\(1\).) s
+376 220 M
+(The number of nodes visited is proportional to the height of the tree.  Hence,) s
+376 212 M
+(the running times of the find\(\), insert\(\), and remove\(\) operations are in O\(h\)) s
+376 204 M
+(and hence in O\(log n\), even in the worst case.) s
+376 188 M
+(Compare this with the Theta\(n\) worst-case time of ordinary binary search trees.) s
+376 172 M
+(Another Approach to Duplicate Keys) s
+376 164 M
+(----------------------------------) s
+376 156 M
+(Rather than have a separate node for each entry, we might wish to collect all) s
+376 148 M
+(the entries that share a common key in one node.  In this case, each node's) s
+376 140 M
+(entry becomes a list of entries.  This simplifies the implementation of) s
+376 132 M
+(findAll\(\), which finds all the entries with a specified key.  It also speeds up) s
+376 124 M
+(other operations by leaving fewer nodes in the tree data structure.  Obviously,) s
+376 116 M
+(this is a change in the implementation, but not a change in the dictionary ADT.) s
+376 100 M
+(This idea can be used with hash tables, binary search trees, and 2-3-4 trees.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

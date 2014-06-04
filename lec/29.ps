@@ -1,0 +1,850 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Fri Apr 11 19:06:32 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (29) def
+/fdir (.) def
+/ftail (29) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/11/14) def
+/modtimestr (19:06:29) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B:  Lecture 29) s
+5 508 M
+(                             Monday, April 7, 2014) s
+5 492 M
+(GRAPHS \(continued\)) s
+5 484 M
+(======) s
+5 476 M
+(Breadth-first search \(BFS\) is a little more complicated than depth-first) s
+5 468 M
+(search, because it's not naturally recursive.  We use a queue so that vertices) s
+5 460 M
+(are visited in order according to their distance from the starting vertex.) s
+5 444 M
+(  public void bfs\(Vertex u\) {) s
+5 436 M
+(    for \(each vertex v in V\) {                                   // O\(|V|\) time) s
+5 428 M
+(      v.visited = false;) s
+5 420 M
+(    }) s
+5 412 M
+(    u.visit\(null\);                            // Do some unspecified thing to u) s
+5 404 M
+(    u.visited = true;                              // Mark the vertex u visited) s
+5 396 M
+(    q = new Queue\(\);                                            // New queue...) s
+5 388 M
+(    q.enqueue\(u\);                                  // ...initially containing u) s
+5 380 M
+(    while \(q is not empty\) {                // With adjacency list, O\(|E|\) time) s
+5 372 M
+(      v = q.dequeue\(\);) s
+5 364 M
+(      for \(each vertex w such that \(v, w\) is an edge in E\) {) s
+5 356 M
+(        if \(!w.visited\) {) s
+5 348 M
+(          w.visit\(v\);                         // Do some unspecified thing to w) s
+5 340 M
+(          w.visited = true;                        // Mark the vertex w visited) s
+5 332 M
+(          q.enqueue\(w\);) s
+5 324 M
+(        }) s
+5 316 M
+(      }) s
+5 308 M
+(    }                                  public class Vertex {               ) s
+5 300 M
+(  }                                      protected Vertex parent;          ) s
+5 292 M
+(                                         protected int depth;              ) s
+5 284 M
+(Notice that when we visit a vertex,      protected boolean visited;        ) s
+5 276 M
+(we pass the edge's origin vertex                                           ) s
+5 268 M
+(as a parameter.  This allows us to       public void visit\(Vertex origin\) {) s
+5 260 M
+(do a computation such as finding           this.parent = origin;           ) s
+5 252 M
+(the distance of the vertex from            if \(origin == null\) {           ) s
+5 244 M
+(the starting vertex, or finding              this.depth = 0;               ) s
+5 236 M
+(the shortest path between them.            } else {                        ) s
+5 228 M
+(The visit\(\) method at right                  this.depth = origin.depth + 1;) s
+5 220 M
+(accomplishes both these tasks.             }                               ) s
+5 212 M
+(                                         }                                 ) s
+5 204 M
+(                                       }                                   ) s
+5 188 M
+(When an edge \(v, w\) is traversed to visit a Vertex w, the depth of w is set to) s
+5 180 M
+(the depth of v plus one, and v is set to become the _parent_ of w.) s
+5 164 M
+(The sequence of figures below shows BFS running on the city adjacency graph) s
+5 156 M
+(\(Albany, Kensington, Emeryville, Berkeley, Oakland, Piedmont\) from last) s
+5 148 M
+(lecture, starting from Albany.  A "V" is currently visited; a digit shows the) s
+5 140 M
+(depth of a vertex that is marked visited; a "*" is a vertex which we try to) s
+5 132 M
+(visit but discover has already been visited.  Underneath each figure of the) s
+5 124 M
+(graph, I depict the queue and the current value of the variable "v" in bfs\(\).) s
+5 108 M
+(V-K  0-V  0-1  *-1  0-1  *-1  0-*  0-1  0-1  0-1  0-1  0-1  0-1  0-1  0-1  0-1) s
+5 100 M
+( \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|   \\|) s
+5 92 M
+(E-B  E-B  E-V  E-1  E-*  E-1  E-1  V-1  2-1  2-*  2-1  *-1  2-*  2-1  2-1  2-1) s
+5 84 M
+(|/   |/   |/   |/   |/   |/   |/   |/   |/   |/   |/   |/   |/   |/   |/   |/ ) s
+5 76 M
+(O-P  O-P  O-P  O-P  O-P  O-P  O-P  O-P  V-P  2-P  *-P  2-P  2-P  2-V  *-3  2-3) s
+5 68 M
+(                                                                              ) s
+5 60 M
+(===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===) s
+5 52 M
+(A    K    KB   B    B              E    EO   O    O              P            ) s
+5 44 M
+(===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===  ===) s
+5 36 M
+(     v=A  v=A  v=K  v=K  v=B  v=B  v=B  v=B  v=E  v=E  v=O  v=O  v=O  v=P) s
+376 508 M
+(After we finish, we can find the shortest path from any vertex to the     0<--1) s
+376 500 M
+(starting vertex by following the parent pointers \(right\).  These           ^   ) s
+376 492 M
+(pointers form a tree rooted at the starting vertex.  Note that they         \\  ) s
+376 484 M
+(point in the direction _opposite_ the search direction that got us there.    \\ ) s
+376 476 M
+(                                                                          2-->1) s
+376 468 M
+(Why does this work?  The starting vertex is enqueued first, then all the     ^ ) s
+376 460 M
+(vertices at a distance of 1 from the start, then all the vertices at a      /  ) s
+376 452 M
+(distance of 2, and so on.  Why?  When the starting vertex is dequeued,     /   ) s
+376 444 M
+(all the vertices at a distance of 1 are enqueued, but no other vertex     2<--3) s
+376 436 M
+(is.  When the depth-1 vertices are dequeued and processed, all the) s
+376 428 M
+(vertices at a distance of 2 are enqueued, because every vertex at a distance of) s
+376 420 M
+(2 must be reachable by a single edge from some vertex at a distance of 1.  No) s
+376 412 M
+(other vertex is enqueued, because every vertex at a distance less than 2 has) s
+376 404 M
+(been marked, and every vertex at a distance greater than 2 is not reachable by) s
+376 396 M
+(a single edge from some vertex at a distance of 1.) s
+376 380 M
+(Recommendation:  pull out a piece of paper, draw a graph and a program stack,) s
+376 372 M
+(and simulate BFS, with you acting as the computer and executing bfs\(\) line by) s
+376 364 M
+(line.  You will understand it much better after taking the time to do this.) s
+376 348 M
+(BFS, like DFS, runs in O\(|V| + |E|\) time if you use an adjacency list;) s
+376 340 M
+(O\(|V|^2\) time if you use an adjacency matrix.) s
+376 324 M
+(Weighted Graphs) s
+376 316 M
+(---------------) s
+376 308 M
+(A weighted graph is a graph in which each edge is labeled with a numerical) s
+376 300 M
+(weight.  A weight might express the distance between two nodes, the cost of) s
+376 292 M
+(moving from one to the other, the resistance between two points in an) s
+376 284 M
+(electrical circuit, or many other things.) s
+376 268 M
+(In an adjacency matrix, each weight is stored in the matrix.  Whereas an) s
+376 260 M
+(unweighted graph uses an array of booleans, a weighted graph uses an array of) s
+376 252 M
+(ints, doubles, or some other numerical type.  Edges missing from the graph can) s
+376 244 M
+(be represented by a special number like Integer.MIN_VALUE, at the cost of) s
+376 236 M
+(declaring that number invalid as an edge weight.  \(If you want to permit every) s
+376 228 M
+(int to be a valid edge weight, you might use an additional array of booleans) s
+376 220 M
+(as well.\)) s
+376 204 M
+(In an adjacency list, recall that each edge is represented by a listnode.  Each) s
+376 196 M
+(listnode must be enlarged to include a weight, in addition to the reference to) s
+376 188 M
+(the destination vertex.  \(If you're using an array implementation of lists,) s
+376 180 M
+(you'll need two separate arrays:  one for weights, and one for destinations.\)) s
+376 164 M
+(There are two particularly common problems involving weighted graphs.  One is) s
+376 156 M
+(the _shortest_path_problem_.  Suppose a graph represents a highway map, and) s
+376 148 M
+(each road is labeled with the amount of time it takes to drive from one) s
+376 140 M
+(interchange to the next.  What's the fastest way to drive from Berkeley to Los) s
+376 132 M
+(Angeles?  A shortest path algorithm will tell us.  You'll learn several of) s
+376 124 M
+(these algorithms if you take CS 170.) s
+376 108 M
+(The second problem is constructing a _minimum_spanning_tree_.  Suppose that) s
+376 100 M
+(you're wiring a house for electricity.  Each node of the graph represents an) s
+376 92 M
+(outlet, or the source of electricity.  Every outlet needs to be connected to) s
+376 84 M
+(the source, but not necessarily directly--possibly routed via another outlet.) s
+376 76 M
+(The edges of the graph are labeled with the length of wire you'll need to) s
+376 68 M
+(connect one node to another.  How do you connect all the nodes together with) s
+376 60 M
+(the shortest length of wire?) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (29) def
+/fdir (.) def
+/ftail (29) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/11/14) def
+/modtimestr (19:06:29) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Kruskal's Algorithm for Finding Mimumum Spanning Trees) s
+5 500 M
+(------------------------------------------------------) s
+5 492 M
+(Let G = \(V, E\) be an undirected graph.  A _spanning_tree_ T = \(V, F\) of G is a) s
+5 484 M
+(graph containing the same vertices as G, and |V| - 1 edges of G that form) s
+5 476 M
+(a tree.  \(Hence, there is exactly one path between any two vertices of T.\)) s
+5 460 M
+(If G is not connected, it has no spanning tree, but we can instead compute a) s
+5 452 M
+(_spanning_forest_, or collection of trees, having one tree for each connected) s
+5 444 M
+(component of G.) s
+5 428 M
+(If G is weighted, then a _minimum_spanning_tree_ T of G is a spanning tree of G) s
+5 420 M
+(whose total weight \(summed over all edges of T\) is minimal.  In other words, no) s
+5 412 M
+(other spanning tree of G has a smaller total weight.) s
+5 396 M
+(Kruskal's algorithm computes the mimimum spanning tree of G as follows.) s
+5 380 M
+([1]  Create a new graph T with the same vertices as G, but no edges \(yet\).) s
+5 372 M
+([2]  Make a list of all the edges in G.) s
+5 364 M
+([3]  Sort the edges by weight, from least to greatest.) s
+5 356 M
+([4]  Iterate through the edges in sorted order.) s
+5 348 M
+(     For each edge \(u, w\):) s
+5 340 M
+([4a]   If u and w are not connected by a path in T, add \(u, w\) to T.) s
+5 324 M
+(Because this algorithm never adds \(u, w\) if some path already connects u and w,) s
+5 316 M
+(T is guaranteed to be a tree \(if G is connected\) or a forest \(if G is not\).) s
+5 300 M
+(Why is T a minimum spanning tree in the end?  Suppose the algorithm is) s
+5 292 M
+(considering adding an edge \(u, w\) to T, and there is not yet a path connecting) s
+5 284 M
+(u to w.  Let U be the set of vertices in T that are connected \(so far\) to u,) s
+5 276 M
+(and let W be a set containing all the other vertices, including w.  Let the) s
+5 268 M
+(_bridge_edges_ be any edges in G that have one end vertex in U and one end) s
+5 260 M
+(vertex in W.  Any spanning tree must contain at least one of these bridge) s
+5 252 M
+(edges.  As long as we choose a bridge edge with the least weight, we are safe.) s
+5 244 M
+(\(There may be several bridge edges with the same least weight, in which case) s
+5 236 M
+(it doesn't matter which one we choose.\)) s
+5 220 M
+(Because we go through the edges of G in order by weight, \(u, w\) must have the) s
+5 212 M
+(least weight, because it's the first edge we encountered connecting U to W.) s
+5 204 M
+(\(See Goodrich and Tamassia page 649 for a proof that choosing the bridge edge) s
+5 196 M
+(with least weight is always the right thing to do.\)) s
+5 180 M
+(What is the running time of Kruskal's algorithm?  As we'll discover in the next) s
+5 172 M
+(two lectures, sorting |E| edges takes O\(|E| log |E|\) time.  The tricky part is,) s
+5 164 M
+(in [4a], determining whether u and w are already connected by a path.  The) s
+5 156 M
+(simplest way to do this is by doing a depth-first search on T starting at u,) s
+5 148 M
+(and seeing if we visit w.  But if we do that, Kruskal's algorithm might take) s
+5 140 M
+(Theta\(|E| |V|\)\) time.) s
+5 124 M
+(We can do better.  In Lecture 33, we'll learn how to solve that problem) s
+5 116 M
+(quickly, so that all the iterations of [4a] together take less than) s
+5 108 M
+(O\(|E| log |E|\) time.) s
+5 92 M
+(If we use an adjacency list, the running time is in O\(|V| + |E| log |E|\).) s
+5 84 M
+(But |E| < |V|^2, so log |E| < 2 log |V|.  Therefore, Kruskal's algorithm runs) s
+5 76 M
+(in O\(|V| + |E| log |V|\) time.) s
+5 60 M
+(If we use an adjacency matrix, the running time is in O\(|V|^2 + |E| log |E|\),) s
+5 52 M
+(because it takes Theta\(|V|^2\) time simply to make a list of all the edges.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

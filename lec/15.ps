@@ -1,0 +1,850 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Wed Feb 26 17:33:08 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (15) def
+/fdir () def
+/ftail (15) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (02/26/14) def
+/modtimestr (17:21:01) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 15) s
+5 508 M
+(                         Wednesday, February 26, 2014) s
+5 492 M
+(Today's reading:  Sierra & Bates, pp. 315-338.) s
+5 476 M
+(EXCEPTIONS) s
+5 468 M
+(==========) s
+5 460 M
+(When a run-time error occurs in Java, the JVM "throws an exception," prints) s
+5 452 M
+(an error message, and quits.  Oddly, an exception is a Java object \(named) s
+5 444 M
+(Exception\), and you can prevent the error message from printing and the program) s
+5 436 M
+(from terminating by "catching" the Exception that Java threw.) s
+5 420 M
+(Purpose #1:  Coping with Errors) s
+5 412 M
+(-------------------------------) s
+5 404 M
+(Exceptions are a way of coping with unexpected errors.  By catching exceptions,) s
+5 396 M
+(you can recover.  For instance, if you try to open a file that doesn't exist or) s
+5 388 M
+(that you aren't allowed to read, Java will throw an exception.  You can catch) s
+5 380 M
+(the exception, handle it, and continue, instead of letting the program crash.) s
+5 364 M
+(  try {) s
+5 356 M
+(    f = new FileInputStream\("~cs61b/pj2.solution"\);) s
+5 348 M
+(    i = f.read\(\);) s
+5 340 M
+(  }) s
+5 332 M
+(  catch \(FileNotFoundException e1\) {) s
+5 324 M
+(    System.out.println\(e1\);                       // An exception handler.) s
+5 316 M
+(  }) s
+5 308 M
+(  catch \(IOException e2\) {) s
+5 300 M
+(    f.close\(\);                                    // Another exception handler.) s
+5 292 M
+(  }) s
+5 276 M
+(What does this code do?) s
+5 268 M
+(\(a\)  It executes the code inside the "try" braces.) s
+5 260 M
+(\(b\)  If the "try" code executes normally, we skip over the "catch" clauses.) s
+5 252 M
+(\(c\)  If the "try" code throws an exception, Java does not finish the "try") s
+5 244 M
+(     code.  It jumps directly to the first "catch" clause that matches the) s
+5 236 M
+(     exception, and executes that "catch" clause.  By "matches", I mean that) s
+5 228 M
+(     the actual exception object thrown is the same class as, or a subclass of,) s
+5 220 M
+(     the static type listed in the "catch" clause.) s
+5 204 M
+(     When the "catch" clause finishes executing, Java jumps to the next line of) s
+5 196 M
+(     code immediately after all the "catch" clauses.) s
+5 180 M
+(The code within a "catch" clause is called an _exception_handler_.) s
+5 164 M
+(If the FileInputStream constructor fails to find the file, it will throw a) s
+5 156 M
+(FileNotFoundException.  The line "i = f.read\(\)" is not executed; execution) s
+5 148 M
+(jumps directly to the first exception handler.) s
+5 132 M
+(FileNotFoundException is a subclass of IOException, so the exception matches) s
+5 124 M
+(both "catch" clauses.  However, only one "catch" clause is executed--the first) s
+5 116 M
+(one that matches.  The second "catch" clause would execute if the first were) s
+5 108 M
+(not present.) s
+5 92 M
+(If the FileInputStream constructor runs without error, but the read\(\) method) s
+5 84 M
+(throws an exception \(for instance, because a disk track is faulty\), it typi-) s
+5 76 M
+(cally generates some sort of IOException that isn't a FileNotFoundException.) s
+5 68 M
+(This causes the second "catch" clause to execute and close the file.  Exception) s
+5 60 M
+(handlers are often used to recover from errors and clean up loose ends like) s
+5 52 M
+(open files.) s
+5 36 M
+(Note that you don't need a "catch" clause for every exception that can occur.) s
+5 28 M
+(You can catch some exceptions and let others propagate.) s
+376 508 M
+(Purpose #2:  Escaping a Sinking Ship) s
+376 500 M
+(------------------------------------) s
+376 492 M
+(Believe it or not, you might want to throw your own exception.  Exceptions are) s
+376 484 M
+(the easiest way to move program execution out of a method whose purpose has) s
+376 476 M
+(been defeated.) s
+376 460 M
+(For example, suppose you're writing a parser that reads Java code and analyzes) s
+376 452 M
+(its syntactic structure.  Parsers are quite complicated, and use many recursive) s
+376 444 M
+(calls and loops.  Suppose that your parser is executing a method many methods) s
+376 436 M
+(deep within the program stack within many levels of loop nesting.  Suddenly,) s
+376 428 M
+(your parser unexpectedly reaches the end of the file, because a student) s
+376 420 M
+(accidentally erased the last 50 lines of his program.) s
+376 404 M
+(It's quite painful to write code that elegantly retraces its way back up) s
+376 396 M
+(through the method calls and loops when a surprise happens deep within a) s
+376 388 M
+(parser.  A better solution?  Throw an exception!  You can even roll your own.) s
+376 372 M
+(  public class ParserException extends Exception { }) s
+376 356 M
+(This class doesn't have any methods except the default constructor.  There's no) s
+376 348 M
+(need; the only purpose of a ParserException is to be distinguishable from other) s
+376 340 M
+(types of exceptions.  Now we can write some parser methods.) s
+376 324 M
+(  public ParseTree parseExpression\(\) throws ParserException {) s
+376 316 M
+(    [loops]) s
+376 308 M
+(        if \(somethingWrong\) {) s
+376 300 M
+(          throw new ParserException\(\);) s
+376 292 M
+(        }) s
+376 284 M
+(        [more code]) s
+376 276 M
+(      }) s
+376 268 M
+(    }) s
+376 260 M
+(    return pt;) s
+376 252 M
+(  }) s
+376 236 M
+(The "throw" statement throws a ParserException, thereby immediately getting us) s
+376 228 M
+(out of the routine.  How is this different from a "return" statement?  First,) s
+376 220 M
+(we don't have to return anything.  Second, an exception can propagate several) s
+376 212 M
+(stack frames down the stack, not just one, as we'll see shortly.) s
+376 196 M
+(The method signature has the modifier "throws ParserException".  This is) s
+376 188 M
+(necessary; Java won't let you compile the method without it.  "throws" clauses) s
+376 180 M
+(help you and the compiler keep track of which exceptions can propagate where.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (15) def
+/fdir () def
+/ftail (15) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (02/26/14) def
+/modtimestr (17:21:01) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(  public ParseTree parse\(\) throws ParserException, DumbCodeException {) s
+5 500 M
+(    [loops and code]) s
+5 492 M
+(        p = parseExpression\(\);) s
+5 484 M
+(        [more code]) s
+5 476 M
+(      }) s
+5 468 M
+(    }) s
+5 460 M
+(  }) s
+5 444 M
+(  public void compile\(\) {) s
+5 436 M
+(    ParseTree p;) s
+5 428 M
+(    try {) s
+5 420 M
+(      p = parse\(\);) s
+5 412 M
+(      p.toByteCode\(\);) s
+5 404 M
+(    }) s
+5 396 M
+(    catch \(ParserException e1\) { }) s
+5 388 M
+(    catch \(DumbCodeException e2\) { }) s
+5 380 M
+(  }) s
+5 364 M
+(The parse\(\) method above shows how to define a method that can throw two \(or) s
+5 356 M
+(more\) exceptions.  Since every exception is a subclass of Exception, we could) s
+5 348 M
+(have replaced the two exceptions with "Exception", but then the caller would) s
+5 340 M
+(have to catch all types of Exceptions.  We don't want \(in this case\) to catch) s
+5 332 M
+(NullPointerExceptions or otherwise hide our bugs from ourselves.) s
+5 316 M
+(When parseExpression\(\) throws an exception, it propagates right through the) s
+5 308 M
+(calling method parse\(\) and down to compile\(\), where it is caught.  compile\(\)) s
+5 300 M
+(doesn't need a "throws ParserException" clause because it catches any) s
+5 292 M
+(ParserException that can occur.  In this code, the "catch" clauses don't do) s
+5 284 M
+(anything except stop the exceptions.) s
+5 268 M
+(If an exception propagates all the way out of main\(\) without being caught, the) s
+5 260 M
+(JVM prints an error message and halts.  You've seen this happen many times.) s
+376 508 M
+(Checked and Unchecked Throwables) s
+376 500 M
+(--------------------------------) s
+376 492 M
+(The top-level class of things you can "throw" and "catch" is called Throwable.) s
+376 484 M
+(Here's part of the Throwable class hierarchy.) s
+376 468 M
+(                                   Throwable) s
+376 460 M
+(                                  /         \\) s
+376 452 M
+(                                 /           \\) s
+376 444 M
+(                                /             \\) s
+376 436 M
+(                               /               \\) s
+376 428 M
+(                              /                 \\) s
+376 420 M
+(                     Exception                   Error) s
+376 412 M
+(                    /    \\                      /     \\) s
+376 404 M
+(         IOException  RunTimeException AssertionError  VirtualMachineError) s
+376 396 M
+(                       /            \\                           \\) s
+376 388 M
+(        NullPointerException  ClassCastException              OutOfMemoryError) s
+376 372 M
+(An Error generally represents a fatal error, like running out of memory or) s
+376 364 M
+(stack space.  Failed "assert" statements also generate a subclass of Error) s
+376 356 M
+(called an AssertionError.  Although you can throw or catch any kind of) s
+376 348 M
+(Throwable, catching an Error is rarely appropriate.) s
+376 332 M
+(Most Exceptions, unlike Errors, signify problems you could conceivably recover) s
+376 324 M
+(from.  The subclass RunTimeException is made up of exceptions that might be) s
+376 316 M
+(thrown by the Java Virtual Machine, such as NullPointerException,) s
+376 308 M
+(ArrayIndexOutOfBoundsException, and ClassCastException.) s
+376 292 M
+(There are two types of Throwables.  _Unchecked_ Throwables are those a method) s
+376 284 M
+(can throw without declaring them in a "throws" clause.  All Errors and) s
+376 276 M
+(RunTimeExceptions \(including all their subclasses\) are unchecked, because) s
+376 268 M
+(almost every method can generate them inadvertently, and it would be silly if) s
+376 260 M
+(we had to declare them.) s
+376 244 M
+(All Exceptions except RunTimeExceptions are _checked_, which means that if your) s
+376 236 M
+(method might throw one without catching it, it must declare that possibility in) s
+376 228 M
+(a "throws" clause.  Examples of checked exceptions include IOException and) s
+376 220 M
+(almost any Throwable subclass you would make yourself.) s
+376 204 M
+(When a method calls another method that can throw a checked exception, it has) s
+376 196 M
+(just two choices.) s
+376 180 M
+(\(1\)  It can catch the exception, or) s
+376 172 M
+(\(2\)  it must be declared so that it "throws" the same exception itself.) s
+376 156 M
+(The easiest way to figure out which exceptions to declare is to declare none) s
+376 148 M
+(and let the compiler's error messages tell you.  \(This won't work on the exams,) s
+376 140 M
+(though.\)) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

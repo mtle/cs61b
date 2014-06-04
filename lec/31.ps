@@ -1,0 +1,932 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Mon Apr  7 22:04:59 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (31) def
+/fdir () def
+/ftail (31) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/07/14) def
+/modtimestr (22:04:44) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS61B:  Lecture 31) s
+5 508 M
+(                           Wednesday, April 9, 2014) s
+5 492 M
+(QUICKSORT) s
+5 484 M
+(=========) s
+5 476 M
+(Quicksort is a recursive divide-and-conquer algorithm, like mergesort.) s
+5 468 M
+(Quicksort is in practice the fastest known comparison-based sort for arrays,) s
+5 460 M
+(even though it has a Theta\(n^2\) worst-case running time.  If properly designed,) s
+5 452 M
+(however, it virtually always runs in O\(n log n\) time.  On arrays, this) s
+5 444 M
+(asymptotic bound hides a constant smaller than mergesort's, but mergesort is) s
+5 436 M
+(often slightly faster for sorting linked lists.) s
+5 420 M
+(Given an unsorted list I of items, quicksort chooses a "pivot" item v from I,) s
+5 412 M
+(then puts each item of I into one of two unsorted lists, depending on whether) s
+5 404 M
+(its key is less or greater than v's key.  \(Items whose keys are equal to v's) s
+5 396 M
+(key can go into either list; we'll discuss this issue later.\)) s
+5 380 M
+(  Start with the unsorted list I of n input items.) s
+5 372 M
+(  Choose a pivot item v from I.) s
+5 364 M
+(  Partition I into two unsorted lists I1 and I2.) s
+5 356 M
+(    - I1 contains all items whose keys are smaller than v's key.) s
+5 348 M
+(    - I2 contains all items whose keys are larger than v's.) s
+5 340 M
+(    - Items with the same key as v can go into either list.) s
+5 332 M
+(    - The pivot v, however, does not go into either list.) s
+5 324 M
+(  Sort I1 recursively, yielding the sorted list S1.) s
+5 316 M
+(  Sort I2 recursively, yielding the sorted list S2.) s
+5 308 M
+(  Concatenate S1, v, and S2 together, yielding a sorted list S.) s
+5 292 M
+(The recursion bottoms out at one-item and zero-item lists.  \(Zero-item lists) s
+5 284 M
+(can arise when the pivot is the smallest or largest item in its list.\)  How) s
+5 276 M
+(long does quicksort take?  The answer is made apparent by examining several) s
+5 268 M
+(possible recursion trees.  In the illustrations below, the pivot v is always) s
+5 260 M
+(chosen to be the first item in the list.) s
+5 244 M
+(                  ---------------------------       ---------------------------) s
+5 236 M
+(                  |4 | 7 | 1 | 5 | 9 | 3 | 0|       |0 | 1 | 3 | 4 | 5 | 7 | 9|) s
+5 228 M
+(v = pivot         ---------------------------       ---------------------------) s
+5 220 M
+(                       /       |       \\           / |             \\           ) s
+5 212 M
+(* = empty list    ----------- --- -----------     / --- -----------------------) s
+5 204 M
+(                  |1 | 3 | 0| |4| |7 | 5 | 9|    *  |0| |1 | 3 | 4 | 5 | 7 | 9|) s
+5 196 M
+(                I1----------- --- -----------I2     --- -----------------------) s
+5 188 M
+(                   /   |   \\   v   /   |   \\         v / |           \\         ) s
+5 180 M
+(                  --- --- ---     --- --- ---         / --- -------------------) s
+5 172 M
+(                  |0| |1| |3|     |5| |7| |9|        *  |1| |3 | 4 | 5 | 7 | 9|) s
+5 164 M
+(                I1--- --- ---I2 I1--- --- ---I2         --- -------------------) s
+5 156 M
+(                       v               v                 v / |         \\       ) s
+5 148 M
+(                                                          / --- ---------------) s
+5 140 M
+(                   0   1   3   4   5   7   9             *  |3| |4 | 5 | 7 | 9|) s
+5 132 M
+(                                                            --- ---------------) s
+5 124 M
+(In the example at left, we get lucky, and the pivot          v / |       \\     ) s
+5 116 M
+(always turns out to be the item having the median key.        / --- -----------) s
+5 108 M
+(Hence, each unsorted list is partitioned into two pieces     *  |4| |5 | 7 | 9|) s
+5 100 M
+(of equal size, and we have a well-balanced recursion            --- -----------) s
+5 92 M
+(tree.  Just like in mergesort, the tree has O\(log n\)             v / |     \\   ) s
+5 84 M
+(levels.  Partitioning a list is a linear-time operation,          / --- -------) s
+5 76 M
+(so the total running time is O\(n log n\).                         *  |5| |7 | 9|) s
+5 68 M
+(                                                                    --- -------) s
+5 60 M
+(The example at right, on the other hand, shows the Theta\(n^2\)        v / |   \\ ) s
+5 52 M
+(performance we suffer if the pivot always proves to have the          / --- ---) s
+5 44 M
+(smallest or largest key in the list.  \(You can see it takes          *  |7| |9|) s
+5 36 M
+(Omega\(n^2\) time because the first n/2 levels each process a list        --- ---) s
+5 28 M
+(of length n/2 or greater.\)  The recursion tree is as unbalanced          v) s
+5 20 M
+(as it can be.  This example shows that when the input list I) s
+5 12 M
+(happens to be already sorted, choosing the pivot to be the first item of the) s
+5 4 M
+(list is a disastrous policy.) s
+376 508 M
+(Choosing a Pivot) s
+376 500 M
+(----------------) s
+376 492 M
+(We need a better way to choose a pivot.  A respected, time-tested method is to) s
+376 484 M
+(randomly select an item from I to serve as pivot.  With a random pivot, we can) s
+376 476 M
+(expect "on average" to obtain a 1/4 - 3/4 split; half the time we'll obtain a) s
+376 468 M
+(worse split, half the time better.  A little math \(see Goodrich and Tamassia) s
+376 460 M
+(Section 11.2.1\) shows that the average running time of quicksort with random) s
+376 452 M
+(pivots is in O\(n log n\).  \(We'll do the analysis late this semester in a) s
+376 444 M
+(lecture on "Randomized analysis."\)) s
+376 428 M
+(An even better way to choose a pivot \(when n is larger than 50 or so\) is called) s
+376 420 M
+(the "median-of-three" strategy.  Select three random items from I, and then) s
+376 412 M
+(choose the item having the middle key.  With a lot of math, this strategy can) s
+376 404 M
+(be shown to have a smaller constant \(hidden in the O\(n log n\) notation\) than) s
+376 396 M
+(the one-random-item strategy.) s
+376 380 M
+(Quicksort on Linked Lists) s
+376 372 M
+(-------------------------                           ---------------------------) s
+376 364 M
+(I deliberately left unresolved the question of      |5 | 5 | 5 | 5 | 5 | 5 | 5|) s
+376 356 M
+(what to do with items that have the same key as     ---------------------------) s
+376 348 M
+(the pivot.  Suppose we put all the items having                /             | ) s
+376 340 M
+(the same key as v into the list I1.  If we try to   ----------------------- ---) s
+376 332 M
+(sort a list in which every single item has the      |5 | 5 | 5 | 5 | 5 | 5| |5|) s
+376 324 M
+(same key, then _every_ item will go into list I1,   ----------------------- ---) s
+376 316 M
+(and quicksort will have quadratic running time!     I1                       v ) s
+376 308 M
+(\(See illustration at right.\)                                                   ) s
+376 300 M
+(                                                    ---------------------------) s
+376 292 M
+(When sorting a linked list, a far better solution   |5 | 7 | 5 | 0 | 6 | 5 | 5|) s
+376 284 M
+(is to partition I into _three_ unsorted lists I1,   ---------------------------) s
+376 276 M
+(I2, and Iv.  Iv contains the pivot v and all the     /         |           \\   ) s
+376 268 M
+(other items with the same key.  We sort I1 and I2   --- --------------- -------) s
+376 260 M
+(recursively, yielding S1 and S2.  Iv, of course,    |0| |5 | 5 | 5 | 5| |7 | 6|) s
+376 252 M
+(does not need to be sorted.  Finally, we            --- --------------- -------) s
+376 244 M
+(concatenate S1, Iv, and S2 to yield S.              I1   v     Iv            I2) s
+376 228 M
+(This strategy is quite fast if there are a large number of duplicate keys,) s
+376 220 M
+(because the lists called "Iv" \(at each level of the recursion tree\) require no) s
+376 212 M
+(further sorting or manipulation.) s
+376 196 M
+(Unfortunately, with linked lists, selecting a pivot is annoying.  With an) s
+376 188 M
+(array, we can read a randomly chosen pivot in constant time; with a linked list) s
+376 180 M
+(we must walk half-way through the list on average, increasing the constant in) s
+376 172 M
+(our running time.  However, if we restrict ourselves to pivots near the) s
+376 164 M
+(beginning of the linked list, we risk quadratic running time \(for instance,) s
+376 156 M
+(if I is already in sorted order, or nearly so\), so we have to pay the price.) s
+376 148 M
+(\(If you are clever, you can speed up your implementation by choosing random) s
+376 140 M
+(pivots during the partitioning step for the _next_ round of partitioning.\)) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (31) def
+/fdir () def
+/ftail (31) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/07/14) def
+/modtimestr (22:04:44) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Quicksort on Arrays) s
+5 500 M
+(-------------------) s
+5 492 M
+(Quicksort shines for sorting arrays.  In-place quicksort is very fast.  But) s
+5 484 M
+(a fast in-place quicksort is tricky to code.  It's easy to write a buggy or) s
+5 476 M
+(quadratic version by mistake.  Goodrich and Tamassia did.) s
+5 460 M
+(Suppose we have an array a in which we want to sort the items starting at) s
+5 452 M
+(a[low] and ending at a[high].  We choose a pivot v and move it out of the way) s
+5 444 M
+(by swapping it with the last item, a[high].) s
+5 428 M
+(We employ two array indices, i and j.  i is initially "low - 1", and j is) s
+5 420 M
+(initially "high", so that i and j sandwich the items to be sorted \(not) s
+5 412 M
+(including the pivot\).  We will enforce the following invariants.) s
+5 404 M
+(  - All items at or left of index i have a key <= the pivot's key.) s
+5 396 M
+(  - All items at or right of index j have a key >= the pivot's key.) s
+5 380 M
+(To partition the array, we advance the index        ---------------------------) s
+5 372 M
+(i until it encounters an item whose key is          |3 | 8 | 0 | 9 | 5 | 7 | 4|) s
+5 364 M
+(greater than or equal to the pivot's key; then      ---------------------------) s
+5 356 M
+(we decrement the index j until it encounters        low              v     high) s
+5 348 M
+(an item whose key is less than or equal to                                     ) s
+5 340 M
+(the pivot's key.  Then, we swap the items at        ---------------------------) s
+5 332 M
+(i and j.  We repeat this sequence until the         |3 | 8 | 0 | 9 | 4 | 7 | 5|) s
+5 324 M
+(indices i and j meet in the middle.  Then,          ---------------------------) s
+5 316 M
+(we move the pivot back into the middle \(by        ^                          ^ ) s
+5 308 M
+(swapping it with the item at index i\).            i                          j ) s
+5 292 M
+(An example is given at right.  The randomly         ---------------------------) s
+5 284 M
+(selected pivot, whose key is 5, is moved to         |3 | 8 | 0 | 9 | 4 | 7 | 5|) s
+5 276 M
+(the end of the array by swapping it with the        ---------------------------) s
+5 268 M
+(last item.  The indices i and j are created.   advance:  i           j         ) s
+5 260 M
+(i advances until it reaches an item whose key                                  ) s
+5 252 M
+(is >= 5, and j retreats until it reaches an         ---------------------------) s
+5 244 M
+(item whose key is <= 5.  The two items are          |3 | 4 | 0 | 9 | 8 | 7 | 5|) s
+5 236 M
+(swapped, and i advances and j retreats again.       ---------------------------) s
+5 228 M
+(After the second advance/retreat, i and j      swap:     i           j         ) s
+5 220 M
+(have crossed paths, so we do not swap their                                    ) s
+5 212 M
+(items.  Instead, we swap the pivot with the         ---------------------------) s
+5 204 M
+(item at index i, putting it between the lists       |3 | 4 | 0 | 9 | 8 | 7 | 5|) s
+5 196 M
+(I1 and I2 where it belongs.                         ---------------------------) s
+5 188 M
+(                                               advance:      j   i) s
+5 180 M
+(What about items having the same key as the                                    ) s
+5 172 M
+(pivot?  Handling these is particularly              ----------- --- -----------) s
+5 164 M
+(tricky.  We'd like to put them on a separate        |3 | 4 | 0| |5| |8 | 7 | 9|) s
+5 156 M
+(list \(as we did for linked lists\), but doing        ----------- --- -----------) s
+5 148 M
+(that in place is too complicated.  As I noted       I1           i           I2) s
+5 140 M
+(previously, if we put all these items into) s
+5 132 M
+(the list I1, we'll have quadratic running time when all the keys in the array) s
+5 124 M
+(are equal, so we don't want to do that either.) s
+5 108 M
+(The solution is to make sure each index, i and j, stops whenever it reaches a) s
+5 100 M
+(key equal to the pivot.  Every key equal to the pivot \(except perhaps one, if) s
+5 92 M
+(we end with i = j\) takes part in one swap.  Swapping an item equal to the pivot) s
+5 84 M
+(may seem unnecessary, but it has an excellent side effect:  if all the items in) s
+5 76 M
+(the array have the same key, half these items will go into I1, and half into) s
+5 68 M
+(I2, giving us a well-balanced recursion tree.  \(To see why, try running the) s
+5 60 M
+(pseudocode below on paper with an array of equal keys.\)  WARNING:  The code on) s
+5 52 M
+(page 530 of Goodrich and Tamassia gets this WRONG.  Their implementation has) s
+5 44 M
+(quadratic running time when all the keys are equal.) s
+376 508 M
+(public static void quicksort\(Comparable[] a, int low, int high\) {) s
+376 500 M
+(  // If there's fewer than two items, do nothing.) s
+376 492 M
+(  if \(low < high\) {) s
+376 484 M
+(    int pivotIndex = random number from low to high;) s
+376 476 M
+(    Comparable pivot = a[pivotIndex];) s
+376 468 M
+(    a[pivotIndex] = a[high];                       // Swap pivot with last item) s
+376 460 M
+(    a[high] = pivot;) s
+376 444 M
+(    int i = low - 1;) s
+376 436 M
+(    int j = high;) s
+376 428 M
+(    do {) s
+376 420 M
+(      do { i++; } while \(a[i].compareTo\(pivot\) < 0\);) s
+376 412 M
+(      do { j--; } while \(\(a[j].compareTo\(pivot\) > 0\) && \(j > low\)\);) s
+376 404 M
+(      if \(i < j\) {) s
+376 396 M
+(        swap a[i] and a[j];) s
+376 388 M
+(      }) s
+376 380 M
+(    } while \(i < j\);) s
+376 364 M
+(    a[high] = a[i];) s
+376 356 M
+(    a[i] = pivot;                   // Put pivot in the middle where it belongs) s
+376 348 M
+(    quicksort\(a, low, i - 1\);                     // Recursively sort left list) s
+376 340 M
+(    quicksort\(a, i + 1, high\);                   // Recursively sort right list) s
+376 332 M
+(  }) s
+376 324 M
+(}) s
+376 308 M
+(Can the "do { i++ }" loop walk off the end of the array and generate an out-of-) s
+376 300 M
+(bounds exception?  No, because a[high] contains the pivot, so i will stop) s
+376 292 M
+(advancing when i == high \(if not sooner\).  There is no such assurance for j,) s
+376 284 M
+(though, so the "do { j-- }" loop explicitly tests whether "j > low" before) s
+376 276 M
+(retreating.) s
+376 260 M
+(Postscript) s
+376 252 M
+(----------) s
+376 244 M
+(The journal "Computing in Science & Engineering" did a poll of experts to make) s
+376 236 M
+(a list of the ten most important and influential algorithms of the twentieth) s
+376 228 M
+(century, and it published a separate article on each of the ten algorithms.) s
+376 220 M
+(Quicksort is one of the ten, and it is surely the simplest algorithm on the) s
+376 212 M
+(list.  Quicksort's inventor, Sir C. A. R. "Tony" Hoare, received the ACM Turing) s
+376 204 M
+(Award in 1980 for his work on programming languages, and was conferred the) s
+376 196 M
+(title of Knight Bachelor in March 2000 by Queen Elizabeth II for his) s
+376 188 M
+(contributions to "Computing Science.") s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

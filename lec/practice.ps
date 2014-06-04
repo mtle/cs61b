@@ -1,0 +1,892 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Tue May  6 18:19:40 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (practice) def
+/fdir () def
+/ftail (practice) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (05/06/14) def
+/modtimestr (18:19:17) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                     CS 61B:  Practice for the Final Exam) s
+5 492 M
+(Please try to answer these questions.  We'll release solutions two or three) s
+5 484 M
+(days before the exam.  Starred problems are particularly difficult--much more) s
+5 476 M
+(difficult than any exam question would be.) s
+5 460 M
+(Warning:  Midterm 1 topics are absent here, but they can reappear on the Final.) s
+5 444 M
+([1]  Given an array containing the digits 71808294, show how the order of the) s
+5 436 M
+(     digits changes during each step of [a] insertion sort, [b] selection sort,) s
+5 428 M
+(     [c] mergesort, [d] quicksort \(using the array-based quicksort of Lecture) s
+5 420 M
+(     31, and always choosing the last element of any subarray to be the pivot\),) s
+5 412 M
+(     and [e] heapsort \(using the backward min-heap version discussed in Lecture) s
+5 404 M
+(     30\).  Show the array after each swap, except in insertion sort.  For) s
+5 396 M
+(     insertion sort, show the array after each insertion.) s
+5 380 M
+([2]  Some sorting methods, like heapsort and array-based quicksort, are not) s
+5 372 M
+(     naturally stable.  Suggest a way to make _any_ sorting algorithm stable by) s
+5 364 M
+(     extending the keys \(making them longer and adding extra information\).) s
+5 348 M
+([3]  Consider the graph at right.                                     e   f    ) s
+5 340 M
+(                                                                      |17 |15  ) s
+5 332 M
+(     [a]  In what order are the vertices visited using DFS            |   |    ) s
+5 324 M
+(          starting from vertex a?  Where a choice exists, use       3 | 9 | 1  ) s
+5 316 M
+(          alphabetical order.  What if you use BFS?               a---c---g---h) s
+5 308 M
+(     [b]  A vertex x is "finished" when the recursive call        |   |   |  / ) s
+5 300 M
+(          DFS\(x\) terminates.  In what order are the vertices      |7 9| 11| /5 ) s
+5 292 M
+(          finished?  \(This is different from the order in         |   |   |/   ) s
+5 284 M
+(          which they are visited, when DFS\(x\) is called.\)         b---d---i    ) s
+5 276 M
+(     [c]  In what order are edges added to the minimum             12  14) s
+5 268 M
+(          spanning tree by Kruskal's algorithm?  List the edges) s
+5 260 M
+(          by giving their endpoints.) s
+5 244 M
+([4]  [a]  How long does it take to determine if an undirected graph contains) s
+5 236 M
+(          a vertex that is connected to no other vertex [i] if you use an) s
+5 228 M
+(          adjacency matrix; [ii] if you use an adjacency list.) s
+5 220 M
+(     [b]  Suppose we use DFS on a binary search tree, starting from the root.) s
+5 212 M
+(          The edge to a left child is always traversed before an edge to the) s
+5 204 M
+(          right child.  In what order are the nodes visited?  Finished?) s
+5 196 M
+(     [c]  An undirected graph contains a "cycle" \(i.e., loop\) if there are two) s
+5 188 M
+(          different simple paths by which we can get from one vertex to) s
+5 180 M
+(          another.  Using breadth-first search \(not DFS\), how can we tell if) s
+5 172 M
+(          an undirected graph contains a cycle?) s
+5 164 M
+(     [d]  Recall that an undirected graph is "connected" if there is a path) s
+5 156 M
+(          from any vertex to any other vertex.  If an undirected graph is not) s
+5 148 M
+(          connected, it has multiple connected components.  A "connected) s
+5 140 M
+(          component" consists of all the vertices reachable from a given) s
+5 132 M
+(          vertex, and the edges incident on those vertices.  Suggest an) s
+5 124 M
+(          algorithm based on DFS \(possibly multiple invocations of DFS\) that) s
+5 116 M
+(          counts the number of connected components in a graph.) s
+5 100 M
+([5]  What does the splay tree at right look like after:                3       ) s
+5 92 M
+(                                                                      / \\      ) s
+5 84 M
+(     [a]  max\(\)    [the operation that finds the maximum item]       1   5     ) s
+5 76 M
+(                                                                    /\\   /\\    ) s
+5 68 M
+(     [b]  insert\(4.5\)  \\                                           0  2 4  11  ) s
+5 60 M
+(                        | Start from the _original_ tree,                 / \\  ) s
+5 52 M
+(     [c]  find\(10\)      | not the tree resulting from the                7   12) s
+5 44 M
+(                        | previous operation.                           / \\    ) s
+5 36 M
+(     [d]  remove\(9\)    /                                               6   9   ) s
+5 28 M
+(                                                                          / \\  ) s
+5 20 M
+(                                                                         8   10) s
+376 508 M
+([6]  Consider the quick-union algorithm for disjoint sets.  We know that a) s
+376 500 M
+(     sequence of n operations \(unions and finds\) can take asymptotically) s
+376 492 M
+(     slightly more than linear time in the worst case.) s
+376 476 M
+(     [a]  Explain why if all the finds are done before all the unions, a) s
+376 468 M
+(          sequence of n operations is guaranteed to take O\(n\) time.) s
+376 460 M
+(     [b]  Explain why if all the unions are done before all the finds, a) s
+376 452 M
+(      *   sequence of n operations is guaranteed to take O\(n\) time.) s
+376 444 M
+(          Hint:  you can tell the number of dollars in the bank just by looking) s
+376 436 M
+(          at the forest.) s
+376 428 M
+(                                                                       -----) s
+376 420 M
+([7]  [a]  Suggest a sequence of insertion operations         4         |3 5|   ) s
+376 412 M
+(          that would create the binary tree at right.       / \\        -----   ) s
+376 404 M
+(     [b]  Suggest a sequence of operations that would      2   6       / | \\   ) s
+376 396 M
+(          create the 2-3-4 tree at right.  You are        / \\     ----- --- ---) s
+376 388 M
+(          allowed to use removal as well as insertion.   1   3    |1 2| |4| |6|) s
+376 380 M
+(                                                                  ----- --- ---) s
+376 364 M
+([8]  Suppose an application uses only three operations:  insert\(\), find\(\), and) s
+376 356 M
+(     remove\(\).) s
+376 340 M
+(     [a]  Under what circumstances would you use a splay tree instead of a hash) s
+376 332 M
+(          table?) s
+376 324 M
+(     [b]  Under what circumstances would you use a 2-3-4 tree instead of) s
+376 316 M
+(          a splay tree?) s
+376 308 M
+(     [c]  Under what circumstances would you use an unordered array instead of) s
+376 300 M
+(          a 2-3-4 tree?) s
+376 292 M
+(     [d]  Under what circumstances would you use a binary heap instead of) s
+376 284 M
+(          an unordered array?) s
+376 276 M
+(     [e]  Under what circumstances would you use a hash tabel instead of) s
+376 268 M
+(          a binary heap?) s
+376 252 M
+([9]  [a]  Suppose we are implementing a binary heap, based on reference-based) s
+376 244 M
+( *        binary trees \(_not_ arrays\).  We want to implement a deleteRef\(\)) s
+376 236 M
+(          operation which, given a _reference_ to a node in the tree, can) s
+376 228 M
+(          delete that node \(and the item it contains\) from the heap while) s
+376 220 M
+(          maintaining the heap-order property--even if the node isn't the root) s
+376 212 M
+(          and its item isn't the minimum.  deleteRef\(\) should run in O\(log n\)) s
+376 204 M
+(          time.  How do we do it?) s
+376 196 M
+(     [b]  Building on your answer to the previous question, explain how to) s
+376 188 M
+(          combine a min-heap and max-heap \(both using reference-based binary) s
+376 180 M
+(          trees\) to yield a data structure that implements insert\(\),) s
+376 172 M
+(          deleteMin\(\), and deleteMax\(\) in O\(log n\) time.  Hint:  You will need) s
+376 164 M
+(          inter-heap pointers.  Think of how you deleted edges in Project 3,) s
+376 156 M
+(          for example.) s
+376 148 M
+(     [c]  How can we accomplish the same thing if we use array-based heaps?) s
+376 140 M
+(          Hint:  Add an extra field to the items stored in each array.) s
+376 124 M
+([10]  Suppose we wish to create a binary heap containing the keys) s
+376 116 M
+(      D A T A S T R U C T U R E.  \(All comparisons use alphabetical order.\)) s
+376 100 M
+(      [a]  Show the resulting min-heap if we build it using successive insert\(\)) s
+376 92 M
+(           operations \(starting from D\).) s
+376 76 M
+(      [b]  Show the resulting min-heap if we build it using bottomUpHeap\(\).) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (practice) def
+/fdir () def
+/ftail (practice) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (05/06/14) def
+/modtimestr (18:19:17) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+([11]  [a]  In Lecture 26, we told you how to implement a method) s
+5 500 M
+(           smallestKeyNotSmaller\(k\) that returns the smallest key not less than) s
+5 492 M
+(           k in a binary search tree.  If the search tree contains an entry) s
+5 484 M
+(           with key k, then an entry with key k is returned.) s
+5 468 M
+(           Describe how to implement a method smallestKeyGreater\(k\) that) s
+5 460 M
+(           returns the smallest key strictly greater than k in a binary search) s
+5 452 M
+(           tree.  Hint:  write a slightly modified version of find\(\) that acts) s
+5 444 M
+(           as if it were searching for k + epsilon, where epsilon > 0 is an) s
+5 436 M
+(           infinitesimally small number.  Therefore, it is never an exact match) s
+5 428 M
+(           with any key in the tree.  \(This "hint" is actually a very useful) s
+5 420 M
+(           general-purpose technique worth remembering.\)) s
+5 404 M
+(           For extra practice, code it in Java.  Use the BinaryTree data) s
+5 396 M
+(           structure from Lecture 26.) s
+5 380 M
+(      [b]  You are given a binary search tree that is NOT a splay tree and does) s
+5 372 M
+(       *   not rebalance itself.  However, every node of the tree stores a) s
+5 364 M
+(           field that specifies the number of items/nodes in the subtree rooted) s
+5 356 M
+(           at that node \(as described at the end of Lecture 40\).) s
+5 340 M
+(           Given two search keys x and y, describe an algorithm that computes) s
+5 332 M
+(           the number of keys in the range [x, y] \(inclusive\) in O\(h\) time,) s
+5 324 M
+(           where h is the height of the binary search tree.) s
+5 308 M
+(           For extra practice, code it in Java.  Assume that every) s
+5 300 M
+(           BinaryTreeNode has an extra int field named "size" that stores the) s
+5 292 M
+(           size of the subtree rooted at that node.) s
+5 276 M
+([12]  Suppose we modify the array-based quicksort\(\) implementation in the) s
+5 268 M
+(      Lecture 31 notes to yield an array-based quickselect\(\) algorithm, as) s
+5 260 M
+(      described in Lecture 34.  Show the steps it would use to find the median) s
+5 252 M
+(      letter in D A T A S T R U C T U R E.  \(The median in this case is the 7th) s
+5 244 M
+(      letter, which would appear at array index 6 if we sorted the letters.\)) s
+5 236 M
+(      As in Question [1], choose the last element of any subarray to be the) s
+5 228 M
+(      pivot, and show the array after each swap.) s
+5 212 M
+([13]  Suppose our radix-sort algorithm takes exactly n+r microseconds per pass,) s
+5 204 M
+(      where n is the number of keys to sort, and r is the radix \(number of) s
+5 196 M
+(      queues\).  To sort 493 keys, what radix r will give us the best running) s
+5 188 M
+(      time?  With this radix, how many passes will it take to sort 420-bit) s
+5 180 M
+(      keys?  To answer this question, you'll need to use calculus \(and a) s
+5 172 M
+(      calculator\), and you'll need to remember that log2 r = \(ln r\) / \(ln 2\).) s
+5 156 M
+([14]  Suppose that while your computer is sorting an array of objects, its) s
+5 148 M
+(      memory is struck by a cosmic ray that changes exactly one of the keys) s
+5 140 M
+(      to something completely different.  For each of the following sorting) s
+5 132 M
+(      algorithms, what is the _worst-case_ possibility?  For each, answer) s
+5 124 M
+(      [x] the final array won't even be close to sorted, [y] the final array) s
+5 116 M
+(      will have just one or two keys out of place, or [z] the final array will) s
+5 108 M
+(      consist of two separate sorted subsets, one following the other, plus) s
+5 100 M
+(      perhaps one or two additional keys out of place.) s
+5 84 M
+(      [a]  Insertion sort) s
+5 76 M
+(      [b]  Selection sort) s
+5 68 M
+(      [c]  Mergesort) s
+5 60 M
+(      [d]  Radix sort) s
+376 508 M
+([15]  [Note:  this is included for those who want some programming practice.) s
+376 500 M
+(      You are not responsible on the Final Exam for knowing anything about the) s
+376 492 M
+(      video Sorting Out Sorting.]) s
+376 476 M
+(      Implement tree sort \(as described in the sorting video\) in Java.  Assume) s
+376 468 M
+(      your treeSort\(\) method's only input parameters are the number of items) s
+376 460 M
+(      and a complete \(perfectly balanced\) BinaryTree of depth d in which each) s
+376 452 M
+(      leaf has an item; hence, there are 2^d items to sort.  All internal nodes) s
+376 444 M
+(      begin with their item field set to null.  Use the data structures below) s
+376 436 M
+(      \(in which each node knows its left and right child\), not a general tree.) s
+376 420 M
+(      Your algorithm should never change a node reference; only the items move.) s
+376 412 M
+(      The centerpiece of your algorithm will be a method that fills an empty) s
+376 404 M
+(      node by \(i\) recursively filling its left and right children if they're) s
+376 396 M
+(      empty, and \(ii\) choosing the smaller of its children's items, which is) s
+376 388 M
+(      moved up into the empty node.  treeSort\(\) will repeatedly:  \(i\) apply) s
+376 380 M
+(      this method to the root node to find the smallest item remaining in the) s
+376 372 M
+(      tree, \(ii\) pluck that item out of the root node, leaving the root empty) s
+376 364 M
+(      again, and \(iii\) put the item into an array of type Comparable[].  Your) s
+376 356 M
+(      treeSort\(\) should allocate and return that array.) s
+376 340 M
+(      public class BinaryTreeNode {       |    public class BinaryTree {    ) s
+376 332 M
+(        Comparable item;                  |      BinaryTreeNode root;) s
+376 324 M
+(        BinaryNode leftChild;             |      int size;) s
+376 316 M
+(        BinaryNode rightChild;            |    }                     ) s
+376 308 M
+(      }                                   |    ) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

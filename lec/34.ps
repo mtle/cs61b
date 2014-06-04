@@ -1,0 +1,888 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Apr 16 01:54:07 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (34) def
+/fdir (.) def
+/ftail (34) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/16/14) def
+/modtimestr (01:53:34) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS61B:  Lecture 34) s
+5 508 M
+(                          Wednesday, April 16, 2014) s
+5 492 M
+(Today's reading:  Goodrich & Tamassia, Sections 11.3.1 & 11.5.) s
+5 476 M
+(SELECTION) s
+5 468 M
+(=========) s
+5 460 M
+(Suppose that we want to find the kth smallest key in a list.  In other words,) s
+5 452 M
+(we want to know which item has index j if the list is sorted \(where j = k - 1\).) s
+5 444 M
+(We could simply sort the list, then look up the item at index j.  But if we) s
+5 436 M
+(don't actually need to sort the list, is there a faster way?  This problem is) s
+5 428 M
+(called _selection_.) s
+5 412 M
+(One example is finding the median of a set of keys.  In an array of n items,) s
+5 404 M
+(we are looking for the item whose index is j = floor\(n / 2\) in the sorted list.) s
+5 388 M
+(Quickselect) s
+5 380 M
+(-----------) s
+5 372 M
+(We can modify quicksort to perform selection for us.  Observe that when we) s
+5 364 M
+(choose a pivot v and use it to partition the list into three lists I1, Iv, and) s
+5 356 M
+(I2, we know which of the three lists contains index j, because we know the) s
+5 348 M
+(lengths of I1 and I2.  Therefore, we only need to search one of the three) s
+5 340 M
+(lists.) s
+5 324 M
+(Here's the quickselect algorithm for finding the item at index j - that is,) s
+5 316 M
+(having the \(j + 1\)th smallest key.) s
+5 300 M
+(  Start with an unsorted list I of n input items.) s
+5 292 M
+(  Choose a pivot item v from I.) s
+5 284 M
+(  Partition I into three unsorted lists I1, Iv, and I2.) s
+5 276 M
+(    - I1 contains all items whose keys are smaller than v's key.) s
+5 268 M
+(    - I2 contains all items whose keys are larger than v's.) s
+5 260 M
+(    - Iv contains the pivot v.) s
+5 252 M
+(    - Items with the same key as v can go into any of the three lists.) s
+5 244 M
+(      \(In list-based quickselect, they go into Iv; in array-based quickselect,) s
+5 236 M
+(      they go into I1 and I2, just like in array-based quicksort.\)) s
+5 228 M
+(  if \(j < |I1|\) {) s
+5 220 M
+(    Recursively find the item with index j in I1; return it.) s
+5 212 M
+(  } else if \(j < |I1| + |Iv|\) {) s
+5 204 M
+(    Return the pivot v.) s
+5 196 M
+(  } else {   // j >= |I1| + |Iv|.) s
+5 188 M
+(    Recursively find the item with index j - |I1| - |Iv| in I2; return it.) s
+5 180 M
+(  }) s
+5 164 M
+(The advantage of quickselect over quicksort is that we only have to make one) s
+5 156 M
+(recursive call, instead of two.  Since we make at most _one_ recursive call at) s
+5 148 M
+(_every_ level of the recursion tree, quickselect is much faster than quicksort.) s
+5 140 M
+(I won't analyze quickselect here, but it runs in Theta\(n\) average time if we) s
+5 132 M
+(select pivots randomly.) s
+5 116 M
+(We can easily modify the code for quicksort on arrays, presented in Lecture 31,) s
+5 108 M
+(to do selection.  The partitioning step is done exactly according to the) s
+5 100 M
+(Lecture 31 pseudocode for array quicksort.  Recall that when the partitioning) s
+5 92 M
+(stage finishes, the pivot is stored at index "i" \(see the variable "i" in the) s
+5 84 M
+(array quicksort pseudocode\).  In the quickselect pseudocode above, just replace) s
+5 76 M
+(|I1| with i and |Iv| with 1.) s
+376 508 M
+(A LOWER BOUND ON COMPARISON-BASED SORTING) s
+376 500 M
+(=========================================) s
+376 492 M
+(Suppose we have a scrambled array of n numbers, with each number from 1...n) s
+376 484 M
+(occurring once.  How many possible orders can the numbers be in?) s
+376 468 M
+(The answer is n!, where n! = 1 * 2 * 3 * ... * \(n-2\) * \(n-1\) * n.  Here's why:) s
+376 460 M
+(the first number in the array can be anything from 1...n, yielding n) s
+376 452 M
+(possibilities.  Once the first number is chosen, the second number can be any) s
+376 444 M
+(one of the remaining n-1 numbers, so there are n * \(n-1\) possible choices of) s
+376 436 M
+(the first two numbers.  The third number can be any one of the remaining n-2) s
+376 428 M
+(numbers, yielding n * \(n-1\) * \(n-2\) possibilities for the first three numbers.) s
+376 420 M
+(Continue this reasoning to its logical conclusion.) s
+376 404 M
+(Each different order is called a _permutation_ of the numbers, and there are n!) s
+376 396 M
+(possible permutations.  \(For Homework 9, you are asked to create a random) s
+376 388 M
+(permutation of maze walls.\)) s
+376 372 M
+(Observe that if n > 0,) s
+376 364 M
+(                                                                 n) s
+376 356 M
+(  n! = 1 * 2 * ... * \(n-1\) * n <= n * n * n * ... * n * n * n = n) s
+376 340 M
+(and \(supposing n is even\)) s
+376 332 M
+(                                  n    n                                n/2) s
+376 324 M
+(  n! = 1 * 2 * ... * \(n-1\) * n >= - * \(- + 1\) * ... * \(n-1\) * n >= \(n/2\)) s
+376 316 M
+(                                  2    2) s
+376 300 M
+(so n! is between \(n/2\)^\(n/2\) and n^n.  Let's look at the logarithms of both) s
+376 292 M
+(these numbers: log\(\(n/2\)^\(n/2\)\) = \(n/2\) log \(n/2\), which is in Theta\(n log n\),) s
+376 284 M
+(and log\(n^n\) = n log n.  Hence, log\(n!\) is also in Theta\(n log n\).) s
+376 268 M
+(A _comparison-based_sort_ is one in which all decisions are based on comparing) s
+376 260 M
+(keys \(generally done by "if" statements\).  All actions taken by the sorting) s
+376 252 M
+(algorithm are based on the results of a sequence of true/false questions.  All) s
+376 244 M
+(of the sorting algorithms we have studied are comparison-based.) s
+376 228 M
+(Suppose that two computers run the _same_ sorting algorithm at the same time on) s
+376 220 M
+(two _different_ inputs.  Suppose that every time one computer executes an "if") s
+376 212 M
+(statement and finds it true, the other computer executes the same "if") s
+376 204 M
+(statement and also finds it true; likewise, when one computer executes an "if") s
+376 196 M
+(and finds it false, so does the other.  Then both computers perform exactly the) s
+376 188 M
+(same data movements \(e.g. swapping the numbers at indices i and j\) in exactly) s
+376 180 M
+(the same order, so they both permute their inputs in _exactly_ the same way.) s
+376 164 M
+(A correct sorting algorithm must generate a _different_ sequence of true/false) s
+376 156 M
+(answers for each different permutation of 1...n, because it takes a different) s
+376 148 M
+(sequence of data movements to sort each permutation.  There are n! different) s
+376 140 M
+(permutations, thus n! different sequences of true/false answers.) s
+376 124 M
+(If a sorting algorithm asks d true/false questions, it generates <= 2^d) s
+376 116 M
+(different sequences of true/false answers.  If it correctly sorts every) s
+376 108 M
+(permutation of 1...n, then n! <= 2^d, so log_2 \(n!\) <= d, and d is in) s
+376 100 M
+(Omega\(n log n\).  The algorithm spends Omega\(d\) time asking these d questions.) s
+376 92 M
+(Hence,) s
+376 76 M
+( ==============================================================================) s
+376 68 M
+( EVERY comparison-based sorting algorithm takes Omega\(n log n\) worst-case time.) s
+376 60 M
+( ==============================================================================) s
+376 44 M
+(This is an amazing claim, because it doesn't just analyze one algorithm.  It) s
+376 36 M
+(says that of the thousands of comparison-based sorting algorithms that haven't) s
+376 28 M
+(even been invented yet, not one of them has any hope of beating O\(n log n\) time) s
+376 20 M
+(for all inputs of length n.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (34) def
+/fdir (.) def
+/ftail (34) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/16/14) def
+/modtimestr (01:53:34) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(LINEAR-TIME SORTING) s
+5 500 M
+(===================) s
+5 492 M
+(However, there are faster sorting algorithms that can make q-way decisions for) s
+5 484 M
+(large values of q, instead of true/false \(2-way\) decisions.  Some of these) s
+5 476 M
+(algorithms run in linear time.) s
+5 460 M
+(Bucket Sort) s
+5 452 M
+(-----------) s
+5 444 M
+(_Bucket_sort_ works well when keys are distributed in a small range, e.g. from) s
+5 436 M
+(0 to q - 1, and the number of items n is larger than, or nearly as large as, q.) s
+5 428 M
+(In other words, when q is in O\(n\).) s
+5 412 M
+(We allocate an array of q queues \(or singly-linked lists with tail references,) s
+5 404 M
+(which are basically the same thing, but we only need the queue operations\),) s
+5 396 M
+(numbered from 0 to q - 1.  The queues are called _buckets_.  We walk through) s
+5 388 M
+(the list of input items, and enqueue each item in the appropriate queue:) s
+5 380 M
+(an item with key i goes into queue i.) s
+5 364 M
+(Each item illustrated here has a numerical key and an associated value.) s
+5 348 M
+(             -------------------------------------------------------------) s
+5 340 M
+(       Input | 6:a | 7:b | 3:c | 0:d | 3:e | 1:f | 5:g | 0:h | 3:i | 7:j |) s
+5 332 M
+(             -------------------------------------------------------------) s
+5 316 M
+(                 0       1       2       3       4       5       6       7) s
+5 308 M
+(             -----------------------------------------------------------------) s
+5 300 M
+(Queue fronts |   .   |   .   |   *   |   .   |   *   |   .   |   .   |   .   |) s
+5 292 M
+(             ----|-------|---------------|---------------|-------|-------|----) s
+5 284 M
+(                 v       v               v               v       v       v) s
+5 276 M
+(              ------- -------         -------         ------- ------- -------) s
+5 268 M
+(              | 0:d | | 1:f |         | 3:c |         | 5:g | | 6:a | | 7:b |) s
+5 260 M
+(              |  .  | |     |         |  .  |         |  *  | |  *  | |  .  |) s
+5 252 M
+(              ---|--- -------         ---|---         ------- ------- ---|---) s
+5 244 M
+(                 v       ^               v               ^       ^       v) s
+5 236 M
+(              -------    |            -------            |       |    -------) s
+5 228 M
+(              | 0:h |    |            | 3:e |            |       |    | 7:j |) s
+5 220 M
+(              |  *  |    |            |  .  |            |       |    |  *  |) s
+5 212 M
+(              -------    |            ---|---            |       |    -------) s
+5 204 M
+(                 ^       |               v               |       |       ^) s
+5 196 M
+(                 |       |            -------            |       |       |) s
+5 188 M
+(                 |       |            | 3:i |            |       |       |) s
+5 180 M
+(                 |       |            |  *  |            |       |       |) s
+5 172 M
+(                 |       |            -------            |       |       |) s
+5 164 M
+(                 |       |               ^               |       |       |) s
+5 156 M
+(             ----|-------|---------------|---------------|-------|-------|----) s
+5 148 M
+(Queue tails  |   .   |   .   |   *   |   .   |   *   |   .   |   .   |   .   |) s
+5 140 M
+(             -----------------------------------------------------------------) s
+5 124 M
+(When we're done, we concatenate all the queues together in order.) s
+5 108 M
+(Concatenated output:) s
+5 100 M
+(------- ------- ------- ------- ------- ------- ------- ------- ------- -------) s
+5 92 M
+(| 0:d |>| 0:h |>| 1:f |>| 3:c |>| 3:e |>| 3:i |>| 5:g |>| 6:a |>| 7:b |>| 7:j |) s
+5 84 M
+(------- ------- ------- ------- ------- ------- ------- ------- ------- -------) s
+5 68 M
+(This data structure is _exactly_ like a hash table \(plus tail references\), but) s
+5 60 M
+(the hash code just maps the key i to bucket i, and there is no compression) s
+5 52 M
+(function because there is no need for compression.) s
+5 36 M
+(Bucket sort takes Theta\(q + n\) time--in the best case and in the worst case.) s
+5 28 M
+(It takes Theta\(q\) time to initialize the buckets in the beginning and to) s
+5 20 M
+(concatenate them together in the end.  It takes Theta\(n\) time to put all the) s
+5 12 M
+(items in their buckets.) s
+376 516 M
+(If q is in O\(n\)--that is, the number of possible keys isn't much larger than) s
+376 508 M
+(the number of items we're sorting--then bucket sort takes Theta\(n\) time.  How) s
+376 500 M
+(did we get around the Omega\(n log n\) lower bound on comparison-based sorting?) s
+376 492 M
+(Bucket sort is not comparison-based.  We are making a q-way decision every time) s
+376 484 M
+(we decide which queue to put an item into, instead of the true/false decisions) s
+376 476 M
+(provided by comparisons and "if" statements.) s
+376 460 M
+(Bucket sort \(as I've described it here\) is said to be _stable_.  A sort is) s
+376 452 M
+(stable if items with equal keys come out in the same order they went in.  For) s
+376 444 M
+(example, observe that 3:c, 3:e, and 3:i appear in the same order in the output) s
+376 436 M
+(above as they appeared in the input.  Bucket sort is not the only stable sort) s
+376 428 M
+(we have seen; insertion sort, selection sort, and mergesort can all be) s
+376 420 M
+(implemented so that they are stable.  The linked list version of quicksort we) s
+376 412 M
+(have seen can be stable, but the array version is decidedly not.  Heapsort is) s
+376 404 M
+(never stable.  \(Actually, we can _make_ heapsort stable using a simple trick) s
+376 396 M
+(called a _secondary_key_, which I might describe later in the semester.\)) s
+376 380 M
+(Take note that bucket sort is ONLY appropriate when keys are distributed in) s
+376 372 M
+(a small range; i.e. q is in O\(n\).  On Monday we'll study a sorting algorithm) s
+376 364 M
+(called _radix_sort_ that will fix that limitation.  The stability of bucket) s
+376 356 M
+(sort will be important for radix sort.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

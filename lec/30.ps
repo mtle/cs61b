@@ -1,0 +1,852 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Wed Apr  9 11:16:53 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (30) def
+/fdir () def
+/ftail (30) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/09/14) def
+/modtimestr (11:16:24) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 30) s
+5 508 M
+(                           Wednesday, April 9, 2014) s
+5 492 M
+(SORTING) s
+5 484 M
+(=======) s
+5 476 M
+(The need to sort numbers, strings, and other records arises frequently.  The) s
+5 468 M
+(entries in any modern phone book were sorted by a computer.  Databases have) s
+5 460 M
+(features that sort the records returned by a query, ordered according to any) s
+5 452 M
+(field the user desires.  Google sorts your query results by their "relevance".) s
+5 444 M
+(We've seen that Kruskal's algorithm uses sorting.  So do hundreds of other) s
+5 436 M
+(algorithms.) s
+5 420 M
+(Sorting is perhaps the simplest fundamental problem that offers a huge variety) s
+5 412 M
+(of algorithms, each with its own inherent advantages and disadvantages.  We'll) s
+5 404 M
+(study and compare eight sorting algorithms.) s
+5 388 M
+(Insertion Sort) s
+5 380 M
+(--------------) s
+5 372 M
+(Insertion sort is very simple and runs in O\(n^2\) time.  We employ a list S, and) s
+5 364 M
+(maintain the invariant that S is sorted.) s
+5 348 M
+(  Start with an empty list S and the unsorted list I of n input items.) s
+5 340 M
+(  for \(each item x in I\) {) s
+5 332 M
+(    insert x into the list S, positioned so that S remains in sorted order.) s
+5 324 M
+(  }) s
+5 308 M
+(S may be an array or a linked list.  If S is a linked list, then it takes) s
+5 300 M
+(Theta\(n\) worst-case time to find the right position to insert each item.  If S) s
+5 292 M
+(is an array, we can find the right position in O\(log n\) time by binary search,) s
+5 284 M
+(but it takes Theta\(n\) worst-case time to shift the larger items over to make) s
+5 276 M
+(room for the new item.  In either case, insertion sort runs in Theta\(n^2\)) s
+5 268 M
+(worst-case time--but for a different reason in each case.) s
+5 252 M
+(If S is an array, one of the nice things about insertion sort is that it's an) s
+5 244 M
+(in-place sort.  An _in-place_sort_ is a sorting algorithm that keeps the sorted) s
+5 236 M
+(items in the same array that initially held the input items.  Besides the input) s
+5 228 M
+(array, it uses only O\(1\) or perhaps O\(log n\) additional memory.) s
+5 212 M
+(To do an in-place insertion sort, we partition the array into two pieces:  the) s
+5 204 M
+(left portion \(initially empty\) holds S, and the right portion holds I.  With) s
+5 196 M
+(each iteration, the dividing line between S and I moves one step to the right.) s
+5 180 M
+(     ----------    ----------    ----------    ----------    ----------) s
+5 172 M
+(     ][7|3|9|5| => |7][3|9|5| => |3|7][9|5| => |3|7|9][5| => |3|5|7|9][) s
+5 164 M
+(     ----------    ----------    ----------    ----------    ----------) s
+5 156 M
+(       \\_____/      S  \\___/      \\_/  \\_/      \\___/  I      \\_____/) s
+5 148 M
+(          I              I         S    I         S              S) s
+5 132 M
+(If the input list I is "almost" sorted, insertion sort can be as fast as) s
+5 124 M
+(Theta\(n\)--if the algorithm starts its search from the _end_ of S.  In this) s
+5 116 M
+(case, the running time is proportional to n plus the number of _inversions_.) s
+5 108 M
+(An inversion is a pair of keys j < k such that j appears after k in I.) s
+5 100 M
+(I could have anywhere from zero to n \(n - 1\) / 2 inversions.) s
+5 84 M
+(If S is a balanced search tree \(like a 2-3-4 tree or splay tree\), then the) s
+5 76 M
+(running time is in O\(n log n\); but that's not what computer scientists mean) s
+5 68 M
+(when they discuss "insertion sort."  This is our first O\(n log n\) sorting) s
+5 60 M
+(algorithm, but we'll pass it by for others that use less memory and have) s
+5 52 M
+(smaller constants hidden in the asymptotic running time bounds.) s
+376 508 M
+(Selection Sort) s
+376 500 M
+(--------------) s
+376 492 M
+(Selection sort is equally simple, and also runs in quadratic time.  Again we) s
+376 484 M
+(employ a list S, and maintain the invariant that S is sorted.  Now, however, we) s
+376 476 M
+(walk through I and pick out the smallest item, which we append to the end of S.) s
+376 460 M
+(  Start with an empty list S and the unsorted list I of n input items.) s
+376 452 M
+(  for \(i = 0; i < n; i++\) {) s
+376 444 M
+(    Let x be the item in I having smallest key.) s
+376 436 M
+(    Remove x from I.) s
+376 428 M
+(    Append x to the end of S.) s
+376 420 M
+(  }) s
+376 404 M
+(Whether S is an array or linked list, finding the smallest item takes Theta\(n\)) s
+376 396 M
+(time, so selection sort takes Theta\(n^2\) time, even in the best case!  Hence,) s
+376 388 M
+(it's even worse than insertion sort.) s
+376 372 M
+(If S is an array, we can do an in-place selection sort.  After finding the) s
+376 364 M
+(item in I having smallest key, swap it with the first item in I, as shown here.) s
+376 348 M
+(     ----------    ----------    ----------    ----------    ----------) s
+376 340 M
+(     ][7|3|9|5| => |3][7|9|5| => |3|5][9|7| => |3|5|7][9| => |3|5|7|9][) s
+376 332 M
+(     ----------    ----------    ----------    ----------    ----------) s
+376 324 M
+(       \\_____/      S  \\___/      \\_/  \\_/      \\___/  I      \\_____/) s
+376 316 M
+(          I              I         S    I         S              S) s
+376 300 M
+(If I is a data structure faster than an array, we call it...) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (30) def
+/fdir () def
+/ftail (30) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/09/14) def
+/modtimestr (11:16:24) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Heapsort) s
+5 500 M
+(--------) s
+5 492 M
+(Heapsort is a selection sort in which I is a heap.) s
+5 476 M
+(  Start with an empty list S and an unsorted list I of n input items.) s
+5 468 M
+(  toss all the items in I onto a heap h \(ignoring the heap-order property\).) s
+5 460 M
+(  h.bottomUpHeap\(\);                         // Enforces the heap-order property) s
+5 452 M
+(  for \(i = 0; i < n; i++\) {) s
+5 444 M
+(    x = h.removeMin\(\);) s
+5 436 M
+(    Append x to the end of S.) s
+5 428 M
+(  }) s
+5 412 M
+(bottomUpHeap\(\) runs in linear time, and each removeMin\(\) takes O\(log n\) time.) s
+5 404 M
+(Hence, heapsort is an O\(n log n\)-time sorting algorithm.) s
+5 388 M
+(There are several ways to do heapsort in place; I'll describe just one.) s
+5 380 M
+(Maintain the heap _backward_ at the _end_ of the array.  This makes the) s
+5 372 M
+(indexing a little more complicated, but not substantially so.  As items are) s
+5 364 M
+(removed from the heap, the heap shrinks toward the end of the array, making) s
+5 356 M
+(room to add items to the end of S.) s
+5 340 M
+(     bottomUpHeap\(\) removeMin\(\)   removeMin\(\)   removeMin\(\)   removeMin\(\)) s
+5 332 M
+(    5             3             5             7             9) s
+5 324 M
+(   / \\           / \\           / \\           /) s
+5 316 M
+(  9   3   =>    7   5   =>    7   9   =>    9       =>            =>   empty) s
+5 308 M
+( /             /) s
+5 300 M
+(7             9) s
+5 292 M
+(---------    ----------    ----------    ----------    ----------    ----------) s
+5 284 M
+(|7|3|9|5| => ][9|5|7|3| => |3][9|7|5| => |3|5][9|7| => |3|5|7][9| => |3|5|7|9][) s
+5 276 M
+(---------    ----------    ----------    ----------    ----------    ----------) s
+5 268 M
+( \\_____/       \\_____/      S  \\___/      \\_/  \\_/      \\___/  I      \\_____/) s
+5 260 M
+(    I             I              I         S    I         S              S) s
+5 244 M
+(Heapsort is excellent for sorting arrays, but it is an awkward choice for) s
+5 236 M
+(linked lists.  The easiest way to heapsort a linked list is to create a new) s
+5 228 M
+(array of n references to the listnodes.  Sort the array of references \(using) s
+5 220 M
+(the keys in the listnodes for comparisons\).  When the array is sorted, link all) s
+5 212 M
+(the listnodes together into a sorted list.) s
+5 196 M
+(The array of references uses extra memory.  There is another O\(n log n\)) s
+5 188 M
+(algorithm that can sort linked lists using very little additional memory.) s
+376 508 M
+(Mergesort) s
+376 500 M
+(---------) s
+376 492 M
+(Mergesort is based on the observation that it's possible to merge two sorted) s
+376 484 M
+(lists into one sorted list in linear time.  In fact, we can do it with queues:) s
+376 468 M
+(  Let Q1 and Q2 be two sorted queues.  Let Q be an empty queue.) s
+376 460 M
+(  while \(neither Q1 nor Q2 is empty\) {) s
+376 452 M
+(    item1 = Q1.front\(\);) s
+376 444 M
+(    item2 = Q2.front\(\);) s
+376 436 M
+(    move the smaller of item1 and item2 from its present queue to end of Q.) s
+376 428 M
+(  }) s
+376 420 M
+(  concatenate the remaining non-empty queue \(Q1 or Q2\) to the end of Q.) s
+376 404 M
+(The merge routine is a kind of selection sort.  At each iteration, it chooses) s
+376 396 M
+(the item having smallest key from the two input lists, and appends it to the) s
+376 388 M
+(output list.  Since the two input lists are sorted, there are only two items to) s
+376 380 M
+(test, so each iteration takes constant time.  Hence, merging takes O\(n\) time.) s
+376 364 M
+(Mergesort is a recursive divide-and-conquer algorithm, in which the merge) s
+376 356 M
+(routine is what allows us to reunite what we divided:) s
+376 340 M
+(  Start with the unsorted list I of n input items.) s
+376 332 M
+(  Break I into two halves I1 and I2, having ceiling\(n/2\) and floor\(n/2\) items.) s
+376 324 M
+(  Sort I1 recursively, yielding the sorted list S1.) s
+376 316 M
+(  Sort I2 recursively, yielding the sorted list S2.) s
+376 308 M
+(  Merge S1 and S2 into a sorted list S.) s
+376 292 M
+(The recursion bottoms out at one-item lists.  How long does mergesort take?) s
+376 284 M
+(The answer is made apparent by examining its recursion tree.) s
+376 268 M
+(            -------------------------------  --\\) s
+376 260 M
+(            |0 | 1 | 3 | 4 | 5 | 7 | 8 | 9|    |) s
+376 252 M
+(            -------------------------------    |) s
+376 244 M
+(                   /               \\           |) s
+376 236 M
+(            --------------- ---------------    |) s
+376 228 M
+(            |3 | 5 | 7 | 9| |0 | 1 | 4 | 8|    |) s
+376 220 M
+(            --------------- ---------------    \\) s
+376 212 M
+(               /       \\       /       \\        >  1 + ceiling\(log  n\) levels) s
+376 204 M
+(            ------- ------- ------- -------    /                  2) s
+376 196 M
+(            |3 | 7| |5 | 9| |4 | 8| |0 | 1|    |) s
+376 188 M
+(            ------- ------- ------- -------    |) s
+376 180 M
+(             /   \\   /   \\   /   \\   /   \\     |) s
+376 172 M
+(            --- --- --- --- --- --- --- ---    |) s
+376 164 M
+(            |7| |3| |9| |5| |4| |8| |0| |1|    |) s
+376 156 M
+(            --- --- --- --- --- --- --- ---  --/) s
+376 140 M
+(\(Note that this tree is not a data structure.  It's the structure of a sequence) s
+376 132 M
+(of recursive calls, like a game tree.\)) s
+376 116 M
+(Each level of the tree involves O\(n\) operations, and there are O\(log n\) levels.) s
+376 108 M
+(Hence, mergesort runs in O\(n log n\) time.) s
+376 92 M
+(What makes mergesort a memory-efficient algorithm for sorting linked lists) s
+376 84 M
+(makes it a memory-inefficient algorithm for sorting arrays.  Unlike the other) s
+376 76 M
+(sorting algorithms we've considered, mergesort is not an in-place algorithm.) s
+376 68 M
+(There is no reasonably efficient way to merge two arrays in place.  Instead,) s
+376 60 M
+(use an extra array of O\(n\) size to temporarily hold the result of a merge.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

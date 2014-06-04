@@ -1,0 +1,928 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Wed Apr 16 01:54:05 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (33) def
+/fdir (.) def
+/ftail (33) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (04/16/14) def
+/modtimestr (01:47:16) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS61B: Lecture 33) s
+5 508 M
+(                          Wednesday, April 16, 2014) s
+5 492 M
+(Today's reading:  Goodrich & Tamassia, Section 11.4.) s
+5 476 M
+(DISJOINT SETS) s
+5 468 M
+(=============) s
+5 460 M
+(A _disjoint_sets_ data structure represents a collection of sets that are) s
+5 452 M
+(_disjoint_:  that is, no item is found in more than one set.  The collection of) s
+5 444 M
+(disjoint sets is called a _partition_, because the items are partitioned among) s
+5 436 M
+(the sets.) s
+5 420 M
+(Moreover, we work with a _universe_ of items.  The universe is made up of all) s
+5 412 M
+(of the items that can be a member of a set.  Every item is a member of exactly) s
+5 404 M
+(one set.) s
+5 388 M
+(For example, suppose the items in our universe are corporations that still) s
+5 380 M
+(exist today or were acquired by other corporations.  Our sets are corporations) s
+5 372 M
+(that still exist under their own name.  For instance, "Microsoft,") s
+5 364 M
+("Forethought," and "Web TV" are all members of the "Microsoft" set.) s
+5 348 M
+(We will limit ourselves to two operations.  The first is called a _union_) s
+5 340 M
+(operation, in which we merge two sets into one.  The second is called a _find_) s
+5 332 M
+(query, in which we ask a question like, "What corporation does Web TV belong to) s
+5 324 M
+(today?"  More generally, a "find" query takes an item and tells us which set it) s
+5 316 M
+(is in.  We will not support operations that break a set up into two or more) s
+5 308 M
+(sets \(not quickly, anyway\).  Data structures designed to support these) s
+5 300 M
+(operations are called _partition_ or _union/find_ data structures.) s
+5 284 M
+(Applications of union/find data structures include maze generation \(which) s
+5 276 M
+(you'll do in Homework 9\) and Kruskal's algorithm for computing the minimum) s
+5 268 M
+(spanning tree of a graph \(which you'll implement in Project 3\).) s
+5 252 M
+(Union/find data structures begin with every item in a separate set.) s
+5 236 M
+(-------------- ------------ -------- ------------------- -------- -----------) s
+5 228 M
+(|Piedmont Air| |Empire Air| |US Air| |Pacific Southwest| |Web TV| |Microsoft|) s
+5 220 M
+(-------------- ------------ -------- ------------------- -------- -----------) s
+5 204 M
+(The query "find\(Empire Air\)" returns "Empire Air".  Suppose we take the union) s
+5 196 M
+(of Piedmont Air and Empire Air and called the resulting corporation Piedmont) s
+5 188 M
+(Air.  Similarly, we unite Microsoft with Web TV and US Air with Pacific SW.) s
+5 172 M
+(               -------------- ------------------- -----------) s
+5 164 M
+(               |Piedmont Air| |      US Air     | |Microsoft|) s
+5 156 M
+(               | Empire Air | |Pacific Southwest| | Web TV  |) s
+5 148 M
+(               -------------- ------------------- -----------) s
+5 132 M
+(The query "find\(Empire Air\)" now returns "Piedmont Air".  Suppose we further) s
+5 124 M
+(unite US Air with Piedmont Air.) s
+5 108 M
+(                -------------------------------- -----------) s
+5 100 M
+(                |      US Air      Piedmont Air| |Microsoft|) s
+5 92 M
+(                |Pacific Southwest  Empire Air | | Web TV  |) s
+5 84 M
+(                -------------------------------- -----------) s
+5 68 M
+(The query "find\(Empire Air\)" now returns "US Air".  When Microsoft takes over) s
+5 60 M
+(US Air, everything will be in one set and no further mergers will be possible.) s
+376 508 M
+(List-Based Disjoint Sets and the Quick-Find Algorithm) s
+376 500 M
+(-----------------------------------------------------) s
+376 492 M
+(The obvious data structure for disjoint sets looks like this.) s
+376 484 M
+(- Each set references a list of the items in that set.) s
+376 476 M
+(- Each item references the set that contains it.) s
+376 460 M
+(With this data structure, find operations take O\(1\) time; hence, we say that) s
+376 452 M
+(list-based disjoint sets use the _quick-find_ algorithm.  However, union) s
+376 444 M
+(operations are slow, because when two sets are united, we must walk through one) s
+376 436 M
+(set and relabel all the items so that they reference the other set.) s
+376 420 M
+(Time prevents us from analyzing this algorithm in detail \(but see Goodrich and) s
+376 412 M
+(Tamassia, Section 11.4.3\).  Instead, let's move on to the less obvious but) s
+376 404 M
+(flatly superior _quick-union_ algorithm.) s
+376 388 M
+(Tree-Based Disjoint Sets and the Quick-Union Algorithm) s
+376 380 M
+(------------------------------------------------------) s
+376 372 M
+(In tree-based disjoint sets, union operations take O\(1\) time, but find) s
+376 364 M
+(operations are slower.  However, for any sequence of union and find operations,) s
+376 356 M
+(the quick-union algorithm is faster overall than the quick-find algorithm.) s
+376 340 M
+(To support fast unions, each set is stored as a general tree.  The quick-union) s
+376 332 M
+(data structure comprises a _forest_ \(a collection of trees\), in which each) s
+376 324 M
+(item is initially the root of its own tree; then trees are merged by union) s
+376 316 M
+(operations.  The quick-union data structure is simpler than the general tree) s
+376 308 M
+(structures you have studied so far, because there are no child or sibling) s
+376 300 M
+(references.  Every node knows only its parent, and you can only walk up the) s
+376 292 M
+(tree.  The true identity of each set is recorded at its root.) s
+376 276 M
+(Union is a simple O\(1\) time operation:  we simply make the root of one set) s
+376 268 M
+(become a child of the root of the other set.  For example, when we form the) s
+376 260 M
+(union of US Air and Piedmont Air:) s
+376 252 M
+(                                                          US Air               ) s
+376 244 M
+(Piedmont Air        US Air                                 ^  ^                ) s
+376 236 M
+(      ^               ^                                    |  |                ) s
+376 228 M
+(      |               |                         Piedmont Air  Pacific Southwest) s
+376 220 M
+( Empire Air   Pacific Southwest      ====>            ^                        ) s
+376 212 M
+(                                                      |                        ) s
+376 204 M
+(                                                 Empire Air                    ) s
+376 188 M
+(US Air becomes a set containing four members.  However, finding the set to) s
+376 180 M
+(which a given item belongs is not a constant-time operation.) s
+376 164 M
+(The find operation is performed by following the chain of parent references) s
+376 156 M
+(from an item to the root of its tree.  For example, find\(Empire Air\) will) s
+376 148 M
+(follow the path of references until it reaches US Air.  The cost of this) s
+376 140 M
+(operation is proportional to the item's depth in the tree.) s
+376 124 M
+(These are the basic union and find algorithms, but we'll consider two) s
+376 116 M
+(optimizations that make finds faster.  One strategy, called union-by-size,) s
+376 108 M
+(helps the union operation to build shorter trees.  The second strategy, called) s
+376 100 M
+(path compression, gives the find operation the power to shorten trees.) s
+376 84 M
+(_Union-by-size_ is a strategy to keep items from getting too deep by uniting) s
+376 76 M
+(sets intelligently.  At each root, we record the size of its tree \(i.e. the) s
+376 68 M
+(number of nodes in the tree\).  When we unite two trees, we make the smaller) s
+376 60 M
+(tree a subtree of the larger one \(breaking ties arbitrarily\).) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (33) def
+/fdir (.) def
+/ftail (33) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (04/16/14) def
+/modtimestr (01:47:16) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(Implementing Quick-Union with an Array) s
+5 500 M
+(--------------------------------------) s
+5 492 M
+(Suppose the items are non-negative integers, numbered from zero.  We'll use an) s
+5 484 M
+(array to record the parent of each item.  If an item has no parent, we'll) s
+5 476 M
+(record the size of its tree.  To distinguish it from a parent reference, we'll) s
+5 468 M
+(record the size s as the negative number -s.  Initially, every item is the root) s
+5 460 M
+(of its own tree, so we set every array element to -1.) s
+5 444 M
+(                        -------------------------------) s
+5 436 M
+(                        |-1|-1|-1|-1|-1|-1|-1|-1|-1|-1|) s
+5 428 M
+(                        -------------------------------) s
+5 420 M
+(                          0  1  2  3  4  5  6  7  8  9) s
+5 404 M
+(The forest illustrated at left below is represented by the array at right.) s
+5 388 M
+(          8        1        2                  -------------------------------) s
+5 380 M
+(         / \\      /|\\                          | 1|-4|-1| 8| 5| 8| 1| 3|-5| 1|) s
+5 372 M
+(        5   3    9 0 6                         -------------------------------) s
+5 364 M
+(        |   |                                    0  1  2  3  4  5  6  7  8  9 ) s
+5 356 M
+(        4   7) s
+5 340 M
+(This is a slightly kludgy way to implement tree-based disjoint sets, but it's) s
+5 332 M
+(fast \(in terms of the constant hidden in the asymptotic notation\).) s
+5 316 M
+(Let root1 and root2 be two items that are roots of their respective trees.) s
+5 308 M
+(Here is code for the union operation with the union-by-size strategy.) s
+5 292 M
+(  public void union\(int root1, int root2\) {) s
+5 284 M
+(    if \(array[root2] < array[root1]\) {                 // root2 has larger tree) s
+5 276 M
+(      array[root2] += array[root1];        // update # of items in root2's tree) s
+5 268 M
+(      array[root1] = root2;                       // make root2 parent of root1) s
+5 260 M
+(    } else {                                  // root1 has equal or larger tree) s
+5 252 M
+(      array[root1] += array[root2];        // update # of items in root1's tree) s
+5 244 M
+(      array[root2] = root1;                       // make root1 parent of root2) s
+5 236 M
+(    }) s
+5 228 M
+(  }) s
+5 212 M
+(Path Compression) s
+5 204 M
+(----------------) s
+5 196 M
+(The find\(\) method is equally simple, but we need one more trick to obtain the) s
+5 188 M
+(best possible speed.  Suppose a sequence of union operations creates a tall) s
+5 180 M
+(tree, and we perform find\(\) repeatedly on its deepest leaf.  Each time we) s
+5 172 M
+(perform find\(\), we walk up the tree from leaf to root, perhaps at considerable) s
+5 164 M
+(expense.  When we perform find\(\) the first time, why not move the leaf up the) s
+5 156 M
+(tree so that it becomes a child of the root?  That way, next time we perform) s
+5 148 M
+(find\(\) on the same leaf, it will run much more quickly.  Furthermore, why not) s
+5 140 M
+(do the same for _every_ node we encounter as we walk up to the root?) s
+5 124 M
+(          0) s
+5 116 M
+(         /|\\                                      _ 0 _) s
+5 108 M
+(        1 2 3                                    / /|\\ \\) s
+5 100 M
+(       /|\\             ==find\(7\)==>             7 4 1 2 3) s
+5 92 M
+(      4 5 6                                      /| |\\) s
+5 84 M
+(     /|\\                                        8 9 5 6) s
+5 76 M
+(    7 8 9) s
+5 60 M
+(In the example above, find\(7\) walks up the tree from 7, discovers that 0 is the) s
+5 52 M
+(root, and then makes 0 be the parent of 4 and 7, so that future find operations) s
+5 44 M
+(on 4, 7, or their descendants will be faster.  This technique is called) s
+5 36 M
+(_path_compression_.) s
+376 508 M
+(Let x be an item whose set we wish to identify.  Here is code for find, which) s
+376 500 M
+(returns the identity of the item at the root of the tree.) s
+376 484 M
+(  public int find\(int x\) {) s
+376 476 M
+(    if \(array[x] < 0\) {) s
+376 468 M
+(      return x;                         // x is the root of the tree; return it) s
+376 460 M
+(    } else {) s
+376 452 M
+(      // Find out who the root is; compress path by making the root x's parent) s
+376 444 M
+(      array[x] = find\(array[x]\);) s
+376 436 M
+(      return array[x];                                       // Return the root) s
+376 428 M
+(    }) s
+376 420 M
+(  }) s
+376 404 M
+(Naming Sets) s
+376 396 M
+(-----------) s
+376 388 M
+(Union-by-size means that if Microsoft acquires US Air, US Air will be the root) s
+376 380 M
+(of the tree, even though the new conglomorate might still be called Microsoft.) s
+376 372 M
+(What if we want some control over the names of the sets when we perform union\(\)) s
+376 364 M
+(operations?) s
+376 348 M
+(The solution is to maintain an additional array that maps root items to set) s
+376 340 M
+(names \(and perhaps vice versa, depending on the application's needs\).  For) s
+376 332 M
+(instance, the array "name" might map 0 to Microsoft.  We must modify the) s
+376 324 M
+(union\(\) method so that when it unites two sets, it assigns the union an) s
+376 316 M
+(appropriate name.) s
+376 300 M
+(For many applications, however, we don't care about the name of a set at all;) s
+376 292 M
+(we only want to know if two items x and y are in the same set.  This is true in) s
+376 284 M
+(both Homework 9 and Project 3.  You only need to run find\(x\), run find\(y\), and) s
+376 276 M
+(check if the two roots are the same.) s
+376 260 M
+(Running Time of Quick-Union) s
+376 252 M
+(---------------------------) s
+376 244 M
+(Union operations obviously take Theta\(1\) time.  \(Look at the code--no loops or) s
+376 236 M
+(recursion.\)) s
+376 220 M
+(If we use union-by-size, a single find operation can take Theta\(log u\)) s
+376 212 M
+(worst-case time, where u is the number of union operations that took place) s
+376 204 M
+(prior to the find.  Path compression does not improve this worst-case time, but) s
+376 196 M
+(it improves the _average_ running time substantially--although a find operation) s
+376 188 M
+(can take Theta\(log u\) time, path compression will make that operation fast if) s
+376 180 M
+(you do it again.  The average running time of find and union operations in the) s
+376 172 M
+(quick-union data structure is so close to a constant that it's hardly worth) s
+376 164 M
+(mentioning that, in a rigorous asymptotic sense, it's slightly slower.) s
+376 148 M
+(The bottom line:  a sequence of f find and u union operations \(in any order and) s
+376 140 M
+(possibly interleaved\) takes Theta\(u + f alpha\(f + u, u\)\) time in the worst) s
+376 132 M
+(case.  alpha is an extremely slowly-growing function known as the _inverse_) s
+376 124 M
+(_Ackermann_function_.) s
+376 108 M
+(When I say "extremely slowly-growing function", I mean "comically slowly-) s
+376 100 M
+(growing function."  The inverse Ackermann function is never larger than 4 for) s
+376 92 M
+(any values of f and u you could ever use \(though it does grow arbitrarily) s
+376 84 M
+(large--for unimaginably gigantic values of f and u\).  Hence, for all practical) s
+376 76 M
+(purposes \(but not on the Final Exam\), you should think of quick-union as having) s
+376 68 M
+(find operations that run, on average, in constant time.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

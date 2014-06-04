@@ -1,0 +1,928 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk
+%%Creator: GNU enscript 1.6.4
+%%CreationDate: Wed Feb 19 16:48:24 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 4
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 4
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 4
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (13) def
+/fdir () def
+/ftail (13) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (02/19/14) def
+/modtimestr (16:48:21) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 13) s
+5 508 M
+(                         Wednesday, February 19, 2014) s
+5 492 M
+(Today's reading:  Sierra & Bates, pp. 154-160, 587-591, 667-668.) s
+5 476 M
+(JAVA PACKAGES) s
+5 468 M
+(=============) s
+5 460 M
+(In Java, a _package_ is a collection of classes and Java interfaces, and) s
+5 452 M
+(possibly subpackages, that trust each other.  Packages have three benefits.) s
+5 436 M
+(\(1\)  Packages can contain hidden classes that are used by the package but are) s
+5 428 M
+(     not visible or accessible outside the package.) s
+5 420 M
+(\(2\)  Classes in packages can have fields and methods that are visible by all) s
+5 412 M
+(     classes inside the package, but not outside.) s
+5 404 M
+(\(3\)  Different packages can have classes with the same name.  For example,) s
+5 396 M
+(     java.awt.Frame and photo.Frame.) s
+5 380 M
+(Here are two examples of packages.) s
+5 364 M
+(\(1\)  java.io is a package of I/O-related classes in the standard Java) s
+5 356 M
+(     libraries.) s
+5 348 M
+(\(2\)  Homework 4 uses "list", a package containing the classes DList and) s
+5 340 M
+(     DListNode.  You will be adding two additional classes to the list package.) s
+5 324 M
+(Package names are hierarchical.  java.awt.image.Model refers to the class Model) s
+5 316 M
+(inside the package image inside the package awt inside the package java.) s
+5 300 M
+(Using Packages) s
+5 292 M
+(--------------) s
+5 284 M
+(You can address any class, field, or method with a fully-qualified name.) s
+5 276 M
+(Here's an example of all three in one.) s
+5 260 M
+(  java.lang.System.out.println\("My fingers are tired."\);) s
+5 244 M
+(Java's "import" command saves us from the tedium of using fully-qualified names) s
+5 236 M
+(all the time.) s
+5 220 M
+(  import java.io.File;  // Can now refer to File class, not just java.io.File.) s
+5 212 M
+(  import java.io.*;     // Can now refer to everything in java.io.) s
+5 196 M
+(Every Java program implicitly imports java.lang.*, so you don't have to import) s
+5 188 M
+(it explicitly to use System.out.println\(\).  However, if you import packages) s
+5 180 M
+(that contain multiple classes with the same name, you'll need to qualify their) s
+5 172 M
+(names explicitly throughout your code.) s
+5 156 M
+(  java.awt.Frame.add\(photo.Frame.canvas\);) s
+5 140 M
+(Any package you create must appear in a directory of the same name.  For) s
+5 132 M
+(example, the photo.Frame class bytecode appears in photo/Frame.class, and) s
+5 124 M
+(x.y.z.Class appears in x/y/z/Class.class.  Where are the photo and x) s
+5 116 M
+(directories?  They can appear in any of the directories on your "classpath".) s
+5 108 M
+(You can specify a classpath on the command line, as when you type) s
+5 92 M
+(    javac -cp ".:~jrs/classes:libraries.jar" *.java) s
+5 76 M
+(This means that Java first looks in ".", the current directory, then looks in) s
+5 68 M
+(~jrs/classes/, then finally in the _Java_archive_ libraries.jar when it's) s
+5 60 M
+(looking for the photo and x directories.  The classpath does not include the) s
+5 52 M
+(location of the Java standard library packages \(those beginning with java or) s
+5 44 M
+(javax\).  The Java compiler knows where to find them.) s
+376 508 M
+(Building Packages) s
+376 500 M
+(-----------------) s
+376 492 M
+(The files that form a package are annotated with a "package" command, which) s
+376 484 M
+(specifies the name of the package, which must match the name of the directory) s
+376 476 M
+(in which the files appear.) s
+376 460 M
+(/* list/SList.java */                |  /* list/SListNode.java */) s
+376 452 M
+(                                     |) s
+376 444 M
+(package list;                        |  package list;) s
+376 436 M
+(                                     |) s
+376 428 M
+(public class SList {                 |  class SListNode {) s
+376 420 M
+(  SListNode head;                    |    Object item;) s
+376 412 M
+(  int size;                          |    SListNode next;) s
+376 404 M
+(}                                    |  }) s
+376 388 M
+(Here, the SListNode class and its fields are marked neither public, private,) s
+376 380 M
+(nor protected.  Instead, they have "package" protection, which falls somewhere) s
+376 372 M
+(between "private" and "protected".  Package protection is specified not by) s
+376 364 M
+(using the word "package", but by using no modifier at all.  Variables are) s
+376 356 M
+(package by default unless declared public, private, or protected.) s
+376 340 M
+(A class or variable with package protection is visible to any class in the same) s
+376 332 M
+(package, but not to classes outside the package \(i.e., files outside the) s
+376 324 M
+(directory\).  The files in a package are presumed to trust each other, and are) s
+376 316 M
+(usually implemented by the same person.  Files outside the package can only see) s
+376 308 M
+(the public classes, methods, and fields.  \(Subclasses outside the package can) s
+376 300 M
+(see the protected methods and fields as well.\)) s
+376 284 M
+(Before we knew about packages, we had to make the fields of SListNode public so) s
+376 276 M
+(that SList could manipulate them.  Our list package above solves this problem) s
+376 268 M
+(by giving SListNode and its fields package protection, so that the SList class) s
+376 260 M
+(may use SListNodes freely, but outside applications cannot access them.) s
+376 244 M
+(In Homework 4, you'll see a different approach.  There, the DListNode class is) s
+376 236 M
+(public, so that DListNodes can be directly held by application programs, but) s
+376 228 M
+(the "prev" and "next" fields have package protection, so an application cannot) s
+376 220 M
+(access these fields or corrupt the DList ADT.  But an application can hop) s
+376 212 M
+(quickly from node to node because it can store DListNode references and use) s
+376 204 M
+(them as parameters in DList method calls.) s
+376 188 M
+(Each public class must be declared in a file named after the class, but a class) s
+376 180 M
+(with package protection can be declared in any .java file \(usually found) s
+376 172 M
+(together with a class that uses it\).  So a public SList class and a package) s
+376 164 M
+(SListNode class can both be declared in the file list/SList.java, if you feel) s
+376 156 M
+(like it.) s
+376 140 M
+(Compiling and running files in a package is a bit tricky, because it must be) s
+376 132 M
+(done from outside the package, using the following syntax:) s
+376 116 M
+(  javac -g list/SList.java) s
+376 108 M
+(  java list.SList) s
+376 92 M
+(Here's the correspondence between declarations and their visibility.) s
+376 76 M
+(        Visible:    in the same package    in a subclass    everywhere) s
+376 68 M
+(  Declaration) s
+376 60 M
+(  "public"                  X                    X              X) s
+376 52 M
+(  "protected"               X                    X) s
+376 44 M
+(  default \(package\)         X) s
+376 36 M
+(  "private") s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (13) def
+/fdir () def
+/ftail (13) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (02/19/14) def
+/modtimestr (16:48:21) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(ITERATORS) s
+5 500 M
+(=========) s
+5 492 M
+(In java.util there is a standard Java interface for iterating over sequences of) s
+5 484 M
+(objects.) s
+5 468 M
+(  public interface Iterator {) s
+5 460 M
+(    boolean hasNext\(\);) s
+5 452 M
+(    Object next\(\);) s
+5 444 M
+(    void remove\(\);                          // The remove\(\) method is optional.) s
+5 436 M
+(  }) s
+5 420 M
+(Part of Project 1 is to write a class RunIterator that implements an Iterator) s
+5 412 M
+(for your RunLengthEncoding class.  Its purpose is to provide an interface by) s
+5 404 M
+(which other classes can read the runs in your run-length encoding, one by one.) s
+5 388 M
+(An Iterator is like a bookmark.  Just as you can have many bookmarks in a book,) s
+5 380 M
+(you can have many Iterators iterating over the same data structure, each one) s
+5 372 M
+(independent of the others.  One Iterator can advance without disturbing other) s
+5 364 M
+(Iterators that are iterating over the same data structure.) s
+5 348 M
+(The first time next\(\) is called on a newly constructed Iterator, it returns the) s
+5 340 M
+(first item in the sequence.  Each subsequent time next\(\) is called, it returns) s
+5 332 M
+(the next item in the sequence.  After the Iterator has returned every item in) s
+5 324 M
+(the sequence, every subsequent call to next\(\) throws an exception and halts) s
+5 316 M
+(with an error message.  \(I find this annoying; I would prefer an interface in) s
+5 308 M
+(which next\(\) returns null.  The Java library designers disagree.\)) s
+5 292 M
+(To help you avoid triggering an exception, hasNext\(\) returns true if the) s
+5 284 M
+(Iterator has more items to return, or false if it has already returned every) s
+5 276 M
+(item in the sequence.  It is usually considered good practice to check) s
+5 268 M
+(hasNext\(\) before calling next\(\).  \(In the next lecture we'll learn how to catch) s
+5 260 M
+(exceptions; that will give us an alternative way to prevent our program from) s
+5 252 M
+(crashing when next\(\) throws an exception.\)) s
+5 236 M
+(There is usually no way to reset an Iterator back to the beginning of the) s
+5 228 M
+(sequence.  Instead, you construct a new Iterator.) s
+5 212 M
+(Most data structures that support Iterators "implement" another interface in) s
+5 204 M
+(java.util called "Iterable".  ) s
+5 188 M
+(  public interface Iterable {) s
+5 180 M
+(    Iterator iterator\(\);) s
+5 172 M
+(  }) s
+5 156 M
+(It is customary for applications that want to iterate over a data structure DS) s
+5 148 M
+(to call DS.iterate\(\), which constructs and returns a DSIterator whose fields) s
+5 140 M
+(are initialized so it is ready to return the first item in DS.) s
+5 124 M
+(A benefit of creating an Iterable class with its own Iterator is that Java has) s
+5 116 M
+(a simple built-in loop syntax, a second kind of "for each" loop, that iterates) s
+5 108 M
+(over the items in a data structure.  Suppose we design an SList that implements) s
+5 100 M
+(Iterator.  The following loop \(which can appear in any class\) iterates through) s
+5 92 M
+(the items in an SList l.) s
+5 76 M
+(  for \(Object o : l\) {) s
+5 68 M
+(    System.out.println\(o\);) s
+5 60 M
+(  }) s
+5 44 M
+(This loop is equivalent to) s
+5 28 M
+(  for \(Iterator i = l.iterator\(\); i.hasNext\(\); \) {) s
+5 20 M
+(    Object o = i.next\(\);) s
+5 12 M
+(    System.out.println\(o\);) s
+5 4 M
+(  }) s
+376 508 M
+(To make all this more concrete, here is a complete implementation of an) s
+376 500 M
+(SListIterator class and a partial implementation of SList, both in the "list") s
+376 492 M
+(package.) s
+376 476 M
+(/* list/SListIterator.java */) s
+376 460 M
+(package list;) s
+376 452 M
+(import java.util.*;) s
+376 436 M
+(public class SListIterator implements Iterator {) s
+376 428 M
+(  SListNode n;) s
+376 412 M
+(  public SListIterator\(SList l\) {) s
+376 404 M
+(    n = l.head;) s
+376 396 M
+(  }) s
+376 380 M
+(  public boolean hasNext\(\) {) s
+376 372 M
+(    return n != null;) s
+376 364 M
+(  }) s
+376 348 M
+(  public Object next\(\) {) s
+376 340 M
+(    if \(n == null\) {) s
+376 332 M
+(      /* We'll learn about throwing exceptions in the next lecture. */) s
+376 324 M
+(      throw new NoSuchElementException\(\);                       // In java.util) s
+376 316 M
+(    }) s
+376 308 M
+(    Object i = n.item;) s
+376 300 M
+(    n = n.next;) s
+376 292 M
+(    return i;) s
+376 284 M
+(  }) s
+376 268 M
+(  public void remove\(\) {) s
+376 260 M
+(    /* Doing it the lazy way.  Remove this, motherf! */) s
+376 252 M
+(    throw new UnsupportedOperationException\("Nice try, bozo."\); // In java.lang) s
+376 244 M
+(  }) s
+376 236 M
+(}) s
+376 220 M
+(/* list/SList.java */) s
+376 204 M
+(package list;) s
+376 196 M
+(import java.util.*;) s
+376 180 M
+(public class SList implements Iterable {) s
+376 172 M
+(  SListNode head;) s
+376 164 M
+(  int size;) s
+376 148 M
+(  public Iterator iterator\(\) {) s
+376 140 M
+(    return new SListIterator\(this\);) s
+376 132 M
+(  }) s
+376 116 M
+(  [other methods here]) s
+376 108 M
+(}) s
+376 92 M
+(Observe that an Iterator may mess up or even crash the program if the) s
+376 84 M
+(structure it is iterating over changes.  For example, if the node "n" that an) s
+376 76 M
+(SListIterator references is removed from the list, the SListIterator will not) s
+376 68 M
+(be able to find the rest of the nodes.) s
+376 52 M
+(An Iterator doesn't have to iterate over a data structure.  For example, you) s
+376 44 M
+(can implement an Iterator subclass called Primes that returns each successive) s
+376 36 M
+(prime number as an Integer object.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF

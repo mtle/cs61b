@@ -1,0 +1,868 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 25 25 587 767
+%%Title: Enscript Output
+%%For: Jonathan R. Shewchuk
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Fri Mar 14 03:52:17 2014
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 742 def
+/d_page_h 562 def
+/d_header_x 0 def
+/d_header_y 526 def
+/d_header_w 742 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 742 def
+/d_footer_h 0 def
+/d_output_w 742 def
+/d_output_h 526 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 1 def
+/fname (23) def
+/fdir (.) def
+/ftail (23) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (03/14/14) def
+/modtimestr (03:51:51) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 516 M
+(                              CS 61B: Lecture 23) s
+5 508 M
+(                            Monday, March 17, 2014) s
+5 492 M
+(ASYMPTOTIC ANALYSIS \(continued\):  More Formalism) s
+5 484 M
+(================================================) s
+5 468 M
+(|-----------------------------------------------------------------------------|) s
+5 460 M
+(| Omega\(f\(n\)\) is the set of all functions T\(n\) that satisfy:                  |) s
+5 452 M
+(|                                                                             |) s
+5 444 M
+(|   There exist positive constants d and N such that, for all n >= N,         |) s
+5 436 M
+(|                              T\(n\) >= d f\(n\)                                 |) s
+5 428 M
+(|-----------------------------------------------------------------------------|) s
+5 420 M
+(^^^^^^^^^^  Compare with the definition of Big-Oh:  T\(n\) <= c f\(n\). ^^^^^^^^^^^) s
+5 404 M
+(Omega is the reverse of Big-Oh.  If T\(n\) is in O\(f\(n\)\), f\(n\) is in Omega\(T\(n\)\).) s
+5 388 M
+(  2n   is in Omega\(n\)                 BECAUSE    n                is in O\(2n\).) s
+5 380 M
+(  n^2  is in Omega\(n\)                 BECAUSE    n                is in O\(n^2\).) s
+5 372 M
+(  n^2  is in Omega\(3 n^2 + n log n\)   BECAUSE    3 n^2 + n log n  is in O\(n^2\).) s
+5 356 M
+(Big-Omega gives us a LOWER BOUND on a function, just as Big-Oh gives us an) s
+5 348 M
+(UPPER BOUND.  Big-Oh says, "Your algorithm is at least this good."  Big-Omega) s
+5 340 M
+(says, "Your algorithm is at least this bad.") s
+5 324 M
+(Recall that Big-Oh notation can be misleading because, for instance,) s
+5 316 M
+(n is in O\(n^8\).  If we know both a lower bound and an upper bound for) s
+5 308 M
+(a function, and they're both the same bound asymptotically \(i.e. they differ) s
+5 300 M
+(only by a constant factor\), we can use Big-Theta notation to precisely specify) s
+5 292 M
+(the function's asymptotic behavior.) s
+5 276 M
+(|-----------------------------------------------------------------------------|) s
+5 268 M
+(| Theta\(f\(n\)\) is the set of all functions that are in both of                 |) s
+5 260 M
+(|                                                                             |) s
+5 252 M
+(|                         O\(f\(n\)\) and Omega\(f\(n\)\).                            |) s
+5 244 M
+(|-----------------------------------------------------------------------------|) s
+5 228 M
+(But how can a function be sandwiched between f\(n\) and f\(n\)?) s
+5 220 M
+(Easy:  we choose different constants \(c and d\) for the upper bound and lower) s
+5 212 M
+(bound.  For instance, here is a function T\(n\) in Theta\(n\):) s
+5 196 M
+(                     c f\(n\) = 10 n) s
+5 188 M
+(           ^                /) s
+5 180 M
+(           |               /                T\(n\)) s
+5 172 M
+(           |              /               **) s
+5 164 M
+(           |             /               *  *) s
+5 156 M
+(           |            /   ***          *   **) s
+5 148 M
+(           |           /   *   *         *) s
+5 140 M
+(           |   ***    /   *     *       *) s
+5 132 M
+(           | **   ** /    *     *       *) s
+5 124 M
+(           |*       **   *       *      *) s
+5 116 M
+(           *       /  *  *        **   *) s
+5 108 M
+(           |      /    **           ***     ~~~) s
+5 100 M
+(           |     /                     ~~~~~) s
+5 92 M
+(           |    /                 ~~~~~) s
+5 84 M
+(           |   /             ~~~~~) s
+5 76 M
+(           |  /         ~~~~~     d f\(n\) = 2 n) s
+5 68 M
+(           | /     ~~~~~) s
+5 60 M
+(           |/ ~~~~~) s
+5 52 M
+(           O~~------------------------------> n) s
+5 36 M
+(If we extend this graph infinitely far to the right, and find that T\(n\) remains) s
+5 28 M
+(always sandwiched between 2n and 10n, then T\(n\) is in Theta\(n\).  If T\(n\) is an) s
+5 20 M
+(algorithm's worst-case running time, the algorithm will never exhibit worse) s
+5 12 M
+(than linear performance, but it can't be counted on to exhibit better than) s
+5 4 M
+(linear performance, either.) s
+376 508 M
+(Theta is symmetric:  if f\(n\) is in Theta\(g\(n\)\), then g\(n\) is in Theta\(f\(n\)\).) s
+376 500 M
+(For instance, n^3 is in Theta\(3 n^3 - n^2\), and 3 n^3 - n^2 is in Theta\(n^3\).) s
+376 492 M
+(n^3 is not in Theta\(n\), and n is not in Theta\(n^3\).) s
+376 476 M
+(Big-Theta notation isn't potentially misleading in the way Big-Oh notation) s
+376 468 M
+(can be:  n is NOT in Omega\(n^8\).  If your algorithm's running time is in) s
+376 460 M
+(Theta\(n^8\), it IS slow.) s
+376 444 M
+(However, some functions are not in "Theta" of anything simple.  For example,) s
+376 436 M
+(the function f\(n\) = n \(1 + sin n\) is in O\(n\) and Omega\(0\), but it's not in) s
+376 428 M
+(Theta\(n\) nor Theta\(0\).  f\(n\) keeps oscillating back and forth between zero and) s
+376 420 M
+(ever-larger numbers.  We could say that f\(n\) is in Theta\(2n \(1 + sin n\)\), but) s
+376 412 M
+(that's not a simplification.) s
+376 396 M
+(Remember that the choice of O, Omega, or Theta is _independent_ of whether) s
+376 388 M
+(we're talking about worst-case running time, best-case running time,) s
+376 380 M
+(average-case running time, memory use, annual beer consumption as a function of) s
+376 372 M
+(population, or some other function.  The function has to be specified.) s
+376 364 M
+("Big-Oh" is NOT a synonym for "worst-case running time," and Omega is not a) s
+376 356 M
+(synonym for "best-case running time.") s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+25 -587 translate
+/pagenum 2 def
+/fname (23) def
+/fdir (.) def
+/ftail (23) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (03/14/14) def
+/modtimestr (03:51:51) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 508 M
+(ALGORITHM ANALYSIS) s
+5 500 M
+(==================) s
+5 492 M
+(Problem #1:  Given a set of p points, find the pair closest to each other.) s
+5 484 M
+(Algorithm #1:  Calculate the distance between each pair; return the minimum.) s
+5 468 M
+(  There are p \(p - 1\) / 2 pairs, and each pair takes constant time to examine.) s
+5 460 M
+(  Therefore, worst- and best-case running times are in Theta\(p^2\).) s
+5 444 M
+(  Often, you can figure out the running time of an algorithm just by looking at) s
+5 436 M
+(  the loops--their loop bounds and how they are nested.  For example, in the) s
+5 428 M
+(  closest pair code below, the outer loop iterates p times, and the inner loop) s
+5 420 M
+(  iterates an average of roughly p / 2 times, which multiply to Theta\(p^2\)) s
+5 412 M
+(  time.) s
+5 396 M
+(  double minDistance = point[0].distance\(point[1]\);) s
+5 380 M
+(  /* Visit a pair \(i, j\) of points. */) s
+5 372 M
+(  for \(int i = 0; i < numPoints; i++\) {) s
+5 364 M
+(    /* We require that j > i so that each pair is visited only once. */) s
+5 356 M
+(    for \(int j = i + 1; j < numPoints; j++\) {) s
+5 348 M
+(      double thisDistance = point[i].distance\(point[j]\);) s
+5 340 M
+(      if \(thisDistance < minDistance\) {) s
+5 332 M
+(        minDistance = thisDistance;) s
+5 324 M
+(      }) s
+5 316 M
+(    }) s
+5 308 M
+(  }) s
+5 292 M
+(  But doubly-nested loops don't always mean quadratic running time!  The next) s
+5 284 M
+(  example has the same loop structure, but runs in linear time.) s
+5 268 M
+(Problem #2:  Smooshing an array called "ints" to remove consecutive duplicates,) s
+5 260 M
+(             from Homework 3.) s
+5 252 M
+(Algorithm #2:) s
+5 236 M
+(  int i = 0, j = 0;) s
+5 220 M
+(  while \(i < ints.length\) {) s
+5 212 M
+(    ints[j] = ints[i];) s
+5 204 M
+(    do {) s
+5 196 M
+(      i++;) s
+5 188 M
+(    } while \(\(i < ints.length\) && \(ints[i] == ints[j]\)\);) s
+5 180 M
+(    j++;) s
+5 172 M
+(  }) s
+5 164 M
+(  // Code to fill in -1's at end of array omitted.) s
+5 148 M
+(The outer loop can iterate up to ints.length times, and so can the inner loop.) s
+5 140 M
+(But the index "i" advances on _every_ iteration of the inner loop.  It can't) s
+5 132 M
+(advance more than ints.length times before both loops end.  So the worst-case) s
+5 124 M
+(running time of this algorithm is in Theta\(ints.length\).  \(So is the best-case) s
+5 116 M
+(time.\)) s
+5 100 M
+(Unfortunately, I can't give you a foolproof formula for determining the running) s
+5 92 M
+(time of any algorithm.  You have to think!  In fact, the problem of determining) s
+5 84 M
+(an algorithm's running time is, in general, as hard as proving _any_) s
+5 76 M
+(mathematical theorem.  For instance, I could give you an algorithm whose) s
+5 68 M
+(running time depends on whether the Riemann Hypothesis \(one of the greatest) s
+5 60 M
+(unsolved questions in mathematics\) is true or false.) s
+376 508 M
+(Functions of Several Variables) s
+376 500 M
+(------------------------------) s
+376 492 M
+(Problem #3:  Write a matchmaking program for w women and m men.) s
+376 484 M
+(Algorithm #3:  Compare each woman with each man.  Decide if they're compatible.) s
+376 468 M
+(  If each comparison takes constant time then the running time, T\(w, m\),) s
+376 460 M
+(  is in Theta\(wm\).) s
+376 444 M
+(  This means that there exist constants c, d, W, and M, such that) s
+376 436 M
+(  d wm <= T\(w, m\) <= c wm  for every w >= W and m >= M.) s
+376 420 M
+(  T is NOT in O\(w^2\), nor in O\(m^2\), nor in Omega\(w^2\), nor in Omega\(m^2\).) s
+376 412 M
+(  Every one of these possibilities is eliminated either by choosing) s
+376 404 M
+(  w >> m or m >> w.  Conversely, w^2 is in neither O\(wm\) nor Omega\(wm\).) s
+376 396 M
+(  You cannot asymptotically compare the functions wm, w^2, and m^2.) s
+376 380 M
+(  If we expand our service to help form women's volleyball teams as well,) s
+376 372 M
+(  the running time is in Theta\(w^6 + wm\).) s
+376 356 M
+(  This expression cannot be simplified; neither term dominates the other.) s
+376 348 M
+(  You cannot asymptotically compare the functions w^6 and wm.) s
+376 332 M
+(Problem #4:  Suppose you have an array containing n music albums, sorted by) s
+376 324 M
+(             title.  You request a list of all albums whose titles begin with) s
+376 316 M
+(             "The Best of"; suppose there are k such albums.) s
+376 308 M
+(Algorithm #4:  Search for one matching album with binary search.) s
+376 300 M
+(               Walk \(in both directions\) to find the other matching albums.) s
+376 284 M
+(  Binary search takes at most log n steps to find a matching album \(if one) s
+376 276 M
+(  exists\).  Next, the complete list of k matching albums is found, each in) s
+376 268 M
+(  constant time.  Thus, the worst-case running time is in) s
+376 252 M
+(    Theta\(log n + k\).) s
+376 236 M
+(  Because k can be as large as n, it is not dominated by the log n term.) s
+376 228 M
+(  Because k can be as small as zero, it does not dominate the log n term.) s
+376 220 M
+(  Hence, there is no simpler expression for the worst-case running time.) s
+376 204 M
+(  Algorithms like this are called _output-sensitive_, because their performance) s
+376 196 M
+(  depends partly on the size k of the output, which can vary greatly.) s
+376 180 M
+(  Because binary search sometimes gets lucky and finds a match right away, the) s
+376 172 M
+(  BEST-case running time is in) s
+376 156 M
+(    Theta\(k\).) s
+376 140 M
+(Problem #5:  Find the k-th item in an n-node doubly-linked list.) s
+376 132 M
+(Algorithm #5:  If k < 1 or k > n, report an error and return.) s
+376 124 M
+(               Otherwise, compare k with n - k.) s
+376 108 M
+(               If k <= n - k, start at the front of the list and walk forward) s
+376 100 M
+(               k - 1 nodes.) s
+376 84 M
+(               Otherwise, start at the back of the list and walk backward) s
+376 76 M
+(               n - k nodes.) s
+376 60 M
+(  If 1 <= k <= n, this algorithm takes Theta\(min{k, n - k}\) time \(in all cases\)) s
+376 52 M
+(  This expression cannot be simplified:  without knowing k and n, we cannot say) s
+376 44 M
+(  that k dominates n - k or that n - k dominates k.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF
