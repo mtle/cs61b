@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>CS 61B:  Tournament</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2014)</font><br>
+<font size=6 color='009000'>
+Enter the Network Tournament!</font>
+<p>
+
+The Network tournament will take place on
+<b>Monday, May 5 from 7:00&ndash;10:00 pm</b> in <b>306 Soda Hall.</b>
+The winning team will receive
+<font color='9000ff'>gift certificates to Amoeba Records</font>.
+Nobody is required to enter the tournament, but
+we welcome all with working players to submit.  You are welcome
+to make improvements to your <tt>MachinePlayer</tt> that were not in
+your original Project 2 submission, but if you don't,
+please give it a shot anyway.
+<p>
+
+The &ldquo;official&rdquo; deadline for submission is
+the day before the tournament.
+Late submissions will probably be accepted, but there are no guarantees.
+Submissions after the tournament will not be eligible.
+
+
+<h1>Submission</h1>
+
+To prevent your submission from conflicting with other competitors'
+submissions, we want you to put <tt>MachinePlayer.java</tt> and all the
+<tt>.java</tt> files your <tt>MachinePlayer</tt> needs (except
+<tt>Player.java</tt> and <tt>Move.java</tt>) into one package, called
+<tt>cs61b**</tt>
+(replacing the asterisks with your submitting partner's login id, and
+dropping the hyphen).
+This includes <tt>.java</tt> files in the
+<tt>list</tt> package or other packages.
+(These are the files that are most likely to conflict.)
+<p>
+
+<b>Make sure that <tt>cs61b**</tt> does <i>not</i> contain
+<tt>Player.java</tt> or <tt>Move.java</tt>.</b>  These two
+files should remain in the <tt>player</tt> package.
+Every team's submission will
+share the same copies of <tt>Player.java</tt> and <tt>Move.java</tt>.
+Since you can't change
+them, you can't submit them, but you should keep them in
+the <tt>player</tt> package so
+you can test that your <tt>MachinePlayer</tt> compiles correctly.
+<p>
+
+You will need to change all the files in the <tt>cs61b**</tt> package to
+include the line &ldquo;<tt>package cs61b**;</tt>&rdquo;
+(replaced with your login id).
+If you want to have a <tt>list</tt> package inside the <tt>cs61b**</tt>
+package, its files should include the line
+&ldquo;<tt>package cs61b**.list;</tt>&rdquo;.
+Packages that call that package will need to
+&ldquo;<tt>import cs61b**.list;</tt>&rdquo;.
+<p>
+
+Also, you will need to add the lines
+&ldquo;<tt>import player.Player;</tt>&rdquo; and/or
+&ldquo;<tt>import player.Move;</tt>&rdquo; to
+any file that refers to the <tt>Player</tt> or <tt>Move</tt> classes.
+(Avoid using &ldquo;<tt>import player.*;</tt>&rdquo;, as that can cause
+compilation problems due to conflicting <tt>MachinePlayer</tt> classes.)
+<b>Make sure that none of your <tt>.java</tt> files imports
+any package outside <tt>cs61b**</tt></b>, except <tt>player</tt>
+or packages in the standard Java library.
+<p>
+
+Once you've made these changes, make sure that your <tt>MachinePlayer</tt>
+still compiles.
+
+<blockquote>
+  <tt>javac -g cs61baa/*.java</tt> or, if you have packages,
+  <tt>javac -g cs61baa/*.java cs61baa/*/*.java</tt>
+</blockquote>
+
+Then, make sure it still runs.  (See instructions below.)
+<p>
+
+Next, pick a team name.  Write a GRADER file with your team's name at the top.
+You may also include details of your implementation (e.g. evaluation function,
+search depth, how the early moves are chosen, other special tricks).  You're
+not required to include anything more than your team's name, but if you win the
+tournament we'll be asking how your MachinePlayer works.
+<p>
+
+Then submit by typing
+
+<blockquote>
+  <tt>submit tourny</tt>
+</blockquote>
+
+
+<h1>Pitting MachinePlayers Against Each Other</h1>
+
+To help you compare different strategies, you can pit two different
+<tt>MachinePlayer</tt>s against each other.
+First, put each one in its own, differently-named package,
+as per the instructions above.
+For instance, one might be in the &ldquo;<tt>cs61byi</tt>&rdquo; package,
+and one might be in the &ldquo;<tt>cs61bxq</tt>&rdquo; package or even in the
+&ldquo;<tt>player</tt>&rdquo; package.  Both <tt>MachinePlayers</tt>
+must use the <tt>Player</tt> and <tt>Move</tt> classes in the
+<tt>player</tt> package.
+<p>
+
+With <tt>Network.class</tt> in your <tt>pj2</tt> directory, run
+
+<blockquote>
+  <tt>java Network cs61byi cs61bxq "Team America" Annihilators</tt>
+</blockquote>
+
+replacing the two ids with the names of the two packages you want to see
+compete.
+Either of the two ids can also be replaced with &ldquo;human&rdquo; (a human player),
+&ldquo;random&rdquo; (a random player), or &ldquo;machine&rdquo;
+(the MachinePlayer in the player package), as usual.
+The team names are optional, and the quotes are only necessary when
+you want a space or another difficult character in a team name.
+<p>
+
+You can also put a &ldquo;<tt>-q</tt>&rdquo; switch right after
+the word &ldquo;<tt>Network</tt>&rdquo;,
+which causes <tt>Network</tt> to quit immediately when the game ends.
+This can be useful for batch testing.
+<p>
+
+
+<h1>Dedicated Machine for Timings</h1>
+
+Instructional Computing has made the machine <tt>cube.cs.berkeley.edu</tt>
+available solely for the tournament,
+and for figuring out how much your <tt>MachinePlayer</tt>
+can accomplish within the five-second limit.
+It is available for login to cs61b accounts only.
+<b>Please do not use the machine for any other purpose than
+to time your one-parameter <tt>MachinePlayer</tt> and
+ensure that it always returns a move within the five-second limit.
+Please do not run text editors, the Java compiler, or anything but your
+game-playing software on <tt>cube.cs.berkeley.edu</tt>.</b>
+<p>
+
+If something doesn't work as I've advertised, please let me know.
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

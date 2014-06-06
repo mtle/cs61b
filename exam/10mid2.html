@@ -1,0 +1,151 @@
+<html>
+<head>
+<title>CS 61B:  Midterm II</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Autumn 2010)</font><br>
+<font size=6 color='009000'>
+Midterm II</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (10 points) <b>A Miscellany.</b>
+<p>
+
+<b>a.</b>
+Determining whether the graph contains a particular edge (<i>x</i>, <i>y</i>).
+Other acceptable answers include inserting an edge and deleting an edge.
+A particularly interesting solution, contributed by one student on his exam,
+is finding all the edges directed <i>into</i> a particular vertex.
+This takes O(|<i>V</i>|) time with an adjacency matrix, and
+O(|<i>V</i>| + |<i>E</i>|) time with an adjacency list.
+<p>
+
+<b>b.</b>
+
+<center>
+<img src="heaparray10.gif">
+</center>
+<p>
+
+<b>c.</b>
+
+<center>
+<img src="23410.gif">
+</center>
+<p>
+
+<b>d.</b>  <tt>cdadcdad</tt>.
+<p>
+
+<b>e.</b>  Three acceptable answers (each worth full points):<br>
+If any one of the characters is zero, the hash code is zero.<br>
+Anagrams all have the same hash code.<br>
+A string's hash code doesn't change if you insert characters equal to one.
+<p>
+
+
+
+<b>Problem 2.</b>  (8 points) <b>Algorithms.</b>
+<p>
+
+<b>a, b.</b>
+With <tt>bottomUpHeap()</tt>, create a heap containing the <i>n</i> numbers.
+This takes &Theta;(<i>n</i>) time.
+Then, call <tt>removeMin()</tt> <i>j</i> times,
+taking &Theta;(<i>j</i> log <i>n</i>) worst-case time.
+The total worst-case running time is in
+&Theta;(<i>n</i> + <i>j</i> log <i>n</i>).
+<p>
+
+An alternative solution uses a <i>max-heap</i>,
+which reverses the heap-order property,
+so that the greatest key is at the top of the heap.
+Starting from an empty max-heap,
+insert <i>j</i> keys (it doesn't matter which ones) into the heap.
+Then repeat the following operations for each remaining key:
+insert the key into the heap, and remove the maximum key from the heap.
+After you've processed all the keys, the heap contains the <i>j</i> smallest.
+At worst, this takes &Theta;(<i>n</i> log <i>j</i>) time.
+<p>
+
+The optimal solution&mdash;which requires knowledge you won't learn until
+later in the semester&mdash;is to use a median-finding algorithm to find
+the <i>j</i>th-smallest key in &Theta;(<i>n</i>) expected time.
+Then, a linear scan through the array can find
+the other <i>j</i> &ndash; 1 smallest items,
+also in &Theta;(<i>n</i>) expected time.
+<p>
+
+<b>c.</b>  Output-sensitive.
+<p>
+
+<b>d.</b>
+Starting from the root, walk down the tree.
+When you encounter a key less than <i>k</i>, go right.
+When you encounter a key greater than or equal to <i>k</i>, go left.
+Repeat until you reach a null pointer.
+(A useful intuition is that this is equivalent to performing
+a <tt>find</tt> operation on the key <i>k</i> &ndash; &epsilon;,
+where &epsilon; is infinitesimal.)
+<p>
+
+As you go down the tree, keep track of the largest key you've encountered
+so far that's less than <i>k</i>.
+When you reach a null pointer, return that value.
+The tree might not contain any key less than <i>k</i>,
+in which case you can return <tt>null</tt>
+or some other value that means &ldquo;no such key.&rdquo;
+<p>
+
+
+
+<b>Problem 3.</b>  (7 points) <b>Sibling-based tree height.</b>
+<p>
+
+The main idea is that if <tt>this</tt> node has a next sibling, then
+<tt>height()</tt> should return the <i>maximum</i> height of <tt>this</tt> node
+and its siblings to the right.
+This information allows the parent to calculate its height.
+The other idea is to use a postorder traversal to calculate the heights.
+<p>
+
+<tt><pre>
+public class SibTreeNode {
+  public Object item;
+  public SibTreeNode parent;
+  public SibTreeNode firstChild;
+  public SibTreeNode nextSibling;
+
+  int height() {
+    int h = 0;
+    if (firstChild != null) {
+      h = 1 + firstChild.height();
+    }
+    if (nextSibling != null) {
+      int hSib = nextSibling.height();
+      if (hSib > h) {
+        return hSib;
+      }
+    }
+    return h;
+  }
+}
+</pre></tt>
+
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

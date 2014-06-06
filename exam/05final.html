@@ -1,0 +1,365 @@
+<html>
+<head>
+<title>CS 61B: Final Exam</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2005)</font><br>
+<font size="6" color="#009000">Final Exam</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+
+<b>Problem 1.</b>  (8 points) <b>A Miscellany.</b>
+<p>
+
+<b>a.</b>
+No.  Simply setting the <tt>head</tt> field to <tt>null</tt> makes
+the listnodes unreachable, so a mark &amp; sweep garbage collector
+can reclaim all of them.
+<p>
+
+<b>b.</b>
+This hash code does not differentiate between two different cells
+for which <i>i</i> + <i>j</i> is the same,
+so moving a chip along a diagonal does not change a board's hash code.
+Thus, collisions are likely.
+<p>
+
+<b>c. </b>
+Use eight hash tables--one for each category.
+You can tell what category a word is in (if any)
+simply by checking for its presence in each of the eight hash tables.
+(Each hash table's size needs to be chosen proportionately to the
+number of words in each category, so that each table will have the same
+load factor as one big hash table would.  That way, the eight hash
+tables offer O(1)-time operations and
+take up the same amount of memory as one big table would.)
+<p>
+
+<b>d.</b>
+<br>
+<tt>
+Second<br>
+Fourth
+</tt>
+<p>
+(Optionally, you can also include an exception message at the end.
+Since this is just a code fragment, we don't know whether or not
+the exception is caught somewhere.)
+<p>
+
+<b>e.</b>
+Insertion sort and quicksort.
+(We gave a full point to people who also circled
+bucket sort, because a bucket sort implementation might inspect the
+range of the input keys before deciding how many buckets to use.)
+<p>
+
+<b>f.</b>
+8.
+<p>
+
+
+<b>Problem 2.</b>  (6 points) <b>Operations on Data Structures.</b>
+<p>
+
+<b>a.</b>
+<img src="heaparray.gif" border="0" align=top>
+<p>
+
+<b>b.</b>
+<img src="splay.gif" border="0" align=top>
+<p>
+
+<b>c.</b>
+<img src="234ins.gif" border="0" align=top>
+<p>
+
+
+<b>Problem 3.</b>  (12 points) <b>Sorting.</b>
+<p>
+
+<b>a.</b>
+<br>
+5 9 7 4 0 2 8 8<br>
+5 8 7 4 0 2 9 8<br>
+5 8 7 4 0 2 8 9<br>
+0 8 7 4 5 2 8 9<br>
+0 2 7 4 5 8 8 9<br>
+0 2 4 7 5 8 8 9<br>
+0 2 4 5 7 8 8 9
+<p>
+
+<b>b.</b> 
+All of the keys might go into the first list
+(e.g. if all the keys are equal).
+Then this quicksort algorithm will call itself recursively with the same list
+it started with, and it will repeatedly call itself forever,
+never terminating.
+<p>
+
+<b>c.</b>
+The worst-case running time is in &Theta;(<i>n</i><sup>2</sup>), and
+the best-case running time is in &Theta;(<i>n</i> log <i>n</i>).
+<p>
+
+<b>d.</b>
+Replace the binary search tree with a splay tree.
+If the input array is already sorted, then after each insertion,
+the root has no right child
+(because the root is the largest key inserted so far).
+Each time a key is inserted, it becomes the new right child of the root,
+then it is splayed to the root with a single zig rotation.
+Thus, each insertion takes O(1) time.
+<p>
+
+<b>e.</b>
+If radix sort uses 512 buckets, it inspects 9 bits of each key per pass
+(as 512 = 2<sup>9</sup>).
+Java <tt>int</tt>s are 32 bits long, so radix sort will need to do four passes
+of bucket sort or counting sort.
+If radix sort uses 256 buckets, it inspects 8 bits per pass, and still only
+needs to do four passes.
+However, sorting with 256 buckets is a bit faster per pass,
+and takes less memory,
+whereas there is no advantage to using 512 buckets at all.
+Therefore, you would never choose 512 buckets over 256 buckets for 32-bit keys.
+<p>
+
+(It's worth mentioning one misconception we saw on the exams.
+Some people thought that it's an inherently bad thing
+if the final pass of radix sort doesn't have 9 bits left to inspect.
+It's not.
+Depending on the number of items <i>n</i> you are sorting,
+it might make a lot of sense to use 2048 = 2<sup>11</sup> buckets,
+even though the final pass will only have 10 bits left to inspect.
+This is the smallest number of buckets that allows you to do just three passes,
+so it's the right choice for some values of <i>n</i>.)
+<p>
+
+<b>f.</b>
+Here are two different correct answers.
+<ul>
+<li>  A key observation is that <tt>bottomUpHeap</tt> is a comparison-based
+      algorithm that transforms any array into a binary heap in
+      O(<i>n</i>) time.  Therefore, if the Professor is correct, then
+      we can create an O(<i>n</i>)-time comparison-based sorting algorithm
+      (for <i>any</i> list of keys, not just a binary heap)
+      by putting <tt>bottomUpHeap</tt> and the Professor's algorithm together.
+      But an O(<i>n</i>)-time comparison-based sorting algorithm cannot exist.
+      (Note that this argument would not work if <tt>bottomUpHeap</tt> had
+      &Theta;(<i>n</i> log <i>n</i>) worst-case running time;
+      its linear running time is central to the argument.)
+<li>  Although the items in a heap are partially sorted, the <i>leaves</i> of
+      a heap are not.  For example, if all the internal nodes of a heap are
+      zeros, and all the leaves are unique positive numbers, we can permute
+      the leaves any way we like, and it's still a valid binary heap.
+      At least half the nodes in a binary tree are leaves,
+      so there are at least (<i>n</i>/2)! such permutations.
+      So sorting the keys in an <i>n</i>-key binary heap is at least as hard
+      as sorting <i>n</i>/2 keys from scratch, which takes
+      &Omega;((<i>n</i>/2) log (<i>n</i>/2)) = &Omega;(<i>n</i> log <i>n</i>)
+      time.
+</ul>
+
+(A lot of exam-takers had the misconception that it doesn't mean anything
+for a list of keys to be ``partly sorted,''
+and that the &Omega;(<i>n</i> log <i>n</i>)-time bound for comparison-based
+sorting applies even to partly sorted keys.
+But remember, we can merge two sorted lists of keys into a single sorted list
+in O(<i>n</i>) time; that's an example of beating the
+&Omega;(<i>n</i> log <i>n</i>) bound with keys that are ``partly sorted.''
+So the Professor's claim wasn't completely far-fetched,
+and it requires a thoughtful argument to debunk it.)
+<p>
+
+
+<b>g.</b>
+This problem is known as <i>topological</i> sorting of
+a directed acyclic graph.
+The key observation is that we can only output a vertex after all the
+vertices that point to it have already been written to the output.
+So assign each vertex two fields:
+<tt>indegree</tt>, which records the indegree of the vertex
+(ignoring self-edges), and
+<tt>prerequisites</tt>, which records the number of vertices that point to this
+vertex and have been written to the output.
+We can initialize every <tt>prerequisites</tt> field to zero, and
+initialize every <tt>indegree</tt> field by looping through all the edges once.
+Then we create a list <i>L</i>, which will contain all the vertices for which
+<tt>indegree = prerequisites</tt>.
+Initialize <i>L</i> with all the vertices that have an indegree of zero.
+Repeat the following step until <i>L</i> is empty:
+remove a vertex from <i>L</i>, write it to the output,
+and increment the <tt>prerequisites</tt> field of every vertex in its
+adjacency list.
+<p>
+
+
+<b>Problem 4.</b>  (5 points) <b>Augmented Binary Search Trees.</b>
+<p>
+
+There are several ways to answer this problem, and
+the three parts of the solution need to match each other,
+so here's just one possibility.
+<p>
+
+<b>a.</b>
+At each node, store the size of the subtree rooted at that node.
+<p>
+
+<b>b.</b>
+Search for the key <i>k</i>
+(in the usual manner for the <tt>find</tt> method in a binary search tree).
+As you walk down the tree, at every node <i>n</i> where you go to
+<i>n</i>'s right child,
+add the size of the subtree rooted at <i>n</i>'s <i>left</i> child to
+a running total, plus one for <i>n</i>.
+<p>
+
+When you reach the node that contains <i>k</i>, treat it the same way:
+add the size of the subtree rooted at that node's left child,
+plus one for <i>k</i>.  Return the sum.
+<p>
+
+<b>c.</b>
+First, <tt>insert</tt> the new key <i>k</i> as usual.
+If <i>k</i> is already in the tree, do nothing.
+Otherwise, create a new leaf for <i>k</i> and
+set its <tt>size</tt> field to one.
+Walk back up the tree (or down the tree a second time)
+and increment the size field of all <i>k</i>'s ancestors.
+<p>
+
+
+<b>Problem 6.</b>  (6 points) <b>Asymptotic Analysis.</b>
+<p>
+
+<b>a.</b>
+O(<i>x</i> log <i>y</i> + 4<sup><i>y</i></sup>).
+(Important note:
+you cannot replace 2<sup>2<i>y</i></sup> with 2<sup><i>y</i></sup>.
+Constants in exponents cannot be tossed out.)
+<p>
+
+<b>b.</b>
+We divide the proof into two separate cases:
+either <i>x</i> &ge; <i>y</i>, or <i>x</i> &lt; <i>y</i>.
+<p>
+
+In the first case, we have
+<blockquote>
+<i>x</i><sup>2</sup> + 10<i>xy</i> + <i>y</i><sup>2</sup><br>
+&le; <i>x</i><sup>2</sup> + 10<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup><br>
+&le; 11 (<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup>)
+</blockquote>
+for all values <i>y</i> &ge; 0 and <i>x</i> &ge; <i>y</i>, so
+<i>x</i><sup>2</sup> + 10<i>xy</i> + <i>y</i><sup>2</sup> &isin;
+O(<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup>) in this case.
+<p>
+
+The second case, where <i>x</i> &lt; <i>y</i>, is symmetric.
+<blockquote>
+<i>x</i><sup>2</sup> + 10<i>xy</i> + <i>y</i><sup>2</sup><br>
+&le; <i>x</i><sup>2</sup> + 10<i>y</i><sup>2</sup> + <i>y</i><sup>2</sup><br>
+&le; 11 (<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup>)
+</blockquote>
+for all values <i>x</i> &ge; 0 and <i>y</i> &ge; <i>x</i>, so
+<i>x</i><sup>2</sup> + 10<i>xy</i> + <i>y</i><sup>2</sup> &isin;
+O(<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup>) in this case too.
+<p>
+
+
+<b>Problem 6.</b>  (6 points) <b>Amortized Analysis.</b>
+<p>
+
+<b>a.</b>
+The smallest possible amortized cost of <tt>enqueue</tt> is $2.
+For <tt>dequeue</tt> and <tt>multiDequeue</tt>,
+we accepted answers of $0 or $1.
+<p>
+
+<b>b.</b>
+This accounting ensures that the following invariant always holds:
+the number of dollars in the bank is (at least)
+the number of items in the queue.
+We can verify that each operation maintains this invariant as follows.
+<p>
+
+An <tt>enqueue</tt> operation increases the size of the queue by one item.
+It costs one actual dollar and puts one dollar in the bank,
+which is enough to maintain the invariant.
+<p>
+
+A <tt>dequeue</tt> operation decreases the size of the queue by one item.
+Thus, the operation can withdraw one dollar from the bank, which is enough
+to pay for the operation's actual cost, giving an amortized cost of zero.
+(Some people charged an amortized cost of $1 to cover the cost of
+throwing an exception if the queue is empty.
+We weren't picky about this when grading.)
+<p>
+
+A <tt>multiDequeue</tt> operation decreases the size of the queue by either
+its parameter <tt>i</tt> or the number of items in the queue, whichever is
+less.  The actual cost of the operation is also the lesser of these two,
+so the operation withdraws from the bank exactly the number of dollars
+needed to cover its actual cost.
+Thus, the amortized cost is zero.
+(Again, one might charge $1 amortized to cover exceptions on an empty queue.)
+<p>
+
+By induction on the sequence of operations, all the operations maintain
+the invariant that the number of dollars in the bank is (at least) as great
+as the number of items in the queue.  Therefore, the bank balance never
+becomes negative.
+<p>
+
+<b>c.</b>
+No, we cannot.  If you start with an empty queue and call
+<tt>multiEnqueue(item, i)</tt> once, it spends &Theta;(<tt>i</tt>) time
+inserting <tt>i</tt> copies of <tt>item</tt>.
+Since only one operation has taken place since the empty queue was created,
+its amortized (average) running time is in &Theta;(<tt>i</tt>).
+Since <tt>i</tt> can be arbitrarily large, the amortized running time is
+<i>not</i> in O(1).
+<p>
+
+
+<b>Problem 7.</b>  (7 points) <b>Index Sort.</b>
+<p>
+
+<pre><tt>
+  public static Thing[] indexSort(Thing[] x) {     // Returns sorted copy of x.
+    Thing[] y;
+    y = new Thing[x.length];
+
+    for (int i = 0; i < x.length; i++) {
+      int index = 0;
+      for (int j = 0; j < x.length; j++) {
+        if ((x[j].key < x[i].key) || ((x[j].key == x[i].key) && (j < i))) {
+          index++;
+        }
+      }
+      y[index] = x[i];
+    }
+
+    return y;
+  }
+</tt></pre>
+
+
+<hr>
+
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

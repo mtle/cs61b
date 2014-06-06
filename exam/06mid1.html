@@ -1,0 +1,122 @@
+<html>
+<head>
+<title>CS 61B:  Midterm I</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Autumn 2006)</font><br>
+<font size=6 color='009000'>
+Midterm I</font><br>
+<p>
+
+
+If you want to relive taking the midterm,
+here it is in
+<a href="06mid1.ps">PostScript</a> or <a href="06mid1.pdf">PDF</a>.
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (6 points) <b>Java bugs.</b>
+<p>
+
+
+<pre><tt>
+public class Quantity {
+  public String thing;       // The thing being measured.
+  public double amount;      // Its numerical quantity.
+
+  // Constructor.
+  public Quantity(String thingString, double amount) {
+    thing = thingString;
+<font color='009000'>    <b>this.</b>amount = amount;</font>
+  }
+
+  // Constructor for thing with quantity 100.  Calls the other constructor.
+  public Quantity(String thingString) {
+<font color='009000'>    <b>this</b>(thingString, 100.0);</font>
+  }
+
+  public static void main(String[] args) {
+<font color='009000'>    Quantity q = <b>new</b> Quantity("I love Java this much:  ");
+    System.out.println(<b>q</b>.thing + <b>q</b>.amount);</font>
+  }
+}
+</tt></pre>
+
+
+<b>Problem 2.</b>  (7 points) <b>Inheritance.</b>
+<p>
+
+<b>a.</b>  <tt>Meow</tt>
+<p>
+
+<b>b.</b>
+<pre><tt>
+What up fool?
+Meeeeow!
+</tt></pre>
+
+<b>c.</b>  Compile-time error.  (<tt>Tomcat t = c;</tt> needs a cast.)
+<p>
+
+<b>d.</b>  <tt>Meeeeow!</tt>
+<p>
+
+<b>e.</b>  Compile-time error.  (The <tt>Cat</tt> class does not have
+a method with the signature <tt>greet(Cat)</tt>.)
+</tt></pre>
+<p>
+
+<b>f.</b>  Run-time error.  (Attempt to cast a <tt>Siamese</tt> object to
+a <tt>Tomcat</tt>.)
+<p>
+
+<b>g.</b>  Compile-time error.
+(Cannot create an instance of the abstract class <tt>Cat</tt>.)
+<p>
+
+
+<b>Problem 3.</b>  (7 points) <b>The heap and the stack.</b>
+
+<center>
+<img src="boxes06.gif" width=581 height=683>
+</center>
+<p>
+
+
+<b>Problem 4.</b>  (5 points) <b>Creating a Doubly-Linked List.</b>
+<p>
+
+This sample solution builds the list backward, from tail to head.
+That way, no special cases are needed to handle a zero-length array or
+an array whose <tt>int</tt>s are all zero.
+
+<pre><tt>
+  public static DListNode makeList(int[] counts) {
+    DListNode l = null;
+    for (int i = counts.length - 1; i >= 0; i--) {
+      for (int j = 0; j < counts[i]; j++) {
+        l = new DListNode(counts[i], null, l);
+        if (l.next != null) {
+          l.next.prev = l;
+        }
+      }
+    }
+    return l;
+  }
+</tt></pre>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<html>
+<head>
+<title>CS 61B:  Midterm I</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2005)</font><br>
+<font size=6 color='009000'>
+Midterm I</font><br>
+<p>
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (4 points) <b>Quickies.</b>
+<p>
+
+<b>a.</b>  If you decide later that you want to make a subclass of the class
+where the instance variable appears, the new functionality that you add to
+the subclass might need to access the variable.
+If the variable is <tt>protected</tt>, you can access it from the subclass.
+If the variable is <tt>private</tt>, you'll have no choice but to go back
+and modify the superclass.
+(This could be very inconvenient if your company has already released
+the superclass to customers.)
+<p>
+
+<b>b.</b>  <tt>Circle</tt> objects are immutable,
+because after one has been constructed,
+it is not possible to change any of its internal state.
+(The sole field <tt>radius</tt> is private,
+and no method of <tt>Circle</tt> modifies it.)
+<p>
+
+<b>c.</b>  In a static method, you can never use the keyword <tt>this</tt>.
+(You can never use <tt>super</tt> either.)
+<p>
+
+<b>d.</b>  Java's <tt>continue</tt> statement can only jump back to
+the beginning of a loop--namely <tt>for</tt>, <tt>while</tt>, or <tt>do</tt>.
+<p>
+
+
+<b>Problem 2.</b>  (8 points) <b>Inheritance.</b>
+<p>
+
+<b>a.</b>  <tt>M1 in C</tt>
+<p>
+
+<b>b.</b>  <tt>M2 in C</tt>
+<p>
+
+<b>c.</b>  Run-time error.  (You can't cast an <tt>A</tt> object to
+           static type <tt>C</tt>; not every <tt>A</tt> is a <tt>C</tt>.)
+<p>
+
+<b>d.</b>  Compile-time error.  (The interface <tt>B</tt> does not have
+           a <tt>whichClass</tt> method.)
+<p>
+
+<b>e.</b>  (This is the two-point question.)
+<pre><tt>
+New A
+New C
+M1 in C
+</tt></pre>
+
+<b>f.</b>  <tt>M1 in A</tt>
+<p>
+
+<b>g.</b>  Compile-time error.  (You cannot create a <tt>B</tt> object.)
+<p>
+
+
+<b>Problem 3.</b>  (6 points) <b>Binary Search.</b>
+
+<center>
+<img src="boxes05.gif" width=686 height=601>
+</center>
+<p>
+
+We'll accept a <tt>2</tt> written in the <tt>j</tt> field as well.
+<p>
+
+
+<b>Problem 4.</b>  (7 points) <b>Reordering a Singly-Linked List.</b>
+
+<pre><tt>
+  public void reorder() {
+    if (head != null) {
+      SListNode evenhead = head.next;
+      SListNode tail1 = head;
+      SListNode tail2 = head.next;
+      while ((tail2 != null) && (tail2.next != null)) {
+        tail1.next = tail2.next;
+        tail2.next = tail2.next.next;
+        tail1 = tail1.next;
+        tail2 = tail2.next;
+      }
+      tail1.next = evenhead;
+    }
+  }
+</tt></pre>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<html>
+<head>
+<title>CS 61B:  Midterm I</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2013)</font><br>
+<font size=6 color='009000'>
+Midterm I</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (10 points) <b>A miscellany.</b>
+<p>
+
+<b>a.</b>
+<pre><tt>
+    int[][] arr = new int[3][];
+    arr[0] = new int[2];
+    arr[1] = new int[3];
+    arr[2] = new int[4];
+</tt></pre>
+
+Another way to do this is with an initializer:
+<pre><tt>
+    int[][] arr = {new int[2], new int[3], new int[4]};
+</tt></pre>
+
+<p>
+
+<b>b.</b>  <tt>if (next != null && "Berkeley".equals(next.label)) {</tt>
+<p>
+
+Note that the example above also works correctly
+if <tt>next.label</tt> is <tt>null</tt>.
+A correct alternative would be
+<pre><tt>
+    if (next != null && next.label != null && next.label.equals("Berkeley")) {
+</tt></pre>
+
+<p>
+
+<b>c.</b>  The signature of the method <tt>shatter</tt> is
+<tt>shatter(String yell)</tt>.
+<tt>Shake.shatter</tt> is an example of a method that overrides
+the method <tt>Harlem.shatter</tt>.
+<p>
+
+<b>d.</b>  For the values 0 and 2.
+<p>
+
+<b>e.</b>  <tt>head</tt>, <tt>head.next</tt>, and <tt>myString</tt>.
+<p>
+
+<b>f.</b>  <tt>return</tt>.
+<p>
+
+
+<b>Problem 2.</b>  (7 points) <b>Inheritance.</b>
+
+<pre><tt>
+public class Harlem {
+  protected String yell;
+  protected static int shakes = 0;    // Note that shakes is static.
+
+  public Harlem() {
+    yell = "Harlem Shake ";
+    shakes++;
+  }
+
+  public Harlem(int x) {
+    yell = "Brooklyn Shuffle ";
+    shakes = x;
+  }
+
+  public void shatter(String yell) {
+    yell = "Queens Shanking ";
+  }
+}
+
+public class Shake extends Harlem {
+  public Shake(int x) {
+    System.out.println(yell + shakes);
+    shatter(yell);
+    System.out.println(yell + shakes);
+  }
+
+  public void shatter(String yell) {
+    shakes++;
+    super.shatter(yell);              // Not recursive!
+  }
+
+  public static void main(String[] args) {
+    Harlem s = new Shake(10);
+    Harlem t = new Harlem(10);
+    System.out.println(t.yell + s.shakes);
+  }
+}
+</tt></pre>
+
+The code prints:
+
+<pre><tt>
+Harlem Shake 1
+Harlem Shake 2
+Brooklyn Shuffle 10
+</tt></pre>
+
+
+<b>Problem 3.</b>  (8 points)
+<b>The heap and the stack.</b>
+<p>
+
+Note:  in the following diagram, we are not grading the stack frame
+for <tt>println</tt>.
+If you left it out, don't worry.
+
+<img src="boxes13.gif" width=830 height=602 border="0" align=top>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

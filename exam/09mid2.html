@@ -1,0 +1,258 @@
+<html>
+<head>
+<title>CS 61B:  Midterm II</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2009)</font><br>
+<font size=6 color='009000'>
+Midterm II</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (12 points) <b>A Miscellany.</b>
+<p>
+
+<b>a.</b>
+
+<center>
+<img src="heapsol09.gif" width=403 height=163>
+</center>
+<p>
+
+<b>b.</b>  <tt>BException</tt>.
+<p>
+
+<b>c.</b>  Alpha-beta search prunes nodes N, H, Q, and R.
+<p>
+
+<b>d.</b>  999.
+(Note that even if <i>G</i> contains self-edges,
+breadth-first search never creates a self-edge in <i>T</i>,
+because it never visits a node twice.)
+<p>
+
+<b>e.</b>  1.
+<p>
+
+<b>f.</b>  No.
+<p>
+
+Because <i>f</i>(<i>n</i>) &isin; <i>O</i>(<i>g</i>(<i>n</i>)),
+there exist positive constants <i>c</i> and <i>N</i> such that
+<i>f</i>(<i>n</i>) &le; <i>c g</i>(<i>n</i>) for all <i>n</i> &gt; <i>N</i>.
+<p>
+
+Because
+<i>h</i>(<i>n</i>) &isin; &Omega(<i>n</i> &sdot;<i>g</i>(<i>n</i>)),
+there exist positive constants <i>d</i> and <i>P</i> such that
+<i>h</i>(<i>n</i>) &ge; <i>d n g</i>(<i>n</i>) for all <i>n</i> &gt; <i>P</i>.
+<p>
+
+Suppose that <i>f</i>(<i>n</i>) &isin; &Theta;(<i>h</i>(<i>n</i>)).
+Then there exist positive constants <i>e</i> and <i>M</i> such that
+<i>f</i>(<i>n</i>) &ge; <i>e h</i>(<i>n</i>) for all <i>n</i> &gt; <i>M</i>.
+<p>
+
+Putting these three together, we have that
+<i>f</i>(<i>n</i>) &ge; <i>ed n</i> <i>g</i>(<i>n</i>)
+&ge; (<i>ed</i> / <i>c</i>) <i>n f</i>(<i>n</i>) for all
+<i>n</i> &gt; max{<i>M</i>, <i>N</i>, <i>P</i>}.
+<p>
+
+In other words, <i>n</i> &le; <i>c</i> / (<i>ed</i>) for all
+<i>n</i> &gt; max{<i>M</i>, <i>N</i>, <i>P</i>}, which is impossible.
+<p>
+
+
+<b>Problem 2.</b>  (6 points) <b>Trees.</b>
+<p>
+
+<b>a.</b>
+
+<center>
+<img src="post.gif" width=157 height=162>
+</center>
+<p>
+
+<b>b.</b>  &Theta;(<i>r</i> log (<i>n</i> + <i>r</i>)).
+This can also be written
+&Theta;(<i>r</i> log <i>n</i> + <i>r</i> log <i>r</i>)).
+<p>
+
+<b>c.</b>
+
+<center>
+<img src="23409.gif" width=303 height=198>
+</center>
+<p>
+
+<b>d.</b>
+Oops!  I wrote &ldquo;<i>i</i>th-largest&rdquo;, but I meant to write
+&ldquo;<i>i</i>th-smallest&rdquo;, so I made the problem even harder than
+necessary.  Below are two algorithms that find the <i>i</i>th-smallest key.
+To find the <i>i</i>th-largest key, just replace <i>i</i> with
+<i>n</i> + 1 &ndash; <i>i</i>.
+<p>
+
+<b>Algorithm 1.</b>
+We start at the root, then walk down the tree until we reach the node
+with the <i>i</i>th-smallest key.
+The question is, how do you know when to go left and when to go right?
+Since the tree is perfectly balanced, and every subtree is perfectly balanced,
+we can adapt binary search for this purpose.
+For example, if <i>n</i> = 15, we know the the tree contains the 1st through
+15th smallest keys, so
+we set <tt>left</tt> &larr 1 and <tt>right</tt> &larr 15.
+The root is exactly in the middle, so it contains the
+<tt>mid</tt> &larr (<tt>left</tt> + <tt>right</tt>) / 2 = 8th smallest key.
+<p>
+
+If <i>i</i> = <tt>mid</tt>, we want the root key, so we're done.
+If <i>i</i> < <tt>mid</tt>, we recurse on the left subtree by setting
+<tt>right</tt> &larr; <tt>mid</tt> &ndash; 1.
+If <i>i</i> > <tt>mid</tt>, we recurse on the right subtree by setting
+<tt>left</tt> &larr; <tt>mid</tt> + 1.
+Either way, then we set <tt>mid</tt> &larr (<tt>left</tt> + <tt>right</tt>) / 2
+again.
+Repeat until <i>i</i> = <tt>mid</tt>.
+<p>
+
+As we go down the tree, we must also keep track of the level number of the node
+we're visiting, so that when we reach the node containing
+the <i>i</i>th-smallest key, we know where to find the key in the array.
+We do this with the standard rules for level numbering:
+at the root, set <i>x</i> &larr 1.
+When we go to a left child, set <i>x</i> &larr 2<i>x</i>.
+When we go to a right child, set <i>x</i> &larr 2<i>x</i> + 1.
+When we finish, return the key at index <i>x</i>.
+<p>
+
+This algorithm takes &Theta;(log <i>n</i>) time.
+For completeness, here's code (though we didn't expect code on the exam).
+<p>
+
+<pre><tt>
+  // Find the ith largest key in a perfectly balanced BST stored by
+  // level numbering in array a.  a.length must be a power of 2.
+  // No item is stored at a[0].  i must be in [1, a.length - 1].
+  public static int ithsmallest(int[] a, int i) {
+    return ithsmallest(a, 1, a.length, i, 1);
+  }
+
+  private static int ithsmallest(int[] a, int left, int right, int i, int x) {
+    int mid = (left + right) / 2;            // Halfway between left and right.
+    if (i == mid) {
+      return a[x];
+    } else if (i < mid) {
+      return ithsmallest(a, left, mid - 1, i, 2 * x);
+    } else {
+      return ithsmallest(a, mid + 1, right, i, 2 * x + 1);
+    }
+  }
+</tt></pre>
+
+Observe that the algorithm never actually looks in the array of keys until
+it reaches the node containing the <i>i</i>th key.
+Until then, it is just computing indices
+(the inorder number and level number of the node it's visiting).
+<p>
+
+<b>Algorithm 2.</b>
+This algorithm is shorter and quicker, but it takes a lot more cleverness
+to think of.  Whereas Algorithm 1 searches from the root down,
+this one searches from the leaves up.
+<p>
+
+If <i>i</i> is odd, then the <i>i</i>th-smallest key is stored in a leaf,
+and its array index is (<i>n</i> + <i>i</i>) / 2.
+<p>
+
+If <i>i</i> is even, but <i>i</i> / 2 is odd,
+then the <i>i</i>th-smallest key has height 1,
+and its array index is &lfloor;(<i>n</i> + <i>i</i>) / 4&rfloor;.
+<p>
+
+If <i>i</i> and <i>i</i> / 2 are even, but <i>i</i> / 4 is odd,
+then the <i>i</i>th-smallest key has height 2,
+and its array index is &lfloor;(<i>n</i> + <i>i</i>) / 8&rfloor;.
+<p>
+
+And so on.  So here's one working algorithm:
+set <i>j</i> &larr; <i>i</i>, and
+set <i>x</i> &larr; (<i>n</i> + <i>i</i>) / 2.
+While <i>j</i> is even, divide both <i>j</i> and <i>x</i> by two.
+(Store <i>x</i> as an integer, so the division rounds down.)
+When <i>j</i> is odd, return the key stored at index <i>x</i>.
+This algorithm takes &Theta;(log <i>n</i>) time.
+<p>
+
+
+
+
+<b>Problem 3.</b>  (7 points) <b>Graph Adjacency Running Times.</b>
+<p>
+
+<center>
+<table border=2 cellpadding=2>
+
+<tr>
+<td></td>
+<td><b>insert</b>(<i>u</i>, <i>v</i>) or <b>remove</b>(<i>u</i>, <i>v</i>)</td>
+<td><b>member</b>(<i>u</i>, <i>v</i>)</td>
+<td><b>printList</b>(<i>u</i>)</td>
+</tr>
+
+<tr>
+<td>Adjacency matrix</td>
+<td>&Theta;(1)</td>
+<td>&Theta;(1)</td>
+<td>&Theta;(<b>n</b>)</td>
+</tr>
+
+<tr>
+<td>Sorted arrays</td>
+<td>&Theta;(<b>d</b>)</td>
+<td>&Theta;(log <b>d</b>)</td>
+<td>&Theta;(<b>d</b>)</td>
+</tr>
+
+<tr>
+<td>Balanced search trees</td>
+<td>&Theta;(log <b>d</b>)</td>
+<td>&Theta;(log <b>d</b>)</td>
+<td>&Theta;(<b>d</b>)</td>
+</tr>
+
+<tr>
+<td>One sorted array</td>
+<td>&Theta;(<b>e</b>)</td>
+<td>&Theta;(log <b>e</b>)</td>
+<td>&Theta;(<b>d</b> + log <b>e</b>)</td>
+</tr>
+
+<tr>
+<td>Dictionary</td>
+<td>&Theta;(1)</td>
+<td>&Theta;(1)</td>
+<td>&Theta;(<b>e</b>)</td>
+</tr>
+
+</table>
+</center>
+<p>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<html>
+<head>
+<title>CS 61B:  Midterm II</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2005)</font><br>
+<font size=6 color='009000'>
+Midterm II</font><br>
+<p>
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (8 points) <b>Quickies.</b>
+<p>
+
+<b>a.</b>  The worst-case time to find the <i>second-smallest</I> key
+in a 2-3-4 tree with <i>n</i> keys is &Theta;(log <i>n</i>).
+<p>
+
+<b>b.</b>  Algorithm A runs in O(<i>n</i> log <i>n</i>) worst-case time, and
+Algorithm B runs in &Omega;(<i>n</i><sup>2</sup>) worst-case time.
+It is <i>not</i> always true that Algorithm A takes less time than
+Algorithm B.
+There are at least two possible counterarguments (either of them worth
+full credit).
+First, on some inputs, Algorithm B might run much faster than its
+worst-case time.
+Second, the constants hidden in the asymptotic notation might be much
+smaller for Algorithm B than for Algorithm A, in which case Algorithm B
+might be much faster on small inputs.
+<p>
+
+<b>c.</b>  The line <tt>System.out.println(e);</tt> is acceptable.
+It calls <tt>e.toString();</tt>, and prints the string returned.
+(Note that <tt>toString</tt> is defined on all <tt>Object</tt>s.)
+<p>
+
+<b>d.</b>
+<center>
+<img src="tree4.gif" width=162 height=162>
+</center>
+<p>
+
+<b>e.</b>
+<center>
+<img src="tree6.gif" width=162 height=222>
+</center>
+<p>
+
+<b>f.</b>
+Suppose that, through a sequence of operations, we create a tree with the keys
+1 through <i>n</i>, where <i>n</i> is one less than a power of two.
+Because each operation always yields a tree with the
+minimum possible height, the tree must appear as follows.
+<center>
+<img src="before.gif" width=282 height=162>
+</center>
+Now, suppose you <tt>delete(1)</tt> and <tt>insert(<i>n</i> + 1)</tt>.
+Because each operation always yields a tree with the
+minimum possible height, the tree must appear as follows.
+<center>
+<img src="after.gif" width=282 height=162>
+</center>
+Every key's parents and children have changed, so
+&Theta;(<i>n</i>) changes have been made to the tree.
+Therefore, either the <tt>delete</tt> or the <tt>insert</tt> operation took
+&Omega;(<i>n</i>) time.
+<p>
+
+<b>g.</b>  The central tenet of <i>Britney Theory</i> is that
+celebrities play the archetypal roles in our lives that were once played
+by pantheistic gods.
+<p>
+
+
+<b>Problem 2.</b>  (7 points) <b>Trees.</b>
+<p>
+
+<b>a.</b>
+<center>
+<img src="xrltmsw.gif" width=282 height=162>
+</center>
+<p>
+
+<b>b.</b>
+<center>
+<img src="23405.gif" width=268 height=198>
+</center>
+<p>
+
+<b>c.</b>
+<pre><tt>
+class BinaryTreeNode {
+  Entry entry;
+  BinaryTreeNode parent;
+  BinaryTreeNode leftChild, rightChild;
+
+  public BinaryTreeNode(Entry[] entries, int first, int last) {
+    parent = null;   leftChild = null;   rightChild = null;
+    int mid = ____(first + last) / 2_________________________;
+    entry = entries[mid];
+    if (mid > first) {
+      leftChild = new BinaryTreeNode(entries, __first___, __mid - 1_);
+      leftChild.parent = ____this___________________________;
+    }
+    if (mid < last) {
+      rightChild = new BinaryTreeNode(entries, __mid + 1_, __last____);
+      rightChild.parent = ____this__________________________;
+    }
+  }
+}
+</tt></pre>
+<p>
+
+
+<b>Problem 3.</b>  (4 points) <b>Asymptotic Analysis.</b>
+<p>
+
+To prove that max{<i>x</i>, <i>y</i>} &isin; &Theta;(<i>x</i> + <i>y</i>),
+we have to do two proofs:  one for the big-Oh bound, and one for the
+big-&Omega; bound.
+<p>
+max{<i>x</i>, <i>y</i>} &isin; O(<i>x</i> + <i>y</i>):
+<p>
+Choose <i>c</i> = 1, <i>X</i> = 0, <i>Y</i> = 0.<br>
+It is clear that for all <i>x</i> &gt; 0 and all <i>y</i> &gt; 0,
+<i>x &lt; x + y</i> and <i>y &lt; x + y</i>.<br>
+Therefore, for all <i>x &gt; X</i> and all <i>y &gt; Y</i>,
+max{<i>x</i>, <i>y</i>} &lt; x + y</i>, which confirms that
+max{<i>x</i>, <i>y</i>} &isin; O(<i>x</i> + <i>y</i>).
+<p>
+<i>x</i> + <i>y</i> &isin; O(max{<i>x</i>, <i>y</i>}):
+<p>
+Choose <i>c</i> = 2.  (<i>X</i> and <i>Y</i> can have any values.)<br>
+There are two cases.<br>
+If <i>x</i> &ge; <i>y</i>, we see that
+<i>x</i> + <i>y</i> &le; 2<i>x</i> = 2 max{<i>x</i>, <i>y</i>}.<br>
+If <i>x</i> &lt; <i>y</i>, we see that
+<i>x</i> + <i>y</i> &lt; 2<i>y</i> = 2 max{<i>x</i>, <i>y</i>}.<br>
+In either case, <i>x</i> + <i>y</i> &le; 2 max{<i>x</i>, <i>y</i>},
+which confirms that
+<i>x</i> + <i>y</i> &isin; O(max{<i>x</i>, <i>y</i>}).
+<p>
+
+
+<b>Problem 4.</b>  (7 points) <b>Reordering a Singly-Linked List.</b>
+<p>
+
+<b>a.</b>
+ABDEFC
+<p>
+
+<b>b.</b>
+EBDFAC
+<p>
+
+<b>c.</b>
+<center>
+<img src="mst.gif" width=352 height=252>
+</center>
+<p>
+
+<b>d.</b>
+Do a traversal of the binary search tree.
+(It doesn't matter which traversal, as long as it takes linear time.)
+When you visit a node, create an adjacency list for the node with up
+to three items:  its parent (if it has one) and its children (if it has any).
+<p>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

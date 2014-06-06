@@ -1,0 +1,147 @@
+<html>
+<head>
+<title>CS 61B:  Midterm I</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2009)</font><br>
+<font size=6 color='009000'>
+Midterm I</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (7 points) <b>Quickies.</b>
+<p>
+
+<b>a.</b>  Each object has its own distinct copy of an instance variable.
+But all the objects in a class share just one &ldquo;copy&rdquo; of
+a class variable.
+<p>
+
+<b>b.</b>  No.
+The <tt>super</tt> keyword calls a superclass method on <tt>this</tt>.
+But in a static method, there is no <tt>this</tt>.
+<p>
+
+<b>c.</b>  The program prints &ldquo;The number is 8&rdquo;.
+The <tt>reset</tt> method, via the <tt>increment</tt> method,
+successfully increments the <tt>n</tt> field in the original <tt>What</tt>
+object from 7 to 8.  Then the <tt>reset</tt> method creates
+a new <tt>What</tt> object and sets its <tt>n</tt> field to zero.
+But <tt>main</tt> passed the reference <tt>w</tt> by value.
+When <tt>reset</tt> changes its local variable <tt>w</tt>,
+the local variable <tt>w</tt> in <tt>main</tt> still references
+the original object, which still holds an 8 in its field <tt>n</tt>.
+<p>
+
+Again, the key is that <tt>w</tt> was passed <i>by value</i>.
+<p>
+
+<b>d.</b>  This code goes into an infinite loop in which the
+constructor keeps calling itself recursively.
+(Eventually, the Java Virtual Machine runs out of stack space and
+throws an exception.)
+We thank the many students in the class who inspired this question
+by doing this in their assignments.
+<p>
+
+
+<b>Problem 2.</b>  (8 points) <b>Inheritance.</b>
+<p>
+
+A few of the blanks have more than one correct answer.
+Here's one possible solution.
+
+<pre><tt>
+import java.io.*;
+
+interface Aaa {
+  public double number();
+}
+
+abstract class Bbb {
+  public int[][] i;
+
+  public Bbb(int j) {
+    i = new int[4][6];
+    i[3][5] = j;
+  }
+
+  public double number() {
+    return 12.73;
+  }
+
+  public abstract void cureCancer();
+}
+
+public class Ccc extends Bbb implements Aaa {
+  public Ccc() {
+    super(2);
+  }
+
+  public void cureCancer(int i) {
+    this.i[1][1] = 4;
+  }
+
+  public void cureCancer() {
+    System.out.println(number());
+  }
+
+  public static void main(String[] args) {
+    Aaa a = new Ccc();
+    Bbb b = (Bbb) a;
+    b.i[0][0] = 1;
+  }
+}
+</tt></pre>
+
+
+<b>Problem 3.</b>  (10 points) <b>Removing a Node from a List.</b>
+<p>
+
+<b>a.</b>
+<p>
+
+<pre><tt>
+  public void removeNode(SListNode node) {
+    if (head == node) {
+      head = head.next;
+    } else {
+      SListNode n = head;
+      while (n.next != node) {
+        n = n.next;
+      }
+      n.next = n.next.next;
+    }
+  }
+</tt></pre>
+
+<b>b.</b>
+<p>
+
+<pre><tt>
+  public void removeNode(SListNode node) {
+    DListNode dnode = (DListNode) node;  // Assume this cast always succeeds.
+    super.removeNode(node);
+    if (tail == node) {
+      tail = dnode.prev;
+    } else {
+      ((DListNode) node.next).prev = dnode.prev;
+    }
+  }
+</tt></pre>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

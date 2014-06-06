@@ -21,6 +21,21 @@ public class Homework3 {
   public static void smoosh(int[] ints) {
     // Fill in your solution here.  (Ours is twelve lines long, not counting
     // blank lines or lines already present in this file.)
+    int[] b = new int[ints.length];
+    int j = 0;
+
+    b[j] = ints[0];
+    for( int i=1; i<ints.length; i++) {
+        if( b[j] != ints[i] ) {
+            b[++j] = ints[i];
+        }
+    }
+    for (int i=0; i<ints.length; i++) {
+        if( i<=j )
+            ints[i] = b[i];
+        else
+            ints[i] = -1;
+    }
   }
 
   /**

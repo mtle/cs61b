@@ -1,0 +1,114 @@
+<html>
+<head>
+<title>CS 61B:  Midterm II</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2013)</font><br>
+<font size=6 color='009000'>
+Midterm II</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (9 points) <b>Data Structures.</b>
+<p>
+
+<b>a.</b>  There are two possible answers, depending on which key is stolen
+from the parent of the node containing 3.
+<p>
+<img src="23413.gif" width=448 height=198 border="0" align=top>
+<p>
+
+<b>b.</b>
+<img src="heaparray13.gif" width=403 height=133 border="0" align=top>
+<p>
+
+<b>c.</b>  In the worst case, removing an entry takes &Theta;(<i>n</i>) time,
+because every entry might hash to the same bucket, and
+the binary search tree might be entirely unbalanced so that
+finding the entry to remove requires a linear-time search down the tree.
+<p>
+
+<b>d.</b>  Finding the maximum key takes &Theta;(<i>n</i>) worst-case time,
+because any one of the leaf nodes could be the maximum key, and
+a binary heap has roughly <i>n</i>/2 leaves.
+<p>
+
+
+<b>Problem 2.</b>  (6 points) <b>Graphs.</b>
+<p>
+
+<b>a.</b>  <tt>A E F B C D</tt>
+<p>
+
+<b>b.</b>
+The maximum number of <tt>dfs()</tt> stack frames that can be on the stack
+at any one time is min{<i>v</i>, <i>e</i> + 1}.
+<p>
+
+<b>c.</b>  Yes,
+it is possible that a minimum spanning tree includes
+the edge in <i>G</i> with maximum weight.
+In the following graph,
+every spanning tree must include the edge with maximum weight.
+<p>
+
+<img src="maxedge.gif" width=352 height=137 border="0" align=top>
+<p>
+
+
+<b>Problem 3.</b>  (10 points)
+<b>Removing the Root Key from a Binary Search Tree.</b>
+<p>
+
+
+<pre><tt>
+public class BinarySearchTree {
+  BinaryTreeNode root;                           // The root node of this tree.
+  int size;                          // The number of keys stored in this tree.
+
+  public void removeRoot() {             // Remove the root key from this tree.
+    if (root == null) {                                  // or "if (size == 0)"
+      return;
+    }
+    if (root.right == null) {
+      root = root.left;
+    } else if (root.left == null) {
+      root = root.right;
+    } else {
+      BinaryTreeNode node = root.right;
+      while (node.left != null) {          // find key following the root's key
+        node = node.left;
+      }
+      root.key = node.key;
+      if (node == root.right) {          // or "if (node == node.parent.right)"
+        root.right = node.right;         // or "node.parent.right = node.right"
+      } else {
+        node.parent.left = node.right;
+      }
+      if (node.right != null) {
+        node.right.parent = node.parent;
+      }
+    }
+    if (root != null) {
+      root.parent = null;   // Only needed when root.right or root.left is null
+    }
+    size--;              // Note that this line is not executed if root == null
+  }
+}
+</tt></pre>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

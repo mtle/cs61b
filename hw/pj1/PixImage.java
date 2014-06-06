@@ -22,6 +22,9 @@ public class PixImage {
    *  variables MUST be private.
    */
 
+    private int imgWidth, imgHeight;
+    private int xcord, ycord;
+    private byte Image[][][];
 
 
 
@@ -34,6 +37,24 @@ public class PixImage {
    */
   public PixImage(int width, int height) {
     // Your solution here.
+    imgWidth = width;
+    imgHeight = height;
+    Image = new byte[imgHeight][imgWidth][3];
+  }
+
+  /**
+   * PixImage(PixImage): copy constructor.
+   * This will do deep copy of image.
+   *
+   */
+  public PixImage(PixImage img) {
+    imgWidth = img.imgWidth;
+    imgHeight = img.imgHeight;
+    Image = new byte[imgHeight][imgWidth][3];
+    for (int y=0; y<imgHeight; y++)
+        for (int x=0; x<imgWidth; x++)
+            for( int i=0; i<3; i++)
+                image[y][x][i] = img[y][x][i];
   }
 
   /**
@@ -43,7 +64,7 @@ public class PixImage {
    */
   public int getWidth() {
     // Replace the following line with your solution.
-    return 1;
+    return imgWidth;
   }
 
   /**
@@ -53,7 +74,7 @@ public class PixImage {
    */
   public int getHeight() {
     // Replace the following line with your solution.
-    return 1;
+    return imgHeight;
   }
 
   /**
@@ -65,7 +86,7 @@ public class PixImage {
    */
   public short getRed(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return Image[y][x][0];
   }
 
   /**
@@ -77,7 +98,7 @@ public class PixImage {
    */
   public short getGreen(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return Image[y][x][1];
   }
 
   /**
@@ -89,7 +110,7 @@ public class PixImage {
    */
   public short getBlue(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return Image[y][x][2];
   }
 
   /**
@@ -107,6 +128,9 @@ public class PixImage {
    */
   public void setPixel(int x, int y, short red, short green, short blue) {
     // Your solution here.
+    Image[y][x][0] = (byte)red;
+    Image[y][x][1] = (byte)green;
+    Image[y][x][2] = (byte)blue;
   }
 
   /**
@@ -154,7 +178,40 @@ public class PixImage {
    */
   public PixImage boxBlur(int numIterations) {
     // Replace the following line with your solution.
-    return this;
+      PixImage[] newImg = new PixImage[numIterations+1];
+      if( numIterations <= 0 ) {
+          return this;
+      } else {
+          newImg[0] = new PixImage(this);
+          for (int i=1; i<=numIterations; i++) { // loop through the number of iterations
+              newImg[i] = new PixImage(getWidth(), getHeight());
+              for (int y=0; y<getWidthi(); y++) { // start with y-coord
+                  for (int x=0; x<getHeight(); x++) { // x-coord
+                      if( y==0 ) {
+                          if( x==0 ) { // NW corner - 4-neighbor
+                              newImg[i].setPixel( = newImg[i-1].
+                          }
+                          // 6-neighbor
+                      } else if (y==(getHeight()-1) ) {
+                          if( x==0) { // NE corner: 4-neighbor
+                          }
+                          // 6-neighbor
+
+                      } else if ( x==0 && y!=0 ) {
+                          if( x==(getHeight()-1)) { // 4-neighbor
+                          }
+                          // 6-neighbor
+                      } else if( y==(getHeight()-1)) {
+                          if( x==(imgWidth-1)) { //4-neighbor
+                          }
+                          // 6 neighbors cases
+                      } else { // 9 neighbor cases
+                      }
+                  } // for x
+              } // for y
+          } // for i
+      } // outer most if-else
+      return newImg[numIterations-1];
   }
 
   /**

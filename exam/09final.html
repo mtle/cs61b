@@ -1,0 +1,299 @@
+<html>
+<head>
+<title>CS 61B: Final Exam</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2009)</font><br>
+<font size="6" color="#009000">Final Exam</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+
+<b>Problem 1.</b>  (9 points) <b>A Miscellany.</b>
+<p>
+
+<b>b.</b>
+&Omega;(log <i>x</i> + <i>z</i><sup>2<i>z</i></sup> +
+<i>y</i><sup>2</sup><i>z</i> log <i>y</i>).
+<p>
+
+<b>c.</b>
+Is is necessary to shrink the hash table when
+<tt>remove</tt> operations cause the load factor to become too small.
+<p>
+
+It is necessary because a hash table might grow very large when a lot of
+items are inserted; subsequently, most of those items might be deleted.
+Then the table might contain <i>n</i> entries but have an asymptotically
+larger number of buckets.
+<p>
+
+<b>d.</b>
+A method call might end, whereupon its stack frame is popped from
+the program stack.  If some of the local variables in that stack frame
+are references, they are no longer included in the roots of
+the garbage collector.
+The objects they point to might thus no longer be live.
+<p>
+
+<b>e.</b>
+(2 + 8) / (7 / 3 ^ 4).
+<p>
+
+
+<b>Problem 2.</b>  (7 points) <b>Trees.</b>
+<p>
+
+<b>a.</b>
+<img src="234.gif" border="0" align=top>
+<p>
+
+<b>b.</b>
+<img src="splay09.gif" border="0" align=top>
+<p>
+
+<b>c.</b>
+Perform a postorder traversal.
+When you visit a node, take the maximum of its children's heights and add one.
+<p>
+
+
+<b>Problem 3.</b>  (10 points) <b>Sorting.</b>
+<p>
+
+<b>a.</b>
+<br>
+5 8 1 9 3 6 7<br>
+5 8 6 9 3 1 7<br>
+5 8 6 9 3 7 1<br>
+5 8 7 9 3 6 1<br>
+1 8 7 9 3 6 5<br>
+1 8 7 9 5 6 3<br>
+1 3 7 9 5 6 8<br>
+1 3 7 9 8 6 5<br>
+1 3 5 9 8 6 7<br>
+1 3 5 9 8 7 6<br>
+1 3 5 6 8 7 9<br>
+1 3 5 6 8 9 7<br>
+1 3 5 6 7 9 8<br>
+1 3 5 6 7 8 9<br>
+<p>
+
+<b>b.</b>
+<br>
+in-place selection sort of an array:
+&Theta;(<i>bn</i> + <i>n</i><sup>2</sup>). <br>
+in-place insertion sort of an array:
+&Theta;(<i>bn</i><sup>2</sup>). <br>
+radix sort of a linked list using bucket sort:
+&Theta;(<i>bn</i> / log <i>n</i>). <br>
+radix sort of an array using counting sort:
+&Theta;(<i>b</i><sup>2</sup><i>n</i> / log (<i>bn</i>)). <br>
+<p>
+
+<b>c.</b>
+Our parallel quicksort sorts <i>n</i> items in &Theta;(<i>n</i>) time,
+because its analysis is the same as that of sequential quickselect.
+<p>
+
+<b>Problem 4.</b>  (8 points) <b>Disjoint Sets.</b>
+<p>
+
+<b>a.</b>
+<img src="forest.gif" border="0" align=top>
+<p>
+
+<b>b.</b>
+<br>
+<tt>find(8)</tt><br>
+<tt>union(7, 9)</tt><br>
+<tt>union(7, 10)</tt><br>
+<tt>union(4, 7)</tt><br>
+<tt>find(2)</tt>
+<p>
+
+(The first three of these operations can occur in any order.)
+<p>
+
+<b>c.</b>
+The worst-case running time of Kruskal's algorithm (with radix sort) is
+&Theta;(<i>v</i> + <i>e</i> &alpha;(2<i>e</i> + <i>v</i>, <i>v</i>)) time.
+<p>
+
+<b>d.</b>
+The worst-case running time of <i>u</i> buggy union operations followed
+by <i>f</i> buggy find operations is
+&Theta;(min{<i>u</i>, <i>f</i> } <i>u</i> + <i>f</i> + <i>u</i>).
+<p>
+
+To create a bad example, first repeatedly unite a set with a sequence of
+one-item sets.  Each time, the one-item set becomes the root.
+After <i>u</i> union operations, the tree is a chain of nodes whose
+height is <i>u</i>.
+<p>
+
+Next, repeatedly perform a find operation on the deepest leaf of the tree.
+Each time, the deepest leaf will become a child of the root,
+decreasing the tree's height by one.
+The first <i>u</i> find operations will cost
+&Theta;(<i>u</i><sup>2</sup>) time total.
+(Additional find operations will cost only constant time each.)
+<p>
+
+<b>e.</b>
+The worst-case running time of <i>u</i> correct union operations followed
+by <i>f</i> buggy find operations is
+&Theta;(min{<i>u</i>, <i>f</i> } log <i>u</i> + <i>u</i> + <i>f</i>).
+<p>
+
+Recall the standard construction for creating the tallest tree
+with the smallest size possible under union by size.
+To create a tree of height <i>h</i>,
+you must unite a tree of height <i>h</i> &ndash; 1 with a tree
+of equal or larger size;
+so to increase the height by one you must double the size.
+Therefore, the smallest tree of height <i>h</i> has
+2<sup><i>h</i></sup> nodes.
+<p>
+
+To create a bad example, use this construction and <i>u</i> union operations
+to create a tree with <i>u</i> + 1 nodes and height
+&lfloor; log<sub>2</sub> (<i>u</i> + 1) &rfloor;.
+Most of the nodes in this tree have a depth of &Theta;(log <i>u</i>).
+<p>
+
+Repeatedly perform a find operation on the deepest leaf of the tree.
+Each time, the deepest leaf will become a child of the root.
+The first <i>u</i> find operations
+will cost O(<i>u</i> log <i>u</i>) time total.
+(Additional find operations will cost only constant time each.)
+<p>
+
+
+<b>Problem 5.</b>  (4 points) <b>Graphs.</b>
+<p>
+
+<b>a.</b>
+Yes.  If several edges have the same weights,
+different sorting algorithms/implementations will put them in different orders.
+A graph can have more than one minimum spanning tree.
+The choice of minimum spanning tree that Kruskal's algorithm returns
+depends on the order in which it inspects edges of the same weight.
+<p>
+
+<b>b.</b>
+Recursive DFS does use a large auxiliary data structure&mdash;namely,
+the program stack.
+<p>
+
+<b>c.</b>
+Here are two algorithms.
+They're essentially equivalent,
+but one changes the graph, and one changes the BFS algorithm.
+<p>
+
+<i>Change the graph:</i>
+Add a new vertex, called the <i>start vertex</i>, to the graph.
+Attach it with edges to all the red vertices.
+Do a breadth-first search from the start vertex,
+and find the nearst green vertex.
+Use the parent pointers to find the shortest path from that green vertex
+back to the start vertex.
+This path will pass through a red vertex just before terminating at
+the start vertex;
+omitting the start vertex, this path is a shortest red-green path.
+<p>
+
+<i>Change breadth-first search:</i>
+Instead of starting breadth-first search by placing one vertex in a queue,
+start it by placing <i>all</i> the red vertices in the queue.
+Then run the BFS loop as usual.
+When you visit a green vertex for the first time, the parent pointers
+trace a shortest red-green path from that green vertex back to a red vertex.
+<p>
+
+
+<b>Problem 6.</b>  (5 points) <b>Range Queries.</b>
+<p>
+
+<b>a.</b>
+Find the keys <i>x</i> and <i>y</i>, or keys close to them, by binary search.
+<p>
+
+Let <i>i<sub>x</sub></i> be the index where the search for <i>x</i> ended.
+If the key stored at index <i>i<sub>x</sub></i> is strictly less than <i>x</i>,
+increment <i>i<sub>x</sub></i> by one.
+Now, <i>i<sub>x</sub></i> is the number of keys strictly less than <i>x</i>.
+<p>
+
+Let <i>i<sub>y</sub></i> be the index where the search for <i>y</i> ended.
+If the key stored at index <i>i<sub>y</sub></i> is less than or equal to
+<i>y</i>, increment <i>i<sub>y</sub></i> by one.
+Now, <i>i<sub>y</sub></i> is the number of keys less than or equal to <i>y</i>.
+<p>
+
+Output <i>i<sub>y</sub></i> &ndash; <i>i<sub>x</sub></i>,
+the number of keys less than or equal to <i>y</i>
+that are not less than <i>x</i>.
+<p>
+
+<b>b.</b>
+Your &ldquo;cheat sheet&rdquo;:
+Create an (<i>n</i> + 1)-element array <tt>counts</tt> in which
+<tt>counts[</tt><i>i</i><tt>]</tt> is the number of keys
+strictly less than <i>i</i>, like counting sort does.
+Observe that <tt>counts[0]</tt> = 0 and
+<tt>counts[</tt><i>n</i><tt>]</tt> = <i>n</i>.
+This takes O(<i>n</i>) time.
+<p>
+
+To answer a query, return
+<tt>counts[</tt><i>y</i><tt> + 1] - counts[</tt><i>x</i><tt>]</tt>.
+<p>
+
+<b>c.</b>
+A splay tree gives you the ability to insert and remove new keys <i>quickly</i>
+(i.e. much faster than linear time), then perform more fast range queries.
+<p>
+
+
+<b>Problem 7.</b>  (7 points) <b>A Binary Search Tree Rotation.</b>
+<p>
+
+<pre><tt>
+  public void rotateRight() {
+    if (left != null) {
+      if (parent == null) {
+        myTree.root = left;
+      } else if (parent.left == this) {
+        parent.left = left;
+      } else {
+        parent.right = left;
+      }
+      left.parent = parent;
+      parent = left;
+      left = left.right;
+      if (left != null) {
+        left.parent = this;
+      }
+      parent.right = this;
+    }
+  }
+</tt></pre>
+
+
+<hr>
+
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

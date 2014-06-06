@@ -1,0 +1,391 @@
+<html>
+<head>
+<title>CS 61B: Final Exam</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Autumn 2010)</font><br>
+<font size="6" color="#009000">Final Exam</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+
+<b>Problem 1.</b>  (8 points) <b>A Miscellany.</b>
+<p>
+
+<b>b.</b>
+The graph of objects in the heap might be nearly strongly connected&mdash;for
+instance, if almost all of the objects are nodes in a doubly-linked list.
+Then, half the roots might lead to all the objects,
+so garbage collection will be no faster than usual.
+<p>
+
+The solution doesn't work because the sweep phase doesn't know
+which objects to sweep away if only some of the live objects are marked live.
+<p>
+
+<b>c.</b>
+<tt>insert()</tt> may cause the array to run out of space,
+forcing you to resize it.
+<p>
+
+<b>d.</b>
+The maze graph is a <i>spanning tree</i> of <i>G</i>.
+<p>
+
+<b>e.</b>
+If the team that implemented the graph ADT thinks of a better way to
+implement the graph, they might change the <tt>VertexPair</tt> class,
+thereby breaking the <tt>Kruskal</tt> application.
+<p>
+
+
+<b>Problem 2.</b>  (9 points) <b>Trees.</b>
+<p>
+
+<b>a.</b>
+<img src="splay10.gif" border="0" align=top>
+<p>
+
+<b>b.</b>
+No sequence of operations can construct this 2-3-4 tree.
+In a valid 2-3-4 tree, every leaf is at the same level.
+<p>
+
+<b>c.</b>
+<img src="bintree10.gif" border="0" align=top>
+<p>
+
+<b>d.</b>
+Each node in the splay tree stores both a date and an exam score.
+The <tt>insert</tt> method works as usual for a splay tree,
+using the dates as the keys by which the nodes are ordered.
+<p>
+
+At each node in the tree, we store the size of the subtree rooted at that node
+<i>and</i> the sum of the scores of all the exams in the subtree rooted
+at that node.
+During each splay tree rotation, we update the subtree sizes as described
+in class, and we update the subtree total scores analogously:
+the total score rooted at a node is the sum of its score
+and its children's subtrees' total scores.
+<p>
+
+To answer an <tt>average</tt> query,
+we determine the number of exams taken between
+<tt>date1</tt> and <tt>date2</tt> (inclusive) as described in class.
+Analogously, we also determine the sum of the scores of those exams.
+Then we divide the total score by the number of exams.
+<p>
+
+Some details (not required for full marks,
+as they repeat what was said in class):
+The root node knows the size of the tree (number of exams stored in the tree)
+and the total score of all the exams stored in the tree.
+We query the number of exams in a range, and the total score in a range,
+by subtracting the exams outside that range.
+First we <tt>find(date1)</tt>, thereby splaying <tt>date1</tt> or
+(if <tt>date1</tt> is not in the tree) a nearby date to the root.
+Then we determine how many exams in the tree occurred before <tt>date1</tt>,
+and their total score, by subtracting out the exams in the root's
+left subtree and possibly in the root itself (depending on its date).
+Then we <tt>find(date2)</tt> and subtract out the exams that
+occurred after <tt>date2</tt>.
+<p>
+
+
+
+<b>Problem 3.</b>  (8 points) <b>Sorting.</b>
+<p>
+
+<b>a.</b>
+<br>
+7 8 9 5 6 1 2 3 4<br>
+7 <b>4</b> 9 5 6 1 2 3 <b>8</b><br>
+7 4 <b>3</b> 5 6 1 2 <b>9</b> 8<br>
+7 4 3 5 6 1 2 <b>8 9</b><br>
+7 <b>2</b> 3 5 6 1 <b>4</b> 8 9<br>
+<b>1</b> 2 3 5 6 <b>7</b> 4 8 9<br>
+1 2 3 <b>4</b> 6 7 <b>5</b> 8 9<br>
+1 <b>3 2</b> 4 6 7 5 8 9<br>
+1 <b>2 3</b> 4 6 7 5 8 9<br>
+1 2 3 4 6 <b>5 7</b> 8 9<br>
+1 2 3 4 <b>5 6</b> 7 8 9<br>
+<p>
+
+<b>b.</b>
+<img src="mergesort.gif" border="0" align=top>
+<p>
+
+<b>c.</b>
+(iv) and (ii).
+<p>
+
+<b>d.</b>
+<pre><tt>
+110  ab7  a17  117  a07  307   17    d
+a07  307    d  110  a17  117   17  ab7
+  d   17  110  117  307  a07  a17  ab7
+</tt></pre>
+<p>
+
+<b>e.</b>
+Use a bucket sort that inspects only the first &lceil;log <i>n</i>&rceil;-bit
+digit of each key, and
+therefore uses 2<sup>&lceil;log <i>n</i>&rceil;</sup> buckets
+(which is at least <i>n</i> and less than 2<i>n</i>).
+To avoid the cost of copying long integers, we sort <tt>LongInteger</tt>
+references instead of moving the integers themselves.
+When a collision occurs&mdash;that is, when you insert a key into a bucket
+that isn't empty&mdash;use insertion sort to enter the key in its proper
+sorted position in the chain (linked list).
+In other words, we enforce the invariant that each bucket's chain is
+always in sorted order.
+The insertion sort uses comparisons, but we rarely have to compare two keys
+in their entirety; rather, we go from the most to the least significant digit,
+and stop as soon as we find a digit where the two keys differ.
+<p>
+
+After placing every key in a bucket, concatenate the chains together
+into a sorted linked list.
+<p>
+
+(Warning:  some students wanted to recursively sort the keys in each bucket
+with further rounds of bucket sort.  But this is too expensive if you use the
+same radix for every round of bucket sort!  Because you're always using
+&Theta;(<i>n</i>) buckets, even just to sort two keys, the total expected
+running time will be in &Theta;(<i>n</i><sup>2</sup>).
+Recursive bucket sorting can work, but only by reducing the number of buckets
+in each recursive call to be roughly equal to the number of keys.)
+<p>
+
+This algorithm needs two randomized analyses.
+First, what is the cost of comparing two keys (for insertion sort)?
+It takes <i>O</i>(1) time to compare their second-most significant digits.
+These will match with probability at most 1 / <i>n</i>, in which case
+we must compare their third-most significant digits.
+The second and third digits will match with probability at most
+1 / <i>n</i><sup>2</sup>.
+Continuing this logic, the expected time to compare two keys is in
+<i>O</i>(1 + 1 / <i>n</i> + 1 / <i>n</i><sup>2</sup> + 1 / <i>n</i><sup>3</sup>
++ &hellip;) = <i>O</i>(1).
+<p>
+
+The second part of the randomized analysis is virtually the same as
+for hash tables.
+Suppose you insert a key <i>k</i> into a bucket,
+when there are <i>m</i> keys already in the buckets.
+Let <i>V<sub>i</sub></i> be a random variable that is 1 if
+the <i>i</i>th key is in the same bucket as <i>k</i>, and 0 otherwise.
+Because the expected cost of comparing <i>k</i> with another key is constant,
+by the linearity of expectation, the expected cost of bucketing <i>k</i> is in
+<blockquote>
+<i>O</i>(1 + <i>V</i><sub>1</sub> + <i>V</i><sub>2</sub> + &hellip; +
+<i>V<sub>m</sub></i>).
+</blockquote>
+Because the keys are random,
+every <i>V<sub>i</sub></i> = 1 / 2<sup>&lceil;log <i>n</i>&rceil;</sup>
+&le; 1 / <i>n</i>.
+So the expected cost of bucketing <i>k</i> is in
+<blockquote>
+<i>O</i>(1 + <i>m</i> / <i>n</i>) = <i>O</i>(1).
+</blockquote>
+By the linearity of expectation, the expected cost of bucketing
+all <i>n</i> long integers is in <i>O</i>(<i>n</i>).
+<p>
+
+
+
+<b>Problem 4.</b>  (8 points) <b>Asymptotic Analysis.</b>
+<p>
+
+<b>a.</b>
+20 log<sub>2</sub> <i>n</i> &isin;
+&Theta;(log<sub>2</sub> (<i>n</i><sup>3</sup>)), because
+log<sub>2</sub> (<i>n</i><sup>3</sup>) = 3 log<sub>2</sub> <i>n</i>,
+which differs from 20 log<sub>2</sub> <i>n</i> only by a constant factor.
+<p>
+
+<b>b.</b>
+<i>x</i> &isin; &Omega;(<i>x</i> sin <i>y</i>), because
+<i>x</i> &ge; <i>x</i> sin <i>y</i> for all positive <i>x</i>.
+We can't use &Theta; because sin <i>y</i> can be zero for arbitrarily large
+values of <i>y</i>.
+<p>
+
+<b>c.</b>
+10<i>n</i>! &isin; <i>O</i>(<i>n</i><sup><i>n</i></sup>), because
+<i>n</i>! &le; <i>n</i><sup><i>n</i></sup>
+(which is obvious if you write out all their factors).
+We can't use &Theta; because
+<i>n</i> &times; <i>n</i>! &le; <i>n</i><sup><i>n</i></sup>
+(also obvious if you write out their factors and ignore the factor of 1 in the
+first product).
+Therefore, as <i>n</i> approaches infinity, the ratio
+<i>n</i><sup><i>n</i></sup> / <i>n</i>! also approaches infinity,
+and no constant can make up for that.
+<p>
+
+<b>d.</b>
+<i>n</i>3<sup><i>n</i></sup> &isin;
+<i>O</i>(3<sup><i>n</i> + log<sub>2</sub> <i>n</i></sup>), because
+3<sup><i>n</i> + log<sub>2</sub> <i>n</i></sup> =
+<i>n</i><sup>log<sub>2</sub> 3 </sup>3<sup><i>n</i></sup>,
+which grows faster than <i>n</i>3<sup><i>n</i></sup> by a factor of
+approximately <i>n</i><sup>0.58496</sup>.
+No constant can make up for that.
+<p>
+
+<b>e.</b>
+<i>f</i>(<i>n</i>) = 2<sup><i>n</i></sup> is one of many counterexamples.
+(Observe that polynomials don't work; you need something faster-growing.)
+<p>
+
+By definition, 2<sup><i>cn</i></sup> &isin; &Theta;(2<sup><i>n</i></sup>)
+if and only if there exist constants <i>a</i>, <i>b</i>, and <i>N</i>
+such that for all <i>n</i> &gt; <i>N</i>,
+2<sup><i>cn</i></sup> &le; <i>a</i>2<sup><i>n</i></sup> and
+2<sup><i>cn</i></sup> &ge; <i>b</i>2<sup><i>n</i></sup>.
+<p>
+
+The first of these implies that
+2<sup>(<i>c</i> &ndash; 1)<i>n</i></sup> &le; <i>a</i>,
+which is clearly not true for large <i>n</i> if <i>c</i> &gt; 1.
+(Likewise, the second of these implies that
+2<sup>(<i>c</i> &ndash; 1)<i>n</i></sup> &ge; <i>b</i>,
+which is clearly not true for large <i>n</i> if <i>c</i> &lt; 1.)
+<p>
+
+
+
+<b>Problem 5.</b>  (4 points) <b>Set Intersection.</b>
+<p>
+
+<b>a.</b>
+For each item in <i>T</i>, check if it's in <i>S</i> by binary search.
+Write the common items to an output array.
+The worst-case running time is in <i>O</i>(<i>t</i> log <i>s</i>).
+<p>
+
+<b>b.</b>
+For each item in the <i>smaller</i> set,
+check if it's in the larger set by hashing.
+Insert the common items into a new hash table.
+The expected running time is in <i>O</i>(min{<i>s</i>, <i>t</i>}).
+<p>
+
+<b>c.</b>
+Store the elements of both <i>S</i> and <i>T</i> in the same hash table.
+Each listnode in each chain must contain not only an element,
+but also a flag specifying whether the element is in <i>S</i> or <i>T</i>
+(or both, if you feel like merging their listnodes&mdash;it will work whether
+you do so or not).
+<p>
+
+Also store a doubly-linked list containing the members of
+<i>S</i> &cap; <i>T</i>.
+This list must be maintained by the <tt>insert</tt> and <tt>remove</tt>
+methods, because there won't be time to construct it when
+an application asks for <i>S</i> &cap; <i>T</i>.
+When an element is inserted into one of the sets,
+we must check whether it is in the other set;
+if so, add it to the doubly-linked list.
+When an element is removed from one of the sets,
+likewise check whether it is in the other set;
+if so, remove it from the doubly-linked list.
+To do that, we have to find its listnode in the doubly-linked list
+in <i>O</i>(1) time.
+Therefore, we must maintain an additional reference from each chain listnode
+to the corresponding doubly-linked listnode
+(which is <tt>null</tt> for elements not in <i>S</i> &cap; <i>T</i>).
+<p>
+
+Now, we can query <i>S</i> &cap; <i>T</i> in
+<i>O</i>(|<i>S</i> &cap; <i>T</i>| + 1) time by
+simply traversing the doubly-linked list.
+<p>
+
+(A good alternative solution uses a third hash table,
+rather than a linked list, to store the intersection.
+It's a little more complicated and slow than a linked list, but you don't need
+to keep listnode references in the chains of the first two hash tables,
+so in some ways it's more elegant.)
+<p>
+
+
+
+<b>Problem 6.</b>  (6 points) <b>Amortized Analysis of a Graph Algorithm.</b>
+<p>
+
+<b>a.</b>
+<tt>mystery(i)</tt> deletes all the edges in the connected component
+that contains vertex <tt>i</tt>.
+Said differently, it deletes all the edges reachable from vertex <tt>i</tt>.
+Said differently again, it deletes all the edges on paths that
+contain vertex <tt>i</tt>.
+<p>
+
+<b>b.</b>
+&Theta;(<i>e</i>).
+<p>
+
+<b>c.</b>
+Every <tt>addEdge</tt> operation saves $9 in the bank.
+A call to <tt>mystery</tt> runs in time proportional to
+the number of edges it deletes&mdash;no more than $9 per edge,
+since we choose the size of a dollar&mdash;plus some
+constant number of dollars.
+Say that the amortized cost of <tt>mystery()</tt> is that constant.
+<p>
+
+With this accounting, it follows by induction that the bank balance
+is always at least $9 times the number of (undirected) edges in the graph.
+That is, if this invariant holds before a call to
+<tt>addEdge</tt> or <tt>mystery</tt>, it will hold after the call;
+therefore it will hold after any number of operations.
+<p>
+
+
+<b>Problem 7.</b>  (7 points) <b>Treenode-and-Reference Disjoint Sets.</b>
+<p>
+
+<pre><tt>
+  public DSElement find() { 
+    if (parent == null) {
+      return this;
+    }
+    parent = parent.find();
+    return parent;	
+  }
+
+
+  public void union(DSElement other) {
+    DSElement thisRoot = this.find();
+    DSElement otherRoot = other.find();
+    if (thisRoot != otherRoot) {
+      if (thisRoot.size > otherRoot.size) {
+        otherRoot.parent = thisRoot;
+        thisRoot.size += otherRoot.size;
+      } else {
+        thisRoot.parent = otherRoot;
+        otherRoot.size += thisRoot.size;
+      }
+    }
+  }
+</tt></pre>
+
+
+<hr>
+
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

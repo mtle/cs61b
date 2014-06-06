@@ -1,0 +1,280 @@
+<html>
+<head>
+<title>CS 61B: Final Exam</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2012)</font><br>
+<font size="6" color="#009000">Final Exam</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+
+<b>Problem 1.</b>  (7 points) <b>A miscellany.</b>
+<p>
+
+<b>b.</b>
+<i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup>, <i>g</i>(<i>x</i>) = <i>x</i>.
+<p>
+
+<b>c.</b>
+Yes, the code compiles without errors.
+The class <tt>LordOfTheRings</tt> provides an implementation of
+the abstract method <tt>makeStory</tt> in the Java interface <tt>Twilight</tt>.
+The two declarations of <tt>makeStory</tt> have matching signatures,
+except for the different parameter names (which are irrelevant);
+but their prototypes match too, so they are compatible.
+<p>
+
+<b>d.</b>
+Change the compression function so that it divides the hash code by 8 before
+compressing.
+<p>
+
+<b>e.</b>
+We accepted two answers:  an explanation that
+no <tt>throws</tt> declaration is required, or throwing <tt>OddException</tt>.
+The former answer is correct, but the latter answer might be correct
+with a Java compiler whose flow analysis is not as smart.
+<p>
+
+
+<b>Problem 2.</b>  (10 points) <b>Trees.</b>
+<p>
+
+<b>a.</b>
+A correct example is any splay tree with at least four keys in which
+you call <tt>find(x)</tt> and the key in the root node is <tt>x</tt>.
+<p>
+
+<b>b.</b>
+<img src="splay12.gif" border="0" align=top>
+<p>
+
+<b>c.</b>
+The node <i>y</i> is in the subtree rooted at <i>x</i>'s right child.
+<p>
+
+<b>d.</b>
+&Theta;(<i>k</i> log<sub><i>k</i></sub> <i>n</i>), which can also be written
+&Theta;(<i>k</i> log <i>n</i> / log <i>k</i>).
+<p>
+
+<b>e.</b>
+<img src="forest12.gif" border="0" align=top>
+<p>
+
+<b>f.</b>
+<pre>
+          [5  15]
+       /     |     \
+   [3]    [8 13]      [22]
+  /  \    / | \      /     \
+[1] [4]  /  |  \ [17 19 20] [28]
+     [6 7] [10] [14]
+
+          [5  15]
+       /     |     \
+   [3]    [8 13]      [19 22]
+  /  \    / | \      /    |   \
+[1] [4]  /  |  \ [17 18] [20] [28]
+     [6 7] [10] [14]
+</pre>
+
+
+<b>Problem 3.</b>  (13 points) <b>Sorting.</b>
+<p>
+
+<b>a.</b>
+<br>
+4 7 8 5 1 0 9 2 6 3<br>
+4 7 8 5 <b>3</b> 0 9 2 6 <b>1</b><br>
+<b>0</b> 7 8 5 3 <b>4</b> 9 2 6 1<br>
+0 <b>1</b> 8 5 3 4 9 2 6 <b>7</b><br>
+0 1 8 5 3 4 9 2 <b>7</b> <b>6</b><br>
+0 1 <b>2</b> 5 3 4 9 <b>8</b> 7 6<br>
+0 1 2 5 3 4 <b>6</b> 8 7 <b>9</b><br>
+0 1 <b>4</b> 5 3 <b>2</b> 6 8 7 9<br>
+0 1 <b>2</b> 5 3 <b>4</b> 6 8 7 9<br>
+0 1 2 <b>3</b> <b>5</b> 4 6 8 7 9<br>
+0 1 2 3 <b>4</b> <b>5</b> 6 8 7 9<br>
+0 1 2 3 4 5 6 8 <b>9</b> <b>7</b><br>
+0 1 2 3 4 5 6 <b>7</b> 9 <b>8</b><br>
+0 1 2 3 4 5 6 7 <b>8</b> <b>9</b><br>
+<p>
+
+<b>b.</b>
+1 + <i>n</i> / 2.
+<p>
+
+<b>c.</b>
+<pre><tt>
+20002  12002    202      2   2210    210  20021  12021    122
+20002      2  20021    122    202    210  12002  12021   2210
+    2    122    202    210   2210  12002  12021  20002  20021
+</tt></pre>
+<p>
+
+<b>d.</b>
+Insertion sort:  2 <br>
+Selection sort:  k <br>
+Quicksort (array-based):  k <br>
+Radix sort:  p
+<p>
+
+<b>e.</b>
+First, sort the <i>u</i> unsorted integers with mergesort or heapsort.
+This takes <i>O</i>(<i>u</i> log <i>u</i>) time.
+Then merge them into a single array with the merging step of mergesort.
+This takes <i>O</i>(<i>s</i> + <i>u</i>) time.
+<p>
+
+
+<b>Problem 4.</b>  (5 points) <b>Amortized and randomized analysis.</b>
+<p>
+
+<b>a.</b>
+Let one &ldquo;dollar&rdquo; be a constant unit of time sufficient to
+construct an object of constant length or to
+collect a garbage object during garbage collection.
+Thus, the actual cost of these operations is $1.
+<p>
+
+Each time we construct an object, we charge an amortized cost of $2, of which
+$1 is deposited in the bank.
+When garbage collection runs, its running time is $1 for each garbage object,
+which we deduct from the bank balance.
+<p>
+
+At any time, the total number of dollars in the bank is equal to
+the number of objects in memory.
+It is easy to see that both an object creation and a garbage collection
+maintain this invariant:
+an object creation increases the number of dollars and objects by one;
+a garbage collection decreases the number of dollars and objects by
+the number of garbage objects.
+Therefore, the bank balance never goes below zero.
+<p>
+
+An operation whose actual cost is <i>f</i>(<i>n</i>) dollars can create
+at most <i>c f</i>(<i>n</i>) objects, where <i>c</i> is a constant.
+We charge an amortized cost of (<i>c</i> + 1) <i>f</i>(<i>n</i>) dollars
+for the operation, of which $<i>c f</i>(<i>n</i>) is deposited in the bank;
+therefore, we deposit at least $1 for each object created.
+It follows that the amortized running time is in <i>O</i>(<i>f</i>(<i>n</i>)).
+<p>
+
+(Note:  this answer is way more wordy than a correct answer would need to be.)
+<p>
+
+<b>b.</b>
+Suppose that the cost of <tt>insert</tt>ing the <i>n</i>th item into a heap is
+1 + log <i>n</i> dollars, and
+suppose that the cost of <tt>removeMin</tt> on an <i>n</i>-item heap is
+1 + log <i>n</i> dollars.
+We charge an amortized cost of 2 + 2 log <i>n</i> dollars for each
+<tt>insert</tt> operation and save it in the bank to pay for a subsequent
+<tt>removeMin</tt> operation.
+Then, we can charge an amortized cost of zero for each <tt>removeMin</tt>.
+At any time, the total number of dollars in the bank is
+<i>n</i> + &sum;<sup><i>n</i></sup> log <i>i</i>.
+It's almost obvious how to show that the accounting always satisfies
+this claim.
+<p>
+
+<b>c.</b>
+The crucial observation is that the analysis for this question is
+exactly the same as the analysis of quicksort in Lecture 38.
+<p>
+
+To justify this, observe that the first integer we insert into
+the binary search tree plays exactly the same role as the pivot in quicksort.
+It becomes the root, and
+it is equally likely to be the smallest key, the second smallest,
+the third smallest, &hellip;, or the largest.
+<p>
+
+With probability at least 0.5, it is a &ldquo;good&rdquo; root:
+neither of the root's two children's subtrees
+contain more than three-quarters of the keys.
+By the same reasoning, every node in the binary search tree is
+a &ldquo;good&rdquo; root of its subtree with probability at least 0.5.
+<p>
+
+Let <i>D</i>(<i>n</i>) be a random variable equal to the depth of an arbitrary
+key in a random <i>n</i>-node binary search tree.
+By the same derivation in Lecture 38,
+<blockquote>
+E[<i>D</i>(<i>n</i>)] &le; 2 log<sub>4/3</sub> <i>n</i>.
+</blockquote>
+
+
+<b>Problem 5.</b>  (9 points) <b>The heap and the stack.</b>
+<p>
+
+<img src="boxes12.gif" border="0" align=top>
+<p>
+
+
+<b>Problem 6.</b>  (6 points)
+<b>Building a sibling-based game tree data structure.</b>
+<p>
+
+
+In the solution below, the three lines of added code near the bottom
+(in bold) are the necessary lines.
+The three lines of added code near the top are mere niceties&hellip;though
+they would be required in C, so it's a good habit to include them anyway.
+
+<pre><tt>
+  public GameTreeNode chooseMove(boolean side) {
+    GameTreeNode node = new GameTreeNode();     // My best move and my treenode
+    GameTreeNode reply = null;                  // Opponent's best reply
+
+    <b>node.parent = null;</b>
+    <b>node.nextSibling = null;</b>
+    if (the current Grid is full or has a win) {
+      node.move = null;
+      node.score = this.score();
+      <b>node.firstChild = null;</b>
+      return node;
+    }
+    if (side == COMPUTER) {
+      node.score = -2147483648;
+    } else {
+      node.score = 2147483647;
+    }
+    for (each legal move m) {
+      perform move m;     // Modifies "this" Grid
+      reply = chooseMove(! side);  // Opponent's best reply
+      undo move m;        // Restores "this" Grid
+      if (((side == COMPUTER) &&
+           (reply.score > node.score)) ||
+          ((side == HUMAN) &&
+           (reply.score < node.score))) {
+        node.move = new String();
+        node.score = reply.score;
+      }
+      <b>reply.parent = node;</b>
+      <b>reply.nextSibling = node.firstChild;</b>
+      <b>node.firstChild = reply;</b>
+    }
+    return node;
+  }
+</tt></pre>
+
+
+<hr>
+
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

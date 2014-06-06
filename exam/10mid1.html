@@ -1,0 +1,109 @@
+<html>
+<head>
+<title>CS 61B:  Midterm I</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Autumn 2010)</font><br>
+<font size=6 color='009000'>
+Midterm I</font><br>
+<p>
+
+
+If you want to relive taking the midterm,
+here it is in
+<a href="10mid1.ps">PostScript</a> or <a href="10mid1.pdf">PDF</a>.
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (8 points) <b>Program Errors and Java Keywords.</b>
+<p>
+
+<b>a.</b>  The variable <tt>i</tt> has not been declared.
+Add an <tt>int i;</tt> (as a separate line or in the <tt>for</tt> statement).
+<p>
+
+The run-time exception (an <tt>ArrayIndexOutOfBoundsException</tt>) arises when
+Java tries to access the invalid array member <tt>a[i - 1]</tt> with
+<tt>i</tt> equal to zero.  Fix it by taking advantage of short-circuiting
+in the <tt>if</tt> statement:
+
+<pre><tt>
+    if (i != 0 && a[i].length() > a[i - 1].length()) {
+</tt></pre>
+
+The debugged program prints out the command-line parameters,
+appending a <tt>"9"</tt> to each parameter that is longer than
+the previous parameter.
+<p>
+
+<b>b.</b>  These three lines won't compile.
+<pre><tt>
+      Object o = new Comparable();
+      double d = ((Object) "string").length();
+      int i = Integer.parseInt(super.toString());
+</tt></pre>
+
+You cannot construct a <tt>Comparable</tt> object,
+because <tt>Comparable</tt> is a Java interface.
+The class <tt>Object</tt> has no <tt>length</tt> method.
+In a static method like <tt>main</tt>, there is no <tt>super</tt>.
+<p>
+
+<b>c.</b>  <tt>static final</tt>.
+<p>
+
+<b>d.</b>  <tt>continue</tt> and <tt>return</tt>.
+<p>
+
+
+<b>Problem 2.</b>  (9 points) <b>The Heap and the Stack.</b>
+
+<center>
+<img src="boxes10.gif" width=600 height=539>
+</center>
+<p>
+
+
+<b>Problem 3.</b>  (8 points)
+<b>Transposing a Matrix Represented by Linked Lists.</b>
+<p>
+
+In this sample solution, the index <tt>j</tt> counts down rather than up,
+because the inner loop builds a new list from tail to head.
+This simplifies the code a bit.
+
+<pre><tt>
+public class SListNode {
+  public int item;
+  public SListNode next;
+
+  public SListNode[] transpose(SListNode[] mx, int columns) {
+    SListNode[] t = new SListNode[columns];    // Transposed matrix goes here.
+    for (int i = 0; i < columns; i++) {
+      for (int j = mx.length - 1; j >= 0; j--) {
+        SListNode n = mx[j];
+        mx[j] = n.next;
+        n.next = t[i];
+        t[i] = n;
+      }
+    }
+    return t;
+  }
+}
+</tt></pre>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

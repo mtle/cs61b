@@ -32,6 +32,23 @@ class Date {
      */
     public Date(String s) {
 
+        int index = s.indexOf('/');
+        if ( index != -1) {
+
+            day = Integer.parseInt(s.substring(0,index));
+            int index2 = s.indexOf('/',index);
+            if (index2 != -1 ) {
+                index += 1;
+                index2 += index;
+                month = Integer.parseInt(s.substring(index,index2));
+                index = index2;
+                index2 = s.indexOf('/',index);
+                if (index2 != -1 ) {
+                    year = Integer.parseInt(s.substring(index2+1));
+                }
+            }
+        }
+
     }
 
     /** Checks whether the given year is a leap year.
@@ -113,8 +130,14 @@ class Date {
      *  @return true if and only if this Date is before d.
      */
     public boolean isBefore(Date d) {
-        if (this.year<=d.year && this.month<=d.month) {
-            if(this.day<d.day)
+
+        if(year<d.year)
+            return true;
+        else if (year <=d.year) {
+            if(month<d.month)
+                return true;
+            else
+                if(day<d.day)
                 return true;
         }
         return false;
@@ -124,7 +147,17 @@ class Date {
      *  @return true if and only if this Date is after d.
      */
     public boolean isAfter(Date d) {
-        return true;                        // replace this line with your solution
+
+        if(year<d.year)
+            return true;
+        else if (year==d.year) {
+            if(month<d.month)
+                return true;
+            else if (month==d.month)
+                if(day<d.day)
+                return true;
+        }
+        return false;
     }
 
     /** Returns the number of this Date in the year.
@@ -133,7 +166,10 @@ class Date {
      *  year.)
      */
     public int dayInYear() {
-        return 0;                           // replace this line with your solution
+        if (isLeapYear(year))
+            return 366;
+
+        return 365;
     }
 
     /** Determines the difference in days between d and this Date.  For example,
@@ -148,20 +184,20 @@ class Date {
     public static void main(String[] argv) {
 
         Date d1 = new Date(1, 1, 1);
-        System.out.println("Date should be 1/1/1: " + d1.toString());
+        //System.out.println("Date should be 1/1/1: " + d1.toString());
         d1 = new Date("2/4/2");
-        System.out.println("Date should be 2/4/2: " + d1);
+        //System.out.println("Date should be 2/4/2: " + d1);
         d1 = new Date("2/29/2000");
-        System.out.println("Date should be 2/29/2000: " + d1);
+        //System.out.println("Date should be 2/29/2000: " + d1);
         d1 = new Date("2/29/1904");
-        System.out.println("Date should be 2/29/1904: " + d1);
+        //System.out.println("Date should be 2/29/1904: " + d1);
 
         d1 = new Date(12, 31, 1975);
-        System.out.println("Date should be 12/31/1975: " + d1);
+        //System.out.println("Date should be 12/31/1975: " + d1);
         Date d2 = new Date("1/1/1976");
-        System.out.println("Date should be 1/1/1976: " + d2);
+        //System.out.println("Date should be 1/1/1976: " + d2);
         Date d3 = new Date("1/2/1976");
-        System.out.println("Date should be 1/2/1976: " + d3);
+        //System.out.println("Date should be 1/2/1976: " + d3);
 
         Date d4 = new Date("2/27/1977");
         Date d5 = new Date("8/31/2110");
@@ -191,7 +227,7 @@ class Date {
         System.out.println(d3 + " before " + d2 + " should be false: " +
                 d3.isBefore(d2));
 
-        System.out.println("\nTesting difference.");
+   /*     System.out.println("\nTesting difference.");
         System.out.println(d1 + " - " + d1  + " should be 0: " +
                 d1.difference(d1));
         System.out.println(d2 + " - " + d1  + " should be 1: " +
@@ -202,6 +238,7 @@ class Date {
                 d3.difference(d4));
         System.out.println(d5 + " - " + d4  + " should be 48762: " +
                 d5.difference(d4));
+    */
     }
     private int day;
     private int month;

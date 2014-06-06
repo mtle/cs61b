@@ -1,0 +1,393 @@
+<html>
+<head>
+<title>CS 61B: Final Exam</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2014)</font><br>
+<font size="6" color="#009000">Final Exam</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+
+<b>Problem 1.</b>  (12 points) <b>A miscellany.</b>
+<p>
+
+<b>b.</b>
+The object referenced by <tt>y</tt> (and now by <tt>x</tt>),
+if not <tt>null</tt>, has its counter incremented.
+The object <i>formerly</i> referenced by <tt>x</tt>,
+if not <tt>null</tt>, has its counter decremented.
+<p>
+
+<b>c.</b>
+Reference counting permits you to free the memory occupied by
+a zero-count object <i>immediately</i>, whereas
+mark-and-sweep garbage collection can only collect garbage after
+marking all live objects by performing a complete sweep phase, during which
+the program is frozen and may pause for a noticeable period of time.
+<p>
+
+<b>d.</b>
+&Theta;(1) time, because Java implements references as
+handles (pointers to pointers).
+Therefore, only one pointer must change when an object is moved.
+<p>
+
+<b>e.</b>
+To compress the paths so that no treenode has a grandchild:
+<pre>
+find(9);
+find(5);
+</pre>
+(It doesn't matter what order these two operations are in.)
+<p>
+
+<b>f.</b>
+Here are two different acceptable answers.
+<p>
+
+Strings (unlike game boards) come in different lengths.
+Because we represent the letter <tt>a</tt> with 0,
+the hash code does not distinguish between Strings like
+<tt>moral</tt> and <tt>amoral</tt>, or <tt>sexual</tt> and <tt>asexual</tt>;
+these pairs collide.
+<p>
+
+Our second answer is trickier, because
+it requires some understanding of bit representations of <tt>int</tt>s.
+If there are more than 32 letters in the String,
+the leftmost letters have no effect on the hash code, because
+they are multiplied by 26<sup>32</sup> or a higher power of 26,
+whose last 32 bits are all zero.
+(Note that it is not a problem that the hash code overflows&mdash;that works
+perfectly fine for base-3 numbers, like when we hash a checkerboard&mdash;but
+it is a problem that the low-order bits that survive the overflow are zero.)
+<p>
+
+<b>g.</b>
+<pre>
+Array contains 0
+Array contains 0
+Except my apologies
+Finally it's over
+java.lang.Exception: I won't do it again
+</pre>
+(Note:  we don't penalize students who don't remember
+the "java.lang.Exception:" part.)
+<p>
+
+<b>h.</b>
+<i>f</i>(<i>x</i>, <i>y</i>) = <i>x</i><sup>3</sup>.
+(There are many other possibilities, of course.)
+<p>
+
+<b>i.</b>
+&Theta;(log log <tt>n</tt>).
+<p>
+
+
+<b>Problem 2.</b>  (11 points) <b>Trees.</b>
+<p>
+
+<b>a.</b>
+<p>
+
+<b>b.</b>
+The minimum depth at which the fourth-smallest key can reside is 1.
+The maximum depth at which the fourth-smallest key can reside is 3.
+<p>
+
+<b>c.</b>
+Every edge connects one child to its parent.
+Every vertex, except the root, adjoins <i>only</i> one edge that connects it
+to its parent.
+Therefore, there is a one-to-one correspondence between
+edges and children (vertices that aren't the root).
+So an <i>n</i>-node tree must have <i>n</i> &ndash; 1 edges.
+<p>
+
+<b>d.</b>
+Here are two acceptable answers, both using hash tables.
+<p>
+
+<i>The easy answer:</i>
+Use a hash table to map each key to its corresponding value.
+The binary heap stores <i>only</i> the keys&mdash;not the values.
+That way, <tt>replace(k, v)</tt> needs to change only
+an entry in the hash table; it does not change the heap.
+<tt>insert(k, v)</tt> adds <tt>k</tt> to the heap and <tt>(k, v)</tt> to
+the hash table.
+<tt>removeMin()</tt> removes the minimum key from the heap and
+its entry from the hash table.
+<p>
+
+<i>The hard answer:</i>
+Use a hash table to map each key to its index in an array-based binary heap.
+The binary heap stores (key, value) pairs.
+Whenever a key in the heap is moved (e.g. swapped with another key),
+we must also update its hash table entry to store its new index.
+<tt>replace(k, v)</tt> uses the hash table to find
+the key's index in the binary heap, then replaces its value with <tt>v</tt>.
+<p>
+
+<b>e.</b>
+Add a field <tt>biggest</tt> that stores the maximum key currently in
+the binary heap.
+Whenever a new key is inserted, check whether it is
+greater than <tt>biggest</tt>; if so, update <tt>biggest</tt>.
+The <tt>max()</tt> operation simply returns the value of <tt>biggest</tt>.
+<p>
+
+Most operations do not reduce the value of <tt>biggest</tt>, with
+one exception:  if <tt>removeMin()</tt> completely empties the heap, then
+<tt>biggest</tt> is set to &ndash;&infin;.
+<p>
+
+<b>e.</b>
+A postorder traversal.
+<p>
+
+
+<b>Problem 3.</b>  (11 points) <b>Sorting.</b>
+<p>
+
+<b>a.</b>
+<br>
+3 7 9 5 1 0 4 8 2 6<br>
+<b>6</b> 7 9 5 1 0 4 8 2 <b>3</b><br>
+<b>2</b> 7 9 5 1 0 4 8 <b>6</b> 3<br>
+2 <b>0</b> 9 5 1 <b>7</b> 4 8 6 3<br>
+2 0 <b>1</b> 5 <b>9</b> 7 4 8 6 3<br>
+2 0 1 <b>3</b> 9 7 4 8 6 <b>5</b><br>
+<b>0</b> <b>2</b> 1 3 9 7 4 8 6 5<br>
+0 <b>1</b> <b>2</b> 3 9 7 4 8 6 5<br>
+0 1 2 3 <b>5</b> 7 4 8 6 <b>9</b><br>
+0 1 2 3 <b>6</b> 7 4 8 <b>5</b> 9<br>
+0 1 2 3 <b>4</b> 7 <b>6</b> 8 5 9<br>
+0 1 2 3 4 <b>5</b> 6 8 <b>7</b> 9<br>
+0 1 2 3 4 5 6 <b>7</b> <b>8</b> 9<br>
+<p>
+
+<b>b.</b>
+Use binary search to find the location to insert each key.
+<p>
+
+<b>c.</b>
+We accepted two answers.
+Some of you may be aware of a trick for merging
+<i>k</i> queues of total length <i>n</i> in O(<i>n</i> log <i>k</i>) time
+by using a binary heap of queues; most of you are not.
+<p>
+
+If you don't know the trick, the top-level merging step takes
+&Theta;(<i>nk</i>) worst-case time, so an entire run takes
+&Theta;(<i>nk</i> log<sub><i>k</i></sub> <i>n</i>) =
+&Theta;(<i>nk</i> log <i>n</i> / log <i>k</i>) worst-case time.
+<p>
+
+If you know the trick, the top-level merging step takes
+&Theta;(<i>n</i> log <i>k</i>) worst-case time, so an entire run takes
+&Theta;(<i>n</i> log <i>k</i> log<sub><i>k</i></sub> <i>n</i>) =
+&Theta;(<i>n</i> log <i>n</i>) worst-case time.
+<p>
+
+As an aside, here's an interesting observation that gives some insight why
+<i>k</i>-way mergesort with the merging trick runs in
+O(<i>n</i> log <i>n</i>) time regardless of the value of <i>k</i>.
+If we choose <i>k</i> = 2, we have pure mergesort.
+If we use the merging trick and choose <i>k</i> = <i>n</i>,
+we have pure heapsort;
+we're using a heap to merge <i>n</i> queues of length 1.
+But intermediate values of <i>k</i> yield
+a mergesort-heapsort hybrid algorithm.
+<p>
+
+<b>d.</b>
+<pre>
+1110101  1000101  0110001  0000101  1110001  0000001  1000101  1000000
+1000000  0110001  1110001  0000001  1110101  1000101  0000101  1000101
+1000000  0000001  1000101  0000101  1000101  0110001  1110001  1110101
+0000001  0000101  0110001  1000000  1000101  1000101  1110001  1110101
+</pre>
+Halfway through the key-copying loop of the first pass of counting sort,
+the <tt>counts</tt> array looks like this.
+<pre>
+            000 (0) 001 (1) 010 (2) 011 (3) 100 (4) 101 (5) 110 (6) 111 (7)
+           -----------------------------------------------------------------
+    counts |   0   |   2   |   4   |   4   |   4   |   7   |   8   |   8   |
+           -----------------------------------------------------------------
+</pre>
+
+
+<b>Problem 4.</b>  (4 points) <b>Graphs.</b>
+<p>
+
+<b>a.</b>
+Depth-first search visits the vertices in the order 0, 6, 2, 4, 5, 3, 1.
+<p>
+
+<b>b.</b>
+&Theta;(<i>v</i> + <i>e</i>).
+The term <i>e</i> follows because the sum of all the vertex degrees is
+2<i>e</i>.
+The term <i>v</i> follows because we have to check each vertex for
+an adjacency list.
+(If there are many more vertices than edges, most vertices have degree zero,
+but we still have to spend time checking whether they have degree zero.)
+Observe that this reasoning is largely the same as
+the reasoning we gave you for why depth-first search runs
+in &Theta;(<i>v</i> + <i>e</i>) time.
+<p>
+
+<b>c.</b>
+During the preparation stage, when we have as much time as we want,
+we prepare the following data structures.
+<ul>
+<li>  A <i>v</i>-by-<i>v</i> adjacency matrix with no edges (yet).
+<li>  An array-based disjoint sets data structure representing <i>v</i> items
+      (each in its own set).
+<li>  A <i>v</i>-vertex adjacency list,
+      in the form of an array of linked lists, with no edges (yet).
+<li>  An array of <i>v</i> <tt>visited</tt> flags, all set to <tt>false</tt>.
+</ul>
+<p>
+
+During the contest stage,
+we start reading edges from <i>L</i> from left to right.
+We use the adjacency matrix to screen out duplicate edges:
+when we read an edge, if the edge is already entered in the adjancency matrix,
+we ignore it and go directly to the next edge.
+But if the edge is new, we enter it in the adjancency matrix.
+Then we check whether its endpoints are in the same disjoint set.
+If not, we unite (union operation) the sets in which its endpoints lie, and
+go on to the next edge.
+But if its endpoints are in the same disjoint set,
+we have discovered that there is a cycle!
+(Note that this works <i>only</i> because we discarded duplicate edges.)
+However, we do <b>not</b> add this new edge to the graph data structure.
+<p>
+
+Once we have discovered a cycle, we must identify which vertices are
+in the cycle.
+We can't simply print the whole disjoint set;
+there may be edges adjoining the cycle that are not part of the cycle.
+Therefore,
+we will use depth-first search (or breadth-first search) to identify the cycle.
+DFS is not fast enough if we use the adjacency matrix; therefore,
+we build an adjacency list as we read the edges.
+When we discover that there is a cycle,
+we run the search to find a path from one endpoint to the other.
+This search uses the array of <tt>visited</tt> flags.
+<p>
+
+It takes only constant time per edge to check and update
+the adjacency matrix and the adjacency list, for a total of O(<i>k</i>) time.
+Each edge may entail two find operations and one union operation,
+so the total time for <i>all</i> the disjoint sets operations for
+<i>all</i> the edges is in O(<i>k</i> &alpha;(3<i>k</i>, <i>k</i>)).
+The depth-first search runs in O(<i>k</i>) time, because
+there are <i>k</i> edges in the adjacency list and
+the array of <tt>visited</tt> flags is already initialized.
+The total running time is in O(<i>k</i> &alpha;(3<i>k</i>, <i>k</i>)), which is
+less than O(<i>k</i> &radic;log <i>k</i>).
+<p>
+
+
+<b>Problem 5.</b>  (7 points) <b>Disjoint Sets.</b>
+<p>
+
+<b>a.</b>
+<pre><tt>
+  public void union(SibTreeNode other) {
+    if (size < other.size) {                           // other has larger tree
+      other.size += size;
+      parent = other;
+      nextSibling = other.firstChild;
+      other.firstChild = this;
+    } else {                                 // "this" has equal or larger tree
+      size += other.size;
+      other.parent = this;
+      other.nextSibling = firstChild;
+      firstChild = other;
+    }
+  }
+</tt></pre>
+<p>
+
+<b>b.</b>
+Consider two roots that each have &Theta;(<i>n</i>) children.
+Take the union of those two roots;
+now one of the root has &Theta;(<i>n</i>) grandchildren.
+Suppose we perform a <tt>find</tt> operation on each of those grandchildren,
+in order from <i>right to left</i>.
+To perform path compression on a grandchild,
+we must remove it from the singly-linked list of its parent's children.
+Because it is the last child in the list,
+we must walk through the entire list to change
+the <tt>nextSibling</tt> reference of the previous child.
+Therefore, it takes &Theta;(<i>n</i>) time on average for each <tt>find</tt>.
+<p>
+
+<!-- <img border="0" src="slowfind.gif" width="851" height="247"> -->
+
+<b>c.</b>
+Give every node a <tt>prevSibling</tt> reference.
+Siblings are now doubly-linked, so a node can be removed from the
+list of its parent's children in constant time.
+<p>
+
+
+<b>Problem 6.</b>  (5 points) <b>Quickselect.</b>
+<p>
+
+<pre><tt>
+  public static Comparable quickselect(Comparable[] a, int k, int low, int high) {
+    if (low < high) {
+      // Generate a random number in the range low...high.
+      int pivotIndex = low + (new Random()).nextInt(high - low + 1);
+      Comparable pivot = a[pivotIndex];
+      a[pivotIndex] = a[high];                     // Swap pivot with last item
+      a[high] = pivot;
+
+      int i = low - 1;
+      int j = high;
+      do {                                          // Partition the (sub)array
+        do { i++; } while (a[i].compareTo(pivot) < 0);
+        do { j--; } while ((a[j].compareTo(pivot) > 0) && (j > low));
+        if (i < j) {
+          Comparable c = a[i];  a[i] = a[j];  a[j] = c;   // Swap a[i] and a[j]
+        }
+      } while (i < j);
+
+      a[high] = a[i];
+      a[i] = pivot;                 // Put pivot in the middle where it belongs
+// !!! Changes start here !!! (No changes were needed above this line) !!!
+      if (k < i) {
+        return quickselect(a, k, low, i - 1);         // Find item in left list
+      } else if (k == i) {
+        return pivot;
+      } else {
+        return quickselect(a, k, i + 1, high);       // Find item in right list
+      }
+    } else {
+      return a[low];
+    }
+  }
+</tt></pre>
+
+
+<hr>
+
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

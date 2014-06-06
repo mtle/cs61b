@@ -1,0 +1,165 @@
+<html>
+<head>
+<title>CS 61B:  Midterm II</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2012)</font><br>
+<font size=6 color='009000'>
+Midterm II</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (6 points) <b>A Miscellany.</b>
+<p>
+
+<b>a.</b>
+<tt>AException</tt> is a superclass of <tt>BException</tt>.
+<p>
+
+<b>b.</b>
+&Theta;(n<sup>2</sup>).
+<p>
+
+<b>c.</b>
+We divide the proof into two separate cases:
+either <i>x</i> &ge; <i>y</i>, or <i>x</i> &lt; <i>y</i>.
+<p>
+
+In the first case, we have
+<blockquote>
+log (<i>x</i> + <i>y</i>) &le; log (2<i>x</i>) = log 2 + log <i>x</i>
+&le; log <i>x</i> + log <i>y</i>
+</blockquote>
+for all values <i>y</i> &ge; 2 and <i>x</i> &ge; <i>y</i>.
+<p>
+
+The second case, where <i>x</i> &lt; <i>y</i>, is symmetric.
+<blockquote>
+log (<i>x</i> + <i>y</i>) &lt; log (2<i>y</i>) = log 2 + log <i>y</i>
+&le; log <i>x</i> + log <i>y</i>
+</blockquote>
+for all values <i>x</i> &ge; 2 and <i>y</i> &ge; <i>x</i>.
+<p>
+
+Therefore, 
+log (<i>x</i> + <i>y</i>) &le; log <i>x</i> + log <i>y</i>
+for all <i>x</i> &ge; 2 and <i>y</i> &ge; <i>2</i>, so
+log (<i>x</i> + <i>y</i>) &isin; O(log <i>x</i> + log <i>y</i>).
+<p>
+
+
+
+<b>Problem 2.</b>  (10 points) <b>Trees.</b>
+<p>
+
+<b>a.</b>
+<center>
+<img src="preorder.gif" width=292 height=292>
+</center>
+<p>
+
+<b>b.</b>
+<center>
+<img src="heaparr12.gif" width=363 height=268>
+</center>
+<p>
+
+<b>c.</b>
+A <b>binary heap</b> of height <i>h</i> contains
+at least 2<sup><i>h</i></sup> keys.
+A <b>binary search tree</b> of height <i>h</i> contains
+at least <i>h</i> + 1 keys.
+A <b>2-3-4 tree</b> of height <i>h</i> contains
+at least 2<sup><i>h</i> + 1</sup> &ndash; 1 keys.
+<p>
+
+<b>d.</b>
+<center>
+<img src="234mid12.gif" width=128 height=118>
+</center>
+<p>
+
+
+<b>e.</b>
+Write a loop that iterates through <tt>k</tt>,
+keeps track of the minimum key so far, and
+counts the number of keys in <tt>k</tt> (except <tt>k[0]</tt>) that are
+smaller than every previous key.
+
+<pre>
+int min = k[0];
+int depth = 0;
+for (int i = 1; i < k.length; i++) {
+  if (k[i] < min) {
+    min = k[i];
+    depth++;
+  }
+}
+</pre>
+<p>
+
+
+
+<b>Problem 3.</b>  (9 points) <b>Graphs.</b>
+<p>
+
+<b>a.</b>
+<center>
+<img src="bfs12.gif" width=352 height=230>
+</center>
+<p>
+
+<b>b.</b>
+(6, 0)
+<p>
+
+<b>c.</b>
+<center>
+<img src="span12.gif" width=352 height=343>
+</center>
+<p>
+
+<b>d.</b>
+
+Do you think that <i>T</i> <b>must</b> include the edge of <i>G</i> with
+the least weight?
+Yes.
+What about the edge with the second-least weight?
+Yes.
+What about the edge with the third-least weight?
+No.
+<p>
+
+Kruskal's algorithm must choose the first two edges, because
+it is impossible that the endpoints of those edges are already connected by
+a path.
+However, the third edge is rejected if the first three edges form a triangle.
+<p>
+
+<b>e.</b>
+&Theta;(<i>n</i><sup>2</sup> + <i>e</i> log <i>e</i>) =
+&Theta;(<i>n</i><sup>2</sup> + <i>e</i> log <i>n</i>);
+either expression is correct.
+<p>
+
+<b>f.</b>
+Asymptotic notation is meaningful only as
+the number of edges <i>e</i> approaches infinity.
+In a 100-vertex undirected graph, the number of edges cannot exceed 5,050.
+
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

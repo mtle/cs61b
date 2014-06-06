@@ -1,0 +1,286 @@
+<html>
+<head>
+<title>CS 61B: Final Exam</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2013)</font><br>
+<font size="6" color="#009000">Final Exam</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+
+<b>Problem 1.</b>  (11 points) <b>A miscellany.</b>
+<p>
+
+<b>b.</b>
+The <tt>insert</tt> operation negates each key before inserting it into
+the min-heap.
+The <tt>removeMax</tt> operation removes the minimum key from the min-heap
+and negates it before returning it.
+<p>
+
+<b>c.</b>
+Replace <tt>SensorIn</tt> with a stub that generates faked earthquake data.
+<p>
+
+<b>d.</b>
+<tt>o1.hashCode() == o2.hashCode()</tt>.
+<p>
+
+<b>e.</b>
+Add a <tt>total</tt> field to the <tt>DList</tt> class that maintains
+the sum of all the items in the list.
+The method <tt>setItem</tt> and
+every method that inserts or removes a listnode must
+update <tt>total</tt> accordingly.
+The <tt>average</tt> method returns <tt>total</tt> / <tt>size</tt>.
+<p>
+
+<b>f.</b>
+Its running time is in &Theta;(log <i>n</i>).
+<p>
+
+<b>g.</b>
+The nodes L and P are pruned.
+<p>
+
+
+<b>Problem 2.</b>  (13 points) <b>Sorting.</b>
+<p>
+
+<b>a.</b>
+<br>
+5 1 0 9 2 6 3<br>
+5 <b>2</b> 0 9 <b>1</b> 6 3<br>
+5 2 <b>6</b> 9 1 <b>0</b> 3<br>
+5 2 6 9 1 <b>3</b> <b>0</b><br>
+<b>0</b> 2 6 9 1 3 <b>5</b><br>
+0 2 6 9 <b>5</b> 3 <b>1</b><br>
+0 <b>5</b> 6 9 <b>2</b> 3 1<br>
+0 <b>1</b> 6 9 2 3 <b>5</b><br>
+0 1 6 9 <b>5</b> 3 <b>2</b><br>
+0 1 <b>2</b> 9 5 3 <b>6</b><br>
+0 1 2 9 5 <b>6</b> <b>3</b><br>
+0 1 2 <b>3</b> 5 6 <b>9</b><br>
+0 1 2 3 <b>9</b> 6 <b>5</b><br>
+0 1 2 3 <b>5</b> 6 <b>9</b><br>
+0 1 2 3 5 <b>9</b> <b>6</b><br>
+0 1 2 3 5 <b>6</b> <b>9</b><br>
+<p>
+
+<b>b.</b>
+Replace the conditional &ldquo;<tt>arr[i] <= arr[j]</tt>&rdquo;
+with &ldquo;<tt>arr[i] < arr[j]</tt>&rdquo;.
+<p>
+
+<b>c.</b>
+Replace
+<pre><tt>
+    for (int j = 0; j < i; j++) {
+      if (arr[i] <= arr[j]) {
+</tt></pre>
+with
+<pre><tt>
+    for (int j = i; j >= 0; j--) {
+      if (j == 0 || arr[i] >= arr[j - 1]) {
+</tt></pre>
+<p>
+
+<b>d.</b>
+The variant with bucket sort uses &Theta;(<i>q</i>) additional memory, whereas
+the variant with couting sort uses &Theta;(<i>q</i> + <i>n</i>)
+additional memory.
+<p>
+
+<b>e.</b>
+The input array has no duplicate keys.
+<p>
+
+<b>f.</b>
+Its expected running time is in &Theta;(<i>n</i><sup>2</sup>).
+<p>
+
+<b>g.</b>
+Preprocessing part:
+Sort the old integers (any way you like) and store them in an array.
+Create an array of buckets (or counts), one for each old integer,
+with each bucket having a queue that contains the old integer
+(or each count being 1).
+<p>
+
+Online part:
+For each new integer, use binary search on the array
+to find the matching old integer.
+The binary search tells us the index of that integer's queue.
+Store the new integer in the corresponding queue (or increase its count).
+After all the new integers have been processed,
+walk through all the queues to generate the output list as in bucket sort
+(or use the counts array as in counting sort to generate the output list).
+<p>
+
+
+<b>Problem 3.</b>  (10 points) <b>Splay Trees.</b>
+<p>
+
+<b>a.</b>
+<img src="splay13.gif" width="192" height="222" border="0" align=top>
+<p>
+
+<b>b.</b>
+<tt>find(1)</tt>, then <tt>find(3)</tt>.
+<p>
+
+<b>c.</b>
+The worst-case running time is in &Theta;(<i>n</i><sup>2</sup>).
+<p>
+
+<b>d.</b>
+Create two modified <tt>find()</tt> methods
+called <tt>findLeft()</tt> and <tt>findRight()</tt>.
+Intuitively, <tt>findLeft(x)</tt> performs the same search as
+<tt>find(x -</tt> &epsilon;</tt>)</tt> for
+an infinitesimally small number &epsilon;.
+How do we implement that?
+The method <tt>findLeft(x)</tt> searches the tree for the key <tt>x</tt>.
+Whenever it finds one, it goes to that key's left child
+(because <tt>x -</tt> &epsilon; is less than <tt>x</tt>) and
+continues to search for <tt>x</tt>.
+<p>
+
+The last node the search visits will be either
+the leftmost <tt>x</tt> in the tree&mdash;that
+is, the first <tt>x</tt> in an inorder traversal&mdash;or
+the key immediately preceding the first <tt>x</tt> in the inorder traversal.
+The method splays that node to the root.
+After the splaying,
+all the nodes in the root's left subtree are strictly less than <tt>x</tt>, and
+all the nodes in the root's right subtree are
+greater than or equal to <tt>x</tt>.
+(The root itself could be either.)
+<p>
+
+Symmetrically, <tt>findRight(y)</tt> performs the same search as
+<tt>find(y +</tt> &epsilon;</tt>)</tt> for
+an infinitesimally small number &epsilon;.
+The method <tt>findRight(y)</tt> searches the tree for the key <tt>y</tt>.
+Whenever it finds one, it goes to that key's right child and
+continues to search for <tt>y</tt>.
+<p>
+
+Now, we just modify the algorithm in Lecture 40 by replacing
+the calls to <tt>find</tt> with <tt>findLeft(x)</tt> and <tt>findRight(y)</tt>.
+<p>
+
+<i>[Note:  this question was probably way too hard.
+So we are also accepting answers that modify the data structure in minor ways.
+The simplest one is to modify the splay tree so that
+all the duplicate keys are stored in a single treenode,
+in some sort of list.]</i>
+<p>
+
+
+<b>Problem 4.</b>  (5 points) <b>Disjoint Sets.</b>
+<p>
+
+<b>a.</b>
+The worst-case running time is in &Theta;(<i>fu + f + u</i>).
+(We accepted &Theta;(<i>fu</i>) for full marks,
+but it's nice to write &Theta;(<i>fu + f + u</i>) because it encompasses
+the cases where <i>u</i> = 0 as <i>f</i> approaches infinity
+and vice versa.)
+<p>
+
+<img border="0" src="disjoint13.gif" width="294" height="291"><p>
+
+<b>b.</b>
+Assign each parent pointer a <i>timestamp</i>, an extra field in each node
+that states the &ldquo;time&rdquo; at which
+its parent reference was set to a non-null value.
+Each <tt>union</tt> operation creates one non-null parent reference with
+a timestamp.
+The <tt>find</tt> operation never traverses a parent reference whose
+timestamp is newer than the parameter <tt>time</tt>.
+<p>
+
+
+<b>Problem 5.</b>  (7 points) <b>Graphs.</b>
+<p>
+
+<b>a.</b>
+The worst-case running time is in &Theta;(<i>ev</i><sup>2</sup>).
+<p>
+
+<b>b.</b>
+First, here's a recursive algorithm for determining whether there is
+a path of length <i>k</i> from a vertex <i>u</i> to a vertex <i>w</i>
+in a graph <i>G</i> = (<i>V</i>, <i>E</i>).
+The base case is <i>k</i> = 0, for which
+a path exists only if <i>u</i> = <i>w</i>.
+Otherwise (<i>k</i> > 0), for each edge (<i>u</i>, <i>v</i>) &isin; <i>E</i>,
+recursively determine whether there is a path of length <i>k</i> &ndash; 1
+from <i>v</i> to <i>w</i>.
+If any one of these edges has such a path, then
+there is a path of length <i>k</i> from <i>u</i> to <i>w</i>.
+<p>
+
+(Of course, there are faster algorithms; we studied one in Lab 13.)
+<p>
+
+To determine if <i>G</i> has a cycle of length <i>k</i>,
+call this algorithm once for each vertex <i>v</i> &isin; <i>V</i>,
+each time asking whether there is
+a path of length <i>k</i> from <i>v</i> to itself.
+<p>
+
+<b>c.</b>
+Here are two acceptable answers.
+<ul>
+  <li>  Use an adjacency matrix of linked lists of edge weights.
+  </li>
+  <li>  Use a hash table to map vertex pairs to linked lists of edge weights.
+  </li>
+</ul>
+<p>
+
+
+<b>Problem 6.</b>  (7 points) <b>Increasing a Key in a Binary Heap.</b>
+<p>
+
+[<i>Note:  most student answers to this question were
+more than twice as long as ours, and some were two full pages long.
+Which makes this question an unusually excellent litmus test of
+programming skill.
+If you first solve it yourself, then carefully study our solution and
+ask yourself why yours is longer,
+you might learn a lot about how to be a better programmer.</i>]
+
+<pre><tt>
+  public void increaseKey(int newKey) {               // Increase key of this node to newKey.
+    if (newKey <= key) return;                  // Method cannot be used to decrease the key.
+    key = newKey;
+    if ((left != null) && (key > left.key) && ((right == null) || (left.key <= right.key))) {
+      key = left.key;
+      left.increaseKey(newKey);
+    } else if ((right != null) && (key > right.key)) {
+      key = right.key;
+      right.increaseKey(newKey);
+    }
+  }
+</tt></pre>
+
+
+<hr>
+
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>

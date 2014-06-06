@@ -1,0 +1,144 @@
+<html>
+<head>
+<title>CS 61B:  Midterm I</title>
+</head>
+<body bgcolor='ffffff'>
+
+<font size=6 color='009000'>
+<a href="../index.html">
+CS 61B:  Data Structures</a></font>
+<font color='009000'>(Spring 2012)</font><br>
+<font size=6 color='009000'>
+Midterm I</font><br>
+<p>
+
+
+<h3>Solutions</h3>
+<p>
+
+<b>Problem 1.</b>  (8 points) <b>A miscellany.</b>
+<p>
+
+<b>a.</b>  Binary search begins by inspecting the middle element of a list
+or sublist thereof.  If the list is linked, you will have to traverse
+half the nodes in the list/sublist to reach the middle one.
+In general, binary search takes at least as long to reach any given node
+as a naive search.
+<p>
+
+<b>b.</b>  The compiler prints out the class, method, and line number where
+the exception occurred.
+Search that line for a &ldquo;dot&rdquo; (dereference) operation.
+<p>
+
+<b>c.</b>  These lines cannot throw run-time errors.
+<pre><tt>
+    boolean b1 = (head != null) && (head.next != null);
+    boolean b2 = (head == null) || (head.next == null);
+    Object o1 = (java.io.InputStream) System.in;
+    int ia[] = {3, 7};
+</tt></pre>
+
+<b>d.</b>  <tt>public final</tt>.
+(It is acceptable to replace <tt>public</tt> with the same protection level
+as the array itself has, though it makes no difference.)
+<p>
+
+<b>e.</b>
+A cast changes the static type of an expression, and
+its effect on dynamic method lookup is nothing whatsoever.
+<p>
+
+
+<b>Problem 2.</b>  (10 points) <b>Inheritance.</b>
+
+<pre><tt>
+public class Rational implements Comparable {
+  public int numer;     // Numerator of a fraction (rational number).
+  public int denom;     // Denominator.  Invariant:  denom is never zero.
+  private static short compare;
+
+  public int compareTo(Object o) {
+    Rational other = (Rational) o;
+    long myProduct = (long) numer * (long) other.denom;
+    long otherProduct = (long) other.numer * (long) denom;
+    if (myProduct == otherProduct) {
+      compare = 0;
+    } else if (myProduct < otherProduct ^ denom < 0 ^ other.denom < 0) {
+      compare = -1;
+    } else {
+      compare = 1;
+    }
+    return compare;
+  }
+
+  public Rational(int n, int denom) {
+    numer = n;
+    this.denom = denom;
+    if (denom == 0) System.exit(1);      // Enforce the invariant.
+  }
+
+  protected static short lastCompareTo() {
+    return compare;
+  }
+}
+
+public class Integr extends Rational {
+  public Integr(int n) {                 // Construct the integer n/1.
+    super(n, 1);
+  }
+
+  public int compareTo(Object o) {
+    if (o instanceof Integr) {
+      if (numer < ((Integr) o).numer) {
+        return -1;
+      } else if (numer == ((Integr) o).numer) {
+        return 0;
+      } else {
+        return 1;
+      }
+    }
+    return super.compareTo(o);
+  }
+}
+
+public class WholeNum extends Integr {   // Invariant:  numer is never zero.
+  public WholeNum(int n) {               // Construct the whole number n/1.
+    super(n);                            // super(n, 1); is also correct.
+    if (n == 0) System.exit(1);          // Enforce the invariant.
+  }
+
+  public short makesNoSense() {
+    return Integr.lastCompareTo();
+  }
+}
+</tt></pre>
+
+
+<b>Problem 3.</b>  (7 points)
+<b>Run-length encoding an array of strings.</b>
+<p>
+
+<pre><tt>
+  public SListNode rle(String[] strings) {      // Run-length encode an array.
+    int i = strings.length - 1;
+    SListNode head = new SListNode(strings[i], 1, null);
+    for (i--; i >= 0; i--) {
+      if (strings[i].equals(head.item)) {
+        head.count++;
+      } else {
+        head = new SListNode(strings[i], 1, head);
+      }
+    }
+    return head;
+  }
+</tt></pre>
+
+
+<hr>
+<address>
+Mail inquiries to
+<a href="mailto:cs61b@cory.eecs">cs61b@cory.eecs</a>
+</address>
+</body>
+</html>
